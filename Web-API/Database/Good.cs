@@ -1,8 +1,8 @@
 namespace Web_API;
 
-public class Order
+public class Good
 {
-    public string Login { get; set; }
+    public int ID { get; set; }
     public string Name { get; set; }
-    public int Age { get; set; }
+    public int Price { get; set; }
 }

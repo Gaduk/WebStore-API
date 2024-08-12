@@ -14,4 +14,14 @@
         <PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="6.7.0" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="wwwroot\" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Include="wwwroot\Css\loginForm.css" />
+      <None Include="wwwroot\Html\loginForm.html" />
+      <None Include="wwwroot\Html\orderForm.html" />
+    </ItemGroup>
+
 </Project>

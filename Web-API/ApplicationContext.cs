@@ -6,9 +6,11 @@ public class ApplicationContext : DbContext
     public DbSet<User> Users { get; set; } = null!;
     public DbSet<Order> Orders { get; set; } = null!;
     public DbSet<Good> Goods { get; set; } = null!;
+    public DbSet<OrderedGood> OrderedGoods { get; set; } = null!;
     public ApplicationContext(DbContextOptions<ApplicationContext> options)
         : base(options)
     {
+        //Database.EnsureDeleted();
         Database.EnsureCreated();
     }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -17,6 +19,8 @@ public class ApplicationContext : DbContext
             .HasKey(user => user.Login); 
         modelBuilder.Entity<Order>()
             .HasKey(order => order.ID); 
+        modelBuilder.Entity<OrderedGood>()
+            .HasKey(orderedGood => new { orderedGood.OrderID, orderedGood.GoodID });
         modelBuilder.Entity<Good>()
             .HasKey(good => good.ID); 
         

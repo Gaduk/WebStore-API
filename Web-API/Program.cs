@@ -2,6 +2,8 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.EntityFrameworkCore;
 using Swashbuckle.AspNetCore.Annotations;
 
@@ -13,108 +15,239 @@ public class Program
     {
         var builder = WebApplication.CreateBuilder(args);
 
-        //Swagger
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen(c =>
         {
             c.EnableAnnotations();
         });
         
-        //Entity Framework
         string connection = builder.Configuration.GetConnectionString("DefaultConnection");
         builder.Services.AddDbContext<ApplicationContext>(options => options.UseSqlServer(connection));
 
-        //Аутентификация, авторизация
-        builder.Services.AddAuthentication("Cookies").AddCookie(options => options.LoginPath = "/login");
+        builder.Services.AddAuthentication("Cookies").AddCookie(options =>
+        {
+            options.LoginPath = "/login";
+            options.AccessDeniedPath = "/accessDenied";
+        });
         builder.Services.AddAuthorization();
         
+        
         var app = builder.Build();
-
-        //Swagger
+        
+        
         if (app.Environment.IsDevelopment())
         {
             app.UseSwagger();
             app.UseSwaggerUI();
         }
-
         app.UseHttpsRedirection();
-
-        //Аутентификация, авторизация
         app.UseAuthentication();  
         app.UseAuthorization();
+        app.UseStaticFiles();
 
-
-        app.MapGet("/login", async (HttpContext context) =>
+        app.MapGet("/accessDenied", async (HttpContext context) =>
         {
-            context.Response.ContentType = "text/html; charset=utf-8";
-            await context.Response.SendFileAsync("Html/loginForm.html");
+            context.Response.StatusCode = 403;
+            await context.Response.WriteAsync("Access Denied");
         });
         
-        app.MapPost("/login", async (string? returnUrl, HttpContext context, ApplicationContext db) =>
+        // Регистрация
+        app.MapPost("/register", async (HttpContext context, ApplicationContext db, User user) =>
         {
-            // получаем из формы логин и пароль
-            var form = context.Request.Form;
-            // если логин и/или пароль не установлены, посылаем статусный код ошибки 400
-            string? login = form["login"];
-            string? password = form["password"];
-            if (login == "" || password == "")
-                return Results.BadRequest("Необходимо ввести логин и пароль в поля формы");
+            await db.Users.AddAsync(user);
+            await db.SaveChangesAsync();
+            return Results.Ok($"Пользователь {user.Login} успешно зарегистрирован");
+        });
+        
+        // Вход в аккаунт
+        app.MapPost("/login", async (HttpContext context, ApplicationContext db, string login, string password) =>
+        {
+            if (string.IsNullOrWhiteSpace(login) || string.IsNullOrWhiteSpace(password))
+                return Results.BadRequest("Необходимо указать логин и пароль");
             
-            // находим пользователя 
-            User? user = db.Users.FirstOrDefault(u => u.Login == login && u.Password == password);
-            // если пользователь не найден, отправляем статусный код 401
+            User? user = await db.Users.FirstOrDefaultAsync(u => u.Login == login && u.Password == password);
             if (user is null) return Results.Unauthorized();
- 
-            var claims = new List<Claim> { new Claim(ClaimTypes.Name, user.Login) };
-            // создаем объект ClaimsIdentity
+
+            string role = user.IsAdmin ? "admin" : "user";
+            var claims = new List<Claim>
+            {
+                new Claim(ClaimTypes.Name, user.Login),
+                new Claim(ClaimTypes.Role, role)
+            };
             ClaimsIdentity claimsIdentity = new ClaimsIdentity(claims, "Cookies");
-            // установка аутентификационных куки
             await context.SignInAsync("Cookies", new ClaimsPrincipal(claimsIdentity));
-            return Results.Redirect(returnUrl??"/");
+            return Results.Ok($"Произведен вход в аккаунт {login}");
         });
  
+        // Выход из аккаунта
         app.MapGet("/logout", async (HttpContext context) =>
         {
             await context.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
             return Results.Redirect("/login");
         });
         
-        app.MapGet("/order", async (HttpContext context) =>
+        // Офромление заказа
+        app.MapPost("{login}/order", [Authorize(Roles = "admin, user")]
+            async (HttpContext context, ApplicationContext db, 
+            string login, OrderedGood[] orderedGoods) =>
         {
-            context.Response.ContentType = "text/html; charset=utf-8";
-            await context.Response.SendFileAsync("Html/orderForm.html");
-        });
-        
-        app.MapPost("/order", async (string? returnUrl, HttpContext context, ApplicationContext db) =>
-        {
-            // берем из кук данные пользователя
-            //...
+            if (!RightsChecker.IsCookiesLogin(context, login) && !RightsChecker.IsAdmin(context))
+                return Results.Forbid();
             
-            var form = context.Request.Form;
-            foreach (string goodName in form.Keys)
+            if (!await RightsChecker.IsLoginAsync(db, login))
+                return Results.NotFound("Пользователь не найден");
+            
+            var order = new Order
             {
-                int goodAmount = int.Parse(form[goodName]);
-                
-                // добавляем заказ в таблицу
-                //...
+                UserLogin = login,
+                IsDone = false
+            };
+            await db.Orders.AddAsync(order);
+            await db.SaveChangesAsync();
+            int orderID = order.ID; 
+
+            foreach (var orderedGood in orderedGoods)
+            {
+                if (orderedGood.Amount != 0)
+                {
+                    orderedGood.OrderID = orderID;
+                    await db.OrderedGoods.AddAsync(orderedGood);
+                }
             }
-            return Results.Redirect(returnUrl??"/");
+            await db.SaveChangesAsync();
+            
+            return Results.Ok("Заказ создан");
+        });
+
+        // Получение информации о пользователе
+        app.MapGet("/{login}", [Authorize(Roles = "admin, user")]
+            async (HttpContext context, ApplicationContext db, string login) =>
+        {
+            if (!RightsChecker.IsCookiesLogin(context, login) && !RightsChecker.IsAdmin(context))
+                return Results.Forbid();
+            
+            if (!await RightsChecker.IsLoginAsync(db, login))
+                return Results.NotFound("Пользователь не найден");
+
+            User? user = await db.Users.FirstOrDefaultAsync(u => u.Login == login);
+            return Results.Ok(user);
         });
         
-        app.MapGet("/users", [Authorize](ApplicationContext db) => db.Users.ToList())
-            .WithMetadata(new SwaggerOperationAttribute(
-                "Получить список пользователей", 
-                "Возвращает список всех пользователей"));
+        // Получение списка заказов пользователя
+        app.MapGet("/{login}/orders", [Authorize(Roles = "admin, user")]
+            async (HttpContext context, ApplicationContext db, string login) =>
+        {
+            if (!RightsChecker.IsCookiesLogin(context, login) && !RightsChecker.IsAdmin(context))
+                return Results.Forbid();
+            
+            if (!await RightsChecker.IsLoginAsync(db, login))
+                return Results.NotFound("Пользователь не найден");
+            
+            var orders = (from order in db.Orders.AsParallel().AsOrdered()
+                where order.UserLogin == login
+                select order).ToList();
+            return Results.Ok(orders);
+        });
         
-        app.MapGet("/orders", (ApplicationContext db) => db.Orders.ToList())
-            .WithMetadata(new SwaggerOperationAttribute(
-                "Получить список заказов", 
-                "Возвращает список всех заказов"));
+        // Получение информации о конкретном заказе пользователя
+        app.MapGet("/{login}/{orderID:int}", [Authorize(Roles = "admin, user")] 
+            async (HttpContext context, ApplicationContext db, string login, int orderID) =>
+        {
+            if (!RightsChecker.IsCookiesLogin(context, login) && !RightsChecker.IsAdmin(context))
+                return Results.Forbid();
+            
+            var order = await db.Orders.FirstOrDefaultAsync(o => o.UserLogin == login && o.ID == orderID);
+            if (order == null)
+                return Results.NotFound("У пользователя нет заказа с таким идентификатором, " +
+                                        "либо пользователь с таким логином не существует.");
+            /*
+            var orderedGoods =
+                db.OrderedGoods.FromSqlRaw(
+                @"SELECT og.*, g.Name, g.Price FROM OrderedGoods og
+                JOIN Goods g ON g.ID = og.GoodID
+                WHERE og.orderID = {0}", orderID).ToList();
+
+            var orderedGoods = (from og in db.OrderedGoods
+                join g in db.Goods on og.GoodID equals g.ID
+                where og.OrderID == orderID
+                select og).ToList();
+                */
+            var orderedGoods = db.OrderedGoods
+                .Join(db.Goods,
+                    og => og.GoodID,
+                    g => g.ID,
+                    (og, g) => new
+                    {
+                        OrderID = og.OrderID, GoodID = og.GoodID, Amount = og.Amount,
+                        Name = g.Name, Price = g.Price
+                    }).ToList();
+            
+            orderedGoods = 
+                (from og in orderedGoods
+                where og.OrderID == orderID
+                select og).ToList();
+            
+            return Results.Ok(orderedGoods);
+            
+        });
         
-        app.MapGet("/goods", (ApplicationContext db) => db.Goods.ToList())
-            .WithMetadata(new SwaggerOperationAttribute(
-                "Получить список товаров", 
-                "Возвращает список всех товаров"));
+        // Изменение статуса заказа
+        app.MapPut("{login}/{orderID:int}/status", [Authorize(Roles = "admin")] 
+            async (HttpContext context, ApplicationContext db, string login, int orderID, bool isDone) => 
+        {
+            var order = await db.Orders.FirstOrDefaultAsync(o => o.UserLogin == login && o.ID == orderID);
+            if (order == null)
+                return Results.NotFound("У пользователя нет заказа с таким идентификатором, " +
+                                        "либо пользователь с таким логином не существует.");
+            order.IsDone = isDone;
+            db.Orders.Update(order);
+            await db.SaveChangesAsync();
+            return Results.Ok();
+        });
+        
+        // Удаление пользователя вместе с данными о его заказах
+        app.MapDelete("/user/{login}", [Authorize(Roles = "admin")] 
+            async (HttpContext context, ApplicationContext db, string login) =>
+        {
+            var user = await db.Users.FirstOrDefaultAsync(u => u.Login == login);
+            if (user == null) return Results.NotFound("Пользователь не найден");
+            
+            var orders = (from order in db.Orders.AsParallel().AsOrdered()
+                where order.UserLogin == login
+                select order).ToList();
+            
+            var orderIds = orders.Select(o => o.ID).ToList(); 
+            
+            var orderedGoods = (from orderedGood in db.OrderedGoods.AsParallel().AsOrdered()
+                where orderIds.Contains(orderedGood.OrderID)
+                select orderedGood).ToList();
+            
+            db.OrderedGoods.RemoveRange(orderedGoods);
+            db.Orders.RemoveRange(orders);
+            db.Users.Remove(user);
+            await db.SaveChangesAsync();
+            return Results.Ok($"Пользователь {login} удален");
+        });
+
+        app.MapGet("/users", [Authorize(Roles = "admin")] async (HttpContext context, ApplicationContext db) =>
+        {
+            return db.Users.ToList();
+        });
+
+        app.MapGet("/orders", [Authorize(Roles = "admin")] async (HttpContext context, ApplicationContext db) =>
+        {
+            return db.Orders.ToList();
+        });
+
+        app.MapGet("/orderedGoods", [Authorize(Roles = "admin")] async (HttpContext context, ApplicationContext db) =>
+        {
+            return db.OrderedGoods.ToList();
+        });
+
+        app.MapGet("/goods", [Authorize(Roles = "admin")] async (HttpContext context, ApplicationContext db) =>
+        {
+            return db.Goods.ToList();
+        });
         
         app.Run();
     }

@@ -409,13 +409,22 @@
       "User": {
         "type": "object",
         "properties": {
-          "login": {
+          "Login": {
             "type": "string"
           },
-          "password": {
+          "Password": {
             "type": "string"
           },
-          "isAdmin": {
+          "FirstName": {
+            "type": "string"
+          },
+          "LastName": {
+            "type": "string"
+          },
+          "PhoneNumber": {
+            "type": "string"
+          },
+          "IsAdmin": {
             "type": "boolean"
           }
         }
@@ -423,13 +432,13 @@
       "Order": {
         "type": "object",
         "properties": {
-          "id": {
+          "ID": {
             "type": "integer"
           },
-          "userLogin": {
+          "UserLogin": {
             "type": "string"
           },
-          "isDone": {
+          "IsDone": {
             "type": "boolean"
           }
         }
@@ -437,34 +446,28 @@
       "OrderedGood": {
         "type": "object",
         "properties": {
-          "orderID": {
+          "OrderID": {
             "type": "integer"
           },
-          "goodID": {
+          "GoodID": {
             "type": "integer"
           },
-          "amount": {
+          "Amount": {
             "type": "integer"
-          },
-          "name": {
-            "type": "string"
-          },
-          "price": {
-            "type": "number"
           }
         }
       },
       "Good": {
         "type": "object",
         "properties": {
-          "id": {
+          "ID": {
             "type": "integer"
           },
-          "name": {
+          "Name": {
             "type": "string"
           },
-          "price": {
-            "type": "number"
+          "Price": {
+            "type": "integer"
           }
         }
       }

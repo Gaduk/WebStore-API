@@ -15,13 +15,15 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="wwwroot\" />
-    </ItemGroup>
-
-    <ItemGroup>
       <None Include="wwwroot\Css\loginForm.css" />
       <None Include="wwwroot\Html\loginForm.html" />
       <None Include="wwwroot\Html\orderForm.html" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Content Update="wwwroot\swagger\swagger.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
     </ItemGroup>
 
 </Project>

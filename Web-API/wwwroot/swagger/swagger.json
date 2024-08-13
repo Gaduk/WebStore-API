@@ -1,0 +1,473 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "WebStore API",
+    "description": "API для заказа товаров из интенет-магазина. \n\nРеализована аутентификация через куки, распределение прав доступа по ролям: гость, пользователь, администратор (помимо своих прав пользователь имеет права гостя, администратор - права гостя и пользователя).\n\n",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/register": {
+      "post": {
+        "tags": ["Guest"],
+        "summary": "Регистрация нового пользователя",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "example": {
+                  "Login": "john_doe",
+                  "Password": "12345",
+                  "FirstName": "John",
+                  "LastName": "Doe",
+                  "PhoneNumber": "+1234567890"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Пользователь успешно зарегистрирован"
+          }
+        }
+      }
+    },
+    "/login": {
+      "post": {
+        "tags": ["Guest"],
+        "summary": "Вход в аккаунт",
+        "parameters": [
+          {
+            "name": "login",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "password",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Успешный вход в аккаунт"
+          },
+          "401": {
+            "description": "Неверные учетные данные"
+          }
+        }
+      }
+    },
+    "/logout": {
+      "get": {
+        "tags": ["User"],
+        "summary": "Выход из аккаунта",
+        "responses": {
+          "200": {
+            "description": "Произведен выход из аккаунта"
+          }
+        }
+      }
+    },
+    "/{login}/order": {
+      "post": {
+        "tags": ["User"],
+        "summary": "Оформление заказа",
+        "parameters": [
+          {
+            "name": "login",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "example": [
+                  {
+                    "goodID": 1001,
+                    "amount": 0
+                  },
+                  {
+                    "goodID": 1002,
+                    "amount": 1
+                  },
+                  {
+                    "goodID": 1003,
+                    "amount": 2
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Заказ создан"
+          },
+          "400": {
+            "description": "Ошибка в теле запроса"
+          },
+          "403": {
+            "description": "Доступ запрещен"
+          },
+          "404": {
+            "description": "Пользователь не найден"
+          }
+        }
+      }
+    },
+    "/{login}": {
+      "get": {
+        "tags": ["User"],
+        "summary": "Получение информации о пользователе",
+        "parameters": [
+          {
+            "name": "login",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Информация о пользователе",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Доступ запрещен"
+          },
+          "404": {
+            "description": "Пользователь не найден"
+          }
+        }
+      }
+    },
+    "/{login}/orders": {
+      "get": {
+        "tags": ["User"],
+        "summary": "Получение списка заказов пользователя",
+        "parameters": [
+          {
+            "name": "login",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Список заказов",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Order"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Доступ запрещен"
+          },
+          "404": {
+            "description": "Пользователь не найден"
+          }
+        }
+      }
+    },
+    "/{login}/{orderID}": {
+      "get": {
+        "tags": ["User"],
+        "summary": "Получение информации о конкретном заказе",
+        "parameters": [
+          {
+            "name": "login",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "orderID",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Информация о заказе",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrderedGood"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Доступ запрещен"
+          },
+          "404": {
+            "description": "Заказ не найден / Пользователь не найден"
+          }
+        }
+      }
+    },
+    "/{login}/{orderID}/status": {
+      "put": {
+        "tags": ["Admin"],
+        "summary": "Изменение статуса заказа",
+        "parameters": [
+          {
+            "name": "login",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "orderID",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "isDone",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Статус заказа обновлен"
+          },
+          "404": {
+            "description": "Заказ не найден / Пользователь не найден"
+          },
+          "405": {
+            "description": "Доступ запрещен"
+          }
+        }
+      }
+    },
+    "/user/{login}": {
+      "delete": {
+        "tags": ["Admin"],
+        "summary": "Удаление пользователя",
+        "parameters": [
+          {
+            "name": "login",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Пользователь удален"
+          },
+          "404": {
+            "description": "Пользователь не найден"
+          },
+          "405": {
+            "description": "Доступ запрещен"
+          }
+        }
+      }
+    },
+    "/users": {
+      "get": {
+        "tags": ["Admin"],
+        "summary": "Получение списка пользователей",
+        "responses": {
+          "200": {
+            "description": "Список пользователей",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Доступ запрещен"
+          }
+        }
+      }
+    },
+    "/orders": {
+      "get": {
+        "tags": ["Admin"],
+        "summary": "Получение списка всех заказов",
+        "responses": {
+          "200": {
+            "description": "Список заказов",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Order"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Доступ запрещен"
+          }
+        }
+      }
+    },
+    "/orderedGoods": {
+      "get": {
+        "tags": ["Admin"],
+        "summary": "Получение списка всех заказанных товаров",
+        "responses": {
+          "200": {
+            "description": "Список заказанных товаров",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrderedGood"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Доступ запрещен"
+          }
+        }
+      }
+    },
+    "/goods": {
+      "get": {
+        "tags": ["Admin"],
+        "summary": "Получение списка товаров",
+        "responses": {
+          "200": {
+            "description": "Список товаров",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Good"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Доступ запрещен"
+          }
+        }
+      }
+    },
+    "/accessDenied": {
+      "get": {
+        "tags": ["Other"],
+        "summary": "Сообщение о запрете доступа",
+        "description": "Сюда перенаправляются пользователи, не имеющие доступа к ресурсу",
+        "responses": {
+          "403": {
+            "description": "Доступ запрещен"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "User": {
+        "type": "object",
+        "properties": {
+          "login": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string"
+          },
+          "isAdmin": {
+            "type": "boolean"
+          }
+        }
+      },
+      "Order": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "userLogin": {
+            "type": "string"
+          },
+          "isDone": {
+            "type": "boolean"
+          }
+        }
+      },
+      "OrderedGood": {
+        "type": "object",
+        "properties": {
+          "orderID": {
+            "type": "integer"
+          },
+          "goodID": {
+            "type": "integer"
+          },
+          "amount": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          },
+          "price": {
+            "type": "number"
+          }
+        }
+      },
+      "Good": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          },
+          "price": {
+            "type": "number"
+          }
+        }
+      }
+    }
+  }
+}

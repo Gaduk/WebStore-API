@@ -28,9 +28,7 @@ public class ApplicationContext : DbContext
             new User { Login = "admin", Password = "111", FirstName = "Иван", LastName = "Иванов", 
                 PhoneNumber = "+79998887766", IsAdmin = true},
             new User { Login = "user", Password = "222", FirstName = "Пётр", LastName = "Петров", 
-                PhoneNumber = "+79991119911", IsAdmin = false},
-            new User { Login = "user2", Password = "333", FirstName = "Семён", LastName = "Семёнов", 
-                PhoneNumber = "+79991119922", IsAdmin = false}
+                PhoneNumber = "+79991119911", IsAdmin = false}
         );
         modelBuilder.Entity<Good>().HasData(
             new Good { ID = 1001, Name = "Товар 1", Price = 10 },

@@ -2,10 +2,7 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http.HttpResults;
-using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.EntityFrameworkCore;
-using Swashbuckle.AspNetCore.Annotations;
 
 namespace Web_API;
 
@@ -21,7 +18,7 @@ public class Program
             c.EnableAnnotations();
         });
         
-        string connection = builder.Configuration.GetConnectionString("DefaultConnection");
+        var connection = builder.Configuration.GetConnectionString("DefaultConnection");
         builder.Services.AddDbContext<ApplicationContext>(options => options.UseSqlServer(connection));
 
         builder.Services.AddAuthentication("Cookies").AddCookie(options =>
@@ -38,7 +35,10 @@ public class Program
         if (app.Environment.IsDevelopment())
         {
             app.UseSwagger();
-            app.UseSwaggerUI();
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/swagger.json", "API V1");
+            });
         }
         app.UseHttpsRedirection();
         app.UseAuthentication();  
@@ -46,14 +46,21 @@ public class Program
         app.UseStaticFiles();
 
         app.MapGet("/accessDenied", async (HttpContext context) =>
-        {
-            context.Response.StatusCode = 403;
+        { 
+            context.Response.StatusCode = StatusCodes.Status403Forbidden;
             await context.Response.WriteAsync("Access Denied");
         });
         
         // Регистрация
         app.MapPost("/register", async (HttpContext context, ApplicationContext db, User user) =>
         {
+            user.IsAdmin = false;
+            User? userWithSameLogin = await db.Users.FirstOrDefaultAsync(u => u.Login == user.Login);
+            if (userWithSameLogin != null)
+            {
+                return Results.Conflict("Пользователь с таким логином уже существует");
+            }
+
             await db.Users.AddAsync(user);
             await db.SaveChangesAsync();
             return Results.Ok($"Пользователь {user.Login} успешно зарегистрирован");
@@ -80,10 +87,9 @@ public class Program
         });
  
         // Выход из аккаунта
-        app.MapGet("/logout", async (HttpContext context) =>
+        app.MapGet("/logout", [Authorize(Roles = "admin, user")] async (HttpContext context) =>
         {
             await context.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-            return Results.Redirect("/login");
         });
         
         // Офромление заказа
@@ -160,18 +166,7 @@ public class Program
             if (order == null)
                 return Results.NotFound("У пользователя нет заказа с таким идентификатором, " +
                                         "либо пользователь с таким логином не существует.");
-            /*
-            var orderedGoods =
-                db.OrderedGoods.FromSqlRaw(
-                @"SELECT og.*, g.Name, g.Price FROM OrderedGoods og
-                JOIN Goods g ON g.ID = og.GoodID
-                WHERE og.orderID = {0}", orderID).ToList();
-
-            var orderedGoods = (from og in db.OrderedGoods
-                join g in db.Goods on og.GoodID equals g.ID
-                where og.OrderID == orderID
-                select og).ToList();
-                */
+            
             var orderedGoods = db.OrderedGoods
                 .Join(db.Goods,
                     og => og.GoodID,
@@ -188,7 +183,6 @@ public class Program
                 select og).ToList();
             
             return Results.Ok(orderedGoods);
-            
         });
         
         // Изменение статуса заказа
@@ -229,22 +223,22 @@ public class Program
             return Results.Ok($"Пользователь {login} удален");
         });
 
-        app.MapGet("/users", [Authorize(Roles = "admin")] async (HttpContext context, ApplicationContext db) =>
+        app.MapGet("/users", [Authorize(Roles = "admin")] (HttpContext context, ApplicationContext db) =>
         {
             return db.Users.ToList();
         });
 
-        app.MapGet("/orders", [Authorize(Roles = "admin")] async (HttpContext context, ApplicationContext db) =>
+        app.MapGet("/orders", [Authorize(Roles = "admin")] (HttpContext context, ApplicationContext db) =>
         {
             return db.Orders.ToList();
         });
 
-        app.MapGet("/orderedGoods", [Authorize(Roles = "admin")] async (HttpContext context, ApplicationContext db) =>
+        app.MapGet("/orderedGoods", [Authorize(Roles = "admin")] (HttpContext context, ApplicationContext db) =>
         {
             return db.OrderedGoods.ToList();
         });
 
-        app.MapGet("/goods", [Authorize(Roles = "admin")] async (HttpContext context, ApplicationContext db) =>
+        app.MapGet("/goods", [Authorize(Roles = "admin")] (HttpContext context, ApplicationContext db) =>
         {
             return db.Goods.ToList();
         });

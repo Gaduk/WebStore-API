@@ -1,9 +1,12 @@
 using System.Security.Claims;
+using Application.Dto;
 using Application.Features.User.Commands.DeleteUser;
+using Application.Features.User.Commands.UpdateUserRole;
 using Application.Features.User.Queries.GetAllUsers;
 using Application.Features.User.Queries.GetUserByLogin;
 using Domain.Entities;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Web_API.Inputs;
@@ -14,7 +17,8 @@ namespace Web_API.Controllers;
 public class UserController(
     IMediator mediator, 
     SignInManager<User> signInManager, 
-    UserManager<User> userManager) : ControllerBase
+    UserManager<User> userManager, 
+    IAuthorizationService authorizationService) : ControllerBase
 {
     [HttpPost("/register")]
     public async Task<IActionResult> CreateUser(RegisterInput input)
@@ -41,8 +45,8 @@ public class UserController(
         
         var claims = new List<Claim>
         {
-            new Claim("Name", input.Login),
-            new Claim("Role", "User")
+            new Claim(ClaimTypes.Name, input.Login),
+            new Claim(ClaimTypes.Role, "user")
         };
         await userManager.AddClaimsAsync(user, claims);
         
@@ -53,12 +57,17 @@ public class UserController(
     public async Task<IActionResult> Login(string login, string password)
     {
         var user = await mediator.Send(new GetUserByLoginQuery(login));
-        if (user is null) return Unauthorized();
+        if (user is null) return Unauthorized("Неверное имя пользователя");
 
-        await signInManager.SignInAsync(user, true);
+        var result = await signInManager.PasswordSignInAsync(user, password, false, false);
+        if(!result.Succeeded) 
+        {
+            return Unauthorized("Неверный пароль");
+        }
         return Ok($"Выполнен вход в аккаунт {login}");
     }
     
+    [Authorize(Roles = "user, admin")]
     [HttpGet("/logout")]
     public async Task<IActionResult> Logout()
     {
@@ -66,7 +75,8 @@ public class UserController(
         return Ok("Выполнен выход из аккаунта");
     }
     
-    [HttpGet("/{login}/makeAdmin")]
+    [Authorize(Roles = "admin")]
+    [HttpPut("/{login}/makeAdmin")]
     public async Task<IActionResult> MakeAdmin(string login)
     {
         var user = await mediator.Send(new GetUserByLoginQuery(login));
@@ -74,23 +84,20 @@ public class UserController(
         {
             return NotFound("Пользователь не найден");
         }
-        //var identity = (ClaimsIdentity)User.Identity!;
-        //var existingClaim = identity.FindFirst(ClaimTypes.Role);
-        //if (existingClaim != null)
-        //{
-        //    identity.RemoveClaim(existingClaim);
-        //}
-        var claim = new Claim("Role", "Admin");
+        await mediator.Send(new UpdateUserRoleCommand(user, true));
+        var claim = new Claim(ClaimTypes.Role, "admin");
         await userManager.AddClaimAsync(user, claim);
+        
         return Ok($"Пользователю {login} выданы права администратора");
     }
     
     [HttpGet("/accessDenied")]
     public async Task<IActionResult> DenyAccess()
     {
-        return Forbid("Доступ запрещен");
+        return StatusCode(StatusCodes.Status403Forbidden);
     }
     
+    [Authorize(Roles = "admin")]
     [HttpDelete("/user/{login}")]
     public async Task<IActionResult> DeleteUser(string login)
     {
@@ -103,9 +110,16 @@ public class UserController(
         return Ok($"Пользователь {user.UserName} удален");
     }
     
+    [Authorize("HaveAccess")]
     [HttpGet("/{login}")]
     public async Task<IActionResult> GetUser(string login)
     {
+        var authorizationResult = await authorizationService.AuthorizeAsync(User, login, "HaveAccess");
+        if (!authorizationResult.Succeeded)
+        {
+            return StatusCode(StatusCodes.Status403Forbidden);
+        }
+        
         var user = await mediator.Send(new GetUserByLoginQuery(login));
         if(user == null)
         {
@@ -114,6 +128,7 @@ public class UserController(
         return Ok(user);
     }
     
+    [Authorize(Roles = "admin")]
     [HttpGet("/users")]
     public async Task<IActionResult> GetAllUsers()
     {

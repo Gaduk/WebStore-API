@@ -6,5 +6,5 @@ public class User : IdentityUser
 {
     public string FirstName { get; set; }
     public string LastName { get; set; }
-    public bool isAdmin { get; set; } = false;
+    public bool IsAdmin { get; set; } = false;
 }

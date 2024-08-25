@@ -6,24 +6,33 @@ using Application.Features.Order.Queries.GetUserOrders;
 using Application.Features.User.Queries.GetUserByLogin;
 using Domain.Entities;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Web_API.Controllers;
 
-public class OrderController(IMediator mediator) : ControllerBase
+public class OrderController(IMediator mediator, IAuthorizationService authorizationService) : ControllerBase
 {
     [HttpPost("/{login}/order")]
-    public async Task<IActionResult> GetAllGoods(string login, OrderedGood[] orderedGoods)
+    public async Task<IActionResult> CreateOrder(string login, OrderedGood[] orderedGoods)
     {
+        var authorizationResult = await authorizationService.AuthorizeAsync(User, login, "HaveAccess");
+        if (!authorizationResult.Succeeded)
+        {
+            return StatusCode(StatusCodes.Status403Forbidden);
+        }
+        
         var user = await mediator.Send(new GetUserByLoginQuery(login));
         if (user == null)
         {
             return NotFound("Пользователь не найден");
         }
+        
         await mediator.Send(new CreateOrderCommand(login, orderedGoods));
         return Ok("Заказ создан");
     }
     
+    [Authorize(Roles = "admin")]
     [HttpPut("/{orderId:int}/status")]
     public async Task<IActionResult> UpdateOrderStatus(int orderId, bool isDone)
     {
@@ -36,6 +45,7 @@ public class OrderController(IMediator mediator) : ControllerBase
         return Ok("Статус заказа обновлен");
     }
     
+    [Authorize(Roles = "admin")]
     [HttpGet("/orders")]
     public async Task<IActionResult> GetAllOrders()
     {
@@ -46,18 +56,31 @@ public class OrderController(IMediator mediator) : ControllerBase
     [HttpGet("/{login}/orders")]
     public async Task<IActionResult> GetUserOrders(string login)
     {
+        var authorizationResult = await authorizationService.AuthorizeAsync(User, login, "HaveAccess");
+        if (!authorizationResult.Succeeded)
+        {
+            return StatusCode(StatusCodes.Status403Forbidden);
+        }
+        
         var orders = await mediator.Send(new GetUserOrdersQuery(login));
         return Ok(orders);
     }
     
     [HttpGet("/{orderId:int}")]
-    public async Task<IActionResult> GetUser(int orderId)
+    public async Task<IActionResult> GetOrder(int orderId)
     {
         var order = await mediator.Send(new GetOrderQuery(orderId));
         if (order == null)
         {
             return NotFound("Заказ не найден");
         }
+        
+        var authorizationResult = await authorizationService.AuthorizeAsync(User, order.UserLogin, "HaveAccess");
+        if (!authorizationResult.Succeeded)
+        {
+            return StatusCode(StatusCodes.Status403Forbidden);
+        }
+        
         return Ok(order);
     }
 }

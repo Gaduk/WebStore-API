@@ -195,19 +195,11 @@
         }
       }
     },
-    "/{login}/{orderID}": {
+    "/{orderId}": {
       "get": {
         "tags": ["User"],
         "summary": "Получение информации о конкретном заказе",
         "parameters": [
-          {
-            "name": "login",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
           {
             "name": "orderID",
             "in": "path",
@@ -237,7 +229,7 @@
         }
       }
     },
-    "/{login}/{orderID}/status": {
+    "/{login}/{orderId}/status": {
       "put": {
         "tags": ["Admin"],
         "summary": "Изменение статуса заказа",
@@ -280,10 +272,34 @@
         }
       }
     },
+    "/{login}/makeAdmin": {
+      "put": {
+        "tags": ["Admin"],
+        "summary": "Назначение прав администратора пользователю",
+        "parameters": [
+          {
+            "name": "login",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Права администратора успешно назначены"
+          },
+          "404": {
+            "description": "Пользователь не найден"
+          }
+        }
+      }
+    },
     "/user/{login}": {
       "delete": {
         "tags": ["Admin"],
-        "summary": "Удаление пользователя",
+        "summary": "Удаление пользователя вместе с информацией о его заказах",
         "parameters": [
           {
             "name": "login",
@@ -300,9 +316,6 @@
           },
           "404": {
             "description": "Пользователь не найден"
-          },
-          "405": {
-            "description": "Доступ запрещен"
           }
         }
       }

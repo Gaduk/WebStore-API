@@ -1,3 +1,4 @@
+using Application.Dto;
 using MediatR;
 
 namespace Application.Features.OrderedGood.Queries.GetAllOrderedGoodDtos;

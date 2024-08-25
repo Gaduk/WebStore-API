@@ -1,4 +1,4 @@
-namespace Application.Features.OrderedGood;
+namespace Application.Dto;
 
 public record OrderedGoodDto(
     int OrderId, 

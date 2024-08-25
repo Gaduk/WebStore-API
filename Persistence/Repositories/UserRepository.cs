@@ -1,4 +1,4 @@
-using Application.Features.User;
+using Application.Dto;
 using Application.Interfaces;
 using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
@@ -31,21 +31,17 @@ public class UserRepository(ApplicationDbContext dbContext) : IUserRepository
         dbContext.Users.Remove(user);
         await dbContext.SaveChangesAsync();
     }
-    
-    public Task Login(string login, string password)
-    {
-        throw new NotImplementedException();
-    }
 
-    public Task Logout()
+    public async Task UpdateUserRole(User user, bool isAdmin)
     {
-        throw new NotImplementedException();
+        user.IsAdmin = isAdmin;
+        dbContext.Users.Update(user);
+        await dbContext.SaveChangesAsync();
     }
 
     public async Task<List<User>> GetAllUsers()
     {
         return await dbContext.Users.ToListAsync();
-        
     }
 
     public async Task<User?> GetUser(string login)
@@ -53,5 +49,4 @@ public class UserRepository(ApplicationDbContext dbContext) : IUserRepository
         var user = await dbContext.Users.FirstOrDefaultAsync(u => u.UserName == login);
         return user;
     }
-
 }

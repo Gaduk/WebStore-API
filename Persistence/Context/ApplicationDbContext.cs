@@ -1,8 +1,6 @@
-using Application.Interfaces;
 using Domain.Entities;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
 
 namespace Persistence.Context;
 
@@ -15,7 +13,7 @@ public class ApplicationDbContext : IdentityDbContext<User>//, IApplicationDbCon
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
         : base(options)
     {
-        //Database.EnsureCreated();
+        Database.EnsureCreated();
     }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -28,12 +26,17 @@ public class ApplicationDbContext : IdentityDbContext<User>//, IApplicationDbCon
         modelBuilder.Entity<Good>()
             .HasKey(good => good.Id); 
         
+        /*
         modelBuilder.Entity<User>().HasData(
-            new User { UserName = "admin", /*Password = "111",*/ FirstName = "Иван", LastName = "Иванов", 
-                PhoneNumber = "+79998887766", /*IsAdmin = true*/},
-            new User { UserName = "user", /*Password = "222",*/ FirstName = "Пётр", LastName = "Петров", 
-                PhoneNumber = "+79991119911", /*IsAdmin = false*/}
+            new User { UserName = "admin", FirstName = "Иван", LastName = "Иванов", 
+                PhoneNumber = "+79998887766", IsAdmin = true
+            },
+            new User { UserName = "user", FirstName = "Пётр", LastName = "Петров", 
+                PhoneNumber = "+79991119911", IsAdmin = false
+            }
         );
+        */
+        
         modelBuilder.Entity<Good>().HasData(
             new Good { Id = 1001, Name = "Товар 1", Price = 10 },
             new Good { Id = 1002, Name = "Товар 2", Price = 20 },

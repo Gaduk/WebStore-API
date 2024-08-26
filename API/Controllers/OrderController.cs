@@ -1,17 +1,21 @@
 using Application.Features.Order.Commands.CreateOrder;
-using Application.Features.Order.Commands.UpdateOrderStatus;
+using Application.Features.Order.Commands.UpdateOrder;
 using Application.Features.Order.Queries.GetAllOrders;
 using Application.Features.Order.Queries.GetOrder;
 using Application.Features.Order.Queries.GetUserOrders;
 using Application.Features.User.Queries.GetUserByLogin;
+using Application.Interfaces;
 using Domain.Entities;
+using Hangfire;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Web_API.Controllers;
 
-public class OrderController(IMediator mediator, IAuthorizationService authorizationService) : ControllerBase
+public class OrderController(
+    IMediator mediator, 
+    IAuthorizationService authorizationService) : ControllerBase
 {
     [HttpPost("/{login}/order")]
     public async Task<IActionResult> CreateOrder(string login, OrderedGood[] orderedGoods)
@@ -29,6 +33,7 @@ public class OrderController(IMediator mediator, IAuthorizationService authoriza
         }
         
         await mediator.Send(new CreateOrderCommand(login, orderedGoods));
+        
         return Ok("Заказ создан");
     }
     
@@ -41,7 +46,8 @@ public class OrderController(IMediator mediator, IAuthorizationService authoriza
         {
             return NotFound("Заказ не найден");
         }
-        await mediator.Send(new UpdateOrderStatusCommand(order, isDone));
+        order.IsDone = isDone;
+        await mediator.Send(new UpdateOrderCommand(order, isDone));
         return Ok("Статус заказа обновлен");
     }
     

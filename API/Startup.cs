@@ -1,4 +1,8 @@
 using Application;
+using Hangfire;
+using Hangfire.SqlServer;
+using Infrastructure;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Persistence;
 using Web_API.Requirements.AccessRequirement;
@@ -10,7 +14,11 @@ public class Startup(IConfiguration configuration)
 {
     public void ConfigureServices(IServiceCollection services)
     {
-        services.AddAuthentication("Cookies").AddCookie(options => 
+        services.AddApplication();
+        services.AddPersistence(configuration);
+        services.AddInfrastructure();
+        
+        services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(options => 
         {
             options.LoginPath = "/login";
             options.AccessDeniedPath = "/accessDenied";
@@ -25,13 +33,14 @@ public class Startup(IConfiguration configuration)
                     policy.Requirements.Add(new AccessRequirement()));
             });
         
-        
         services.AddControllers();
+        
         services.AddSwaggerGen();
-        services.AddApplication();
-        services.AddPersistence(configuration);
         
+        var connection = configuration.GetConnectionString("DefaultConnection");
         
+        services.AddHangfire(x => x.UseSqlServerStorage(connection));
+        services.AddHangfireServer();
     }
 
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -49,6 +58,13 @@ public class Startup(IConfiguration configuration)
         app.UseAuthentication();  
         app.UseAuthorization();
         app.UseStaticFiles();
-        app.UseEndpoints(endpoints => endpoints.MapControllers());
+        app.UseEndpoints(
+            endpoints =>
+            {
+                endpoints.MapControllers();
+                endpoints.MapHangfireDashboard();
+            }
+        );
+        app.UseHangfireDashboard();
     }
 }

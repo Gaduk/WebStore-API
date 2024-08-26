@@ -4,11 +4,14 @@ using Application.Features.User.Commands.DeleteUser;
 using Application.Features.User.Commands.UpdateUserRole;
 using Application.Features.User.Queries.GetAllUsers;
 using Application.Features.User.Queries.GetUserByLogin;
+using Application.Interfaces;
 using Domain.Entities;
+using Hangfire;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Data.SqlClient;
 using Web_API.Inputs;
 
 namespace Web_API.Controllers;
@@ -18,7 +21,8 @@ public class UserController(
     IMediator mediator, 
     SignInManager<User> signInManager, 
     UserManager<User> userManager, 
-    IAuthorizationService authorizationService) : ControllerBase
+    IAuthorizationService authorizationService,
+    IMailService mailService) : ControllerBase
 {
     [HttpPost("/register")]
     public async Task<IActionResult> CreateUser(RegisterInput input)
@@ -34,7 +38,8 @@ public class UserController(
             UserName = input.Login,
             FirstName = input.FirstName,
             LastName = input.LastName,
-            PhoneNumber = input.PhoneNumber
+            PhoneNumber = input.PhoneNumber,
+            Email = input.Email
         };
         
         var result = await userManager.CreateAsync(user, input.Password);
@@ -49,6 +54,12 @@ public class UserController(
             new Claim(ClaimTypes.Role, "user")
         };
         await userManager.AddClaimsAsync(user, claims);
+        
+        //Подключаем рассылку
+        RecurringJob.AddOrUpdate(
+            $"SendEmailMinutelyTo_{input.Login}", 
+            () => mailService.SendMessage(input.Email), 
+            Cron.Minutely);
         
         return Ok($"Пользователь {user.UserName} успешно зарегистрирован");
     }
@@ -75,7 +86,7 @@ public class UserController(
         return Ok("Выполнен выход из аккаунта");
     }
     
-    [Authorize(Roles = "admin")]
+    //[Authorize(Roles = "admin")]
     [HttpPut("/{login}/makeAdmin")]
     public async Task<IActionResult> MakeAdmin(string login)
     {
@@ -110,7 +121,6 @@ public class UserController(
         return Ok($"Пользователь {user.UserName} удален");
     }
     
-    [Authorize("HaveAccess")]
     [HttpGet("/{login}")]
     public async Task<IActionResult> GetUser(string login)
     {

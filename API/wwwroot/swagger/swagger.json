@@ -19,7 +19,8 @@
                   "Password": "12345",
                   "FirstName": "John",
                   "LastName": "Doe",
-                  "PhoneNumber": "+1234567890"
+                  "PhoneNumber": "+1234567890",
+                  "Email": "john@mail.ru"
                 }
               }
             }

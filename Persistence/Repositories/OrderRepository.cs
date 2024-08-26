@@ -7,7 +7,7 @@ namespace Persistence.Repositories;
 
 public class OrderRepository(ApplicationDbContext dbContext) : IOrderRepository
 {
-    public async Task CreateOrder(string login, OrderedGood[] orderedGoods)
+    public async Task<int> CreateOrder(string login, OrderedGood[] orderedGoods)
     {
         var order = new Order
         {
@@ -27,11 +27,11 @@ public class OrderRepository(ApplicationDbContext dbContext) : IOrderRepository
             }
         }
         await dbContext.SaveChangesAsync();
+        return orderId;
     }
 
-    public async Task UpdateOrderStatus(Order order, bool isDone)
+    public async Task UpdateOrder(Order order, bool isDone)
     {
-        order.IsDone = isDone;
         dbContext.Orders.Update(order);
         await dbContext.SaveChangesAsync();
     }

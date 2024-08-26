@@ -5,4 +5,5 @@ public record RegisterInput(
     string Password,
     string FirstName,
     string LastName,
-    string PhoneNumber);
+    string PhoneNumber,
+    string Email);

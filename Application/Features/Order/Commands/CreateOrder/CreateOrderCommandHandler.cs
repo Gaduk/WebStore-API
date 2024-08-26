@@ -3,10 +3,10 @@ using MediatR;
 
 namespace Application.Features.Order.Commands.CreateOrder;
 
-public class CreateOrderCommandHandler(IOrderRepository orderRepository) : IRequestHandler<CreateOrderCommand>
+public class CreateOrderCommandHandler(IOrderRepository orderRepository) : IRequestHandler<CreateOrderCommand, int>
 {
-    public async Task Handle(CreateOrderCommand request, CancellationToken cancellationToken)
+    public async Task<int> Handle(CreateOrderCommand request, CancellationToken cancellationToken)
     {
-        await orderRepository.CreateOrder(request.Login, request.OrderedGoods);
+        return await orderRepository.CreateOrder(request.Login, request.OrderedGoods);
     }
 }

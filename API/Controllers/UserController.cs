@@ -1,5 +1,4 @@
 using System.Security.Claims;
-using Application.Dto;
 using Application.Features.User.Commands.DeleteUser;
 using Application.Features.User.Commands.UpdateUserRole;
 using Application.Features.User.Queries.GetAllUsers;
@@ -8,10 +7,11 @@ using Application.Interfaces;
 using Domain.Entities;
 using Hangfire;
 using MediatR;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Data.SqlClient;
 using Web_API.Inputs;
 
 namespace Web_API.Controllers;
@@ -53,7 +53,9 @@ public class UserController(
             new Claim(ClaimTypes.Name, input.Login),
             new Claim(ClaimTypes.Role, "user")
         };
-        await userManager.AddClaimsAsync(user, claims);
+        
+        var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+        await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity));
         
         //Подключаем рассылку
         RecurringJob.AddOrUpdate(
@@ -96,8 +98,12 @@ public class UserController(
             return NotFound("Пользователь не найден");
         }
         await mediator.Send(new UpdateUserRoleCommand(user, true));
-        var claim = new Claim(ClaimTypes.Role, "admin");
-        await userManager.AddClaimAsync(user, claim);
+        var claims = new List<Claim>
+        {
+            new Claim(ClaimTypes.Role, "admin")
+        };
+        var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+        await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity));
         
         return Ok($"Пользователю {login} выданы права администратора");
     }

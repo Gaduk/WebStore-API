@@ -26,17 +26,6 @@ public class ApplicationDbContext : IdentityDbContext<User>//, IApplicationDbCon
         modelBuilder.Entity<Good>()
             .HasKey(good => good.Id); 
         
-        /*
-        modelBuilder.Entity<User>().HasData(
-            new User { UserName = "admin", FirstName = "Иван", LastName = "Иванов", 
-                PhoneNumber = "+79998887766", IsAdmin = true
-            },
-            new User { UserName = "user", FirstName = "Пётр", LastName = "Петров", 
-                PhoneNumber = "+79991119911", IsAdmin = false
-            }
-        );
-        */
-        
         modelBuilder.Entity<Good>().HasData(
             new Good { Id = 1001, Name = "Товар 1", Price = 10 },
             new Good { Id = 1002, Name = "Товар 2", Price = 20 },

@@ -4,7 +4,9 @@ using Hangfire.SqlServer;
 using Infrastructure;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Persistence;
+using Persistence.Context;
 using Web_API.Requirements.AccessRequirement;
 using Web_API.Requirements.AccessRequirement.Handlers;
 
@@ -41,6 +43,7 @@ public class Startup(IConfiguration configuration)
         
         services.AddHangfire(x => x.UseSqlServerStorage(connection));
         services.AddHangfireServer();
+        
     }
 
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

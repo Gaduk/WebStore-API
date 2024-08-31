@@ -97,13 +97,20 @@ public class UserController(
         {
             return NotFound("Пользователь не найден");
         }
-        await mediator.Send(new UpdateUserRoleCommand(user, true));
+        
+        if (User.HasClaim(ClaimTypes.Role, "admin"))
+        {
+            return Conflict("Пользователь уже является администратором");
+        }
+
         var claims = new List<Claim>
         {
             new Claim(ClaimTypes.Role, "admin")
         };
         var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
         await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity));
+        
+        await mediator.Send(new UpdateUserRoleCommand(user, true));
         
         return Ok($"Пользователю {login} выданы права администратора");
     }

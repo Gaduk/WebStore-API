@@ -8,7 +8,6 @@ public class IsAdminHandler : AuthorizationHandler<AccessRequirement>
     protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, AccessRequirement requirement)
     {
         bool isAdmin = context.User.HasClaim(c => c.Type == ClaimTypes.Role && c.Value == "admin");
-        Console.WriteLine(isAdmin);
         if (isAdmin)
         {
             context.Succeed(requirement);

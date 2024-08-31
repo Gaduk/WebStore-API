@@ -1,6 +1,7 @@
 using Application.Interfaces;
 using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
+using Npgsql;
 using Persistence.Context;
 using Persistence.Repositories;
 
@@ -11,7 +12,7 @@ public static class DependencyInjection
     public static void AddPersistence(this IServiceCollection services, IConfiguration configuration)
     {
         var connection = configuration.GetConnectionString("DefaultConnection");
-        services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(connection));
+        services.AddDbContext<ApplicationDbContext>(options => options.UseNpgsql(connection));
         
         services.AddTransient<IUserRepository, UserRepository>();
         services.AddTransient<IOrderRepository, OrderRepository>();

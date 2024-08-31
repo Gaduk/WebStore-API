@@ -1,5 +1,6 @@
 using Application;
 using Hangfire;
+using Hangfire.PostgreSql;
 using Hangfire.SqlServer;
 using Infrastructure;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -41,7 +42,8 @@ public class Startup(IConfiguration configuration)
         
         var connection = configuration.GetConnectionString("DefaultConnection");
         
-        services.AddHangfire(x => x.UseSqlServerStorage(connection));
+        services.AddHangfire(config => 
+            config.UsePostgreSqlStorage(options => options.UseNpgsqlConnection(connection)));
         services.AddHangfireServer();
         
     }

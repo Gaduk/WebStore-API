@@ -1,0 +1,37 @@
+﻿services:
+  
+  postgres:
+    image: postgres:16
+    container_name: postgres
+    networks:
+      - web_store_net
+    environment:
+      - POSTGRES_DB=postgresdb
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    ports:
+      - 5432:5432
+    volumes:
+      - web_store_postgres:/var/lib/postgresql/data
+  
+  api:
+    image: api
+    build:
+      context: .
+      dockerfile: API/Dockerfile
+    networks:
+      - web_store_net
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=Host=postgres;Port=5432;Database=postgresdb;Username=postgres;Password=postgres
+    ports:
+      - 5008:8080
+    depends_on:
+      - postgres
+          
+volumes:
+  web_store_postgres:
+    
+networks:
+  web_store_net:
+    driver: bridge

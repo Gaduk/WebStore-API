@@ -2,9 +2,11 @@
 
     <PropertyGroup>
         <TargetFramework>net8.0</TargetFramework>
+	<GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
         <OutputType>Library</OutputType>
+        <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
     </PropertyGroup>
 
     <ItemGroup>

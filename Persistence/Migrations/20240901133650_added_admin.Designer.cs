@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Persistence.Context;
@@ -11,9 +12,11 @@ using Persistence.Context;
 namespace Persistence.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240901133650_added_admin")]
+    partial class added_admin
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -175,9 +178,9 @@ namespace Persistence.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "admin",
+                            Id = "431d6728-209c-4fac-8693-b8747b7bdc8d",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "2e89036d-7391-4a29-b6d7-dcbc95041e38",
+                            ConcurrencyStamp = "a5297634-4332-46cb-8b7f-45fb909ac2b9",
                             Email = "admin@mail.ru",
                             EmailConfirmed = true,
                             FirstName = "Иван",
@@ -186,9 +189,9 @@ namespace Persistence.Migrations
                             LockoutEnabled = false,
                             NormalizedEmail = "ADMIN@MAIL.RU",
                             NormalizedUserName = "ADMIN",
-                            PasswordHash = "AQAAAAIAAYagAAAAEOcZj1TqZJsmFgQ+PuXAeNdeAhkxDBT0K5o/YZuxs8HH5WlHOtPUzu39RZqCOYCY9g==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEJ9USPM9ixsAq75C6m+NBNyQ+wbwm/zdVTIenHKMoVHg1GaLHn9kPTxJe6YValYbcQ==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "18d74696-c8ed-4601-95c0-71f09c7130dd",
+                            SecurityStamp = "95e1dc93-6a1f-426e-8a4c-0bfefd1f8db3",
                             TwoFactorEnabled = false,
                             UserName = "admin"
                         });
@@ -268,29 +271,6 @@ namespace Persistence.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("AspNetUserClaims", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            ClaimType = "http://schemas.microsoft.com/ws/2008/06/identity/claims/role",
-                            ClaimValue = "user",
-                            UserId = "admin"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            ClaimType = "http://schemas.microsoft.com/ws/2008/06/identity/claims/role",
-                            ClaimValue = "admin",
-                            UserId = "admin"
-                        },
-                        new
-                        {
-                            Id = 3,
-                            ClaimType = "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name",
-                            ClaimValue = "admin",
-                            UserId = "admin"
-                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>

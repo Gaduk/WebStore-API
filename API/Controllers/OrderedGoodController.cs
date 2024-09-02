@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Web_API.Controllers;
 
+[ApiController]
 public class OrderedGoodController(IMediator mediator, IAuthorizationService authorizationService) : ControllerBase
 {
     [Authorize(Roles = "admin")]
@@ -17,7 +18,7 @@ public class OrderedGoodController(IMediator mediator, IAuthorizationService aut
         return Ok(orderGoods);
     }
     
-    [HttpGet("/{orderId:int}")]
+    [HttpGet("/orderedGoods/{orderId:int}")]
     public async Task<IActionResult> GetOrderedGoodDtos(int orderId)
     {
         var order = await mediator.Send(new GetOrderQuery(orderId));

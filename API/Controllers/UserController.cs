@@ -12,9 +12,11 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
 using Web_API.Inputs;
 
 namespace Web_API.Controllers;
+
 
 [ApiController]
 public class UserController(
@@ -53,9 +55,7 @@ public class UserController(
             new Claim(ClaimTypes.Name, input.Login),
             new Claim(ClaimTypes.Role, "user")
         };
-        
-        var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-        await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity));
+        await userManager.AddClaimsAsync(user, claims);
         
         //Подключаем рассылку
         RecurringJob.AddOrUpdate(
@@ -69,14 +69,38 @@ public class UserController(
     [HttpPost("/login")]
     public async Task<IActionResult> Login(string login, string password)
     {
-        var user = await mediator.Send(new GetUserByLoginQuery(login));
-        if (user is null) return Unauthorized("Неверное имя пользователя");
+        var user = await userManager.FindByNameAsync(login);
+        if (user == null)
+        {
+            return Unauthorized("Неверное имя пользователя");
+        }
+        
+        var resultTask = signInManager.CheckPasswordSignInAsync(user, password, false);
+        var claimsTask = userManager.GetClaimsAsync(user);
+        await Task.WhenAll(resultTask, claimsTask);
+        
+        var result = resultTask.Result;
+        var claims = claimsTask.Result;
 
-        var result = await signInManager.PasswordSignInAsync(user, password, false, false);
+        if (claims.IsNullOrEmpty() && login == "admin")
+        {
+            
+        }
+        
         if(!result.Succeeded) 
         {
             return Unauthorized("Неверный пароль");
         }
+        
+        foreach (var claim in claims)
+        {
+            Console.WriteLine(claim.Value);
+        }
+        
+        var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+        await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+        await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity));
+        
         return Ok($"Выполнен вход в аккаунт {login}");
     }
     
@@ -84,12 +108,12 @@ public class UserController(
     [HttpGet("/logout")]
     public async Task<IActionResult> Logout()
     {
-        await signInManager.SignOutAsync();
+        await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
         return Ok("Выполнен выход из аккаунта");
     }
     
-    //[Authorize(Roles = "admin")]
-    [HttpPut("/{login}/makeAdmin")]
+    [Authorize(Roles = "admin")]
+    [HttpPut("/user/{login}/isAdmin")]
     public async Task<IActionResult> MakeAdmin(string login)
     {
         var user = await mediator.Send(new GetUserByLoginQuery(login));
@@ -107,8 +131,9 @@ public class UserController(
         {
             new Claim(ClaimTypes.Role, "admin")
         };
+        await userManager.AddClaimsAsync(user, claims);
         var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-        await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity));
+        User.AddIdentity(claimsIdentity);
         
         await mediator.Send(new UpdateUserRoleCommand(user, true));
         
@@ -116,7 +141,7 @@ public class UserController(
     }
     
     [HttpGet("/accessDenied")]
-    public async Task<IActionResult> DenyAccess()
+    public IActionResult DenyAccess()
     {
         return StatusCode(StatusCodes.Status403Forbidden);
     }
@@ -134,7 +159,7 @@ public class UserController(
         return Ok($"Пользователь {user.UserName} удален");
     }
     
-    [HttpGet("/{login}")]
+    [HttpGet("user/{login}")]
     public async Task<IActionResult> GetUser(string login)
     {
         var authorizationResult = await authorizationService.AuthorizeAsync(User, login, "HaveAccess");

@@ -11,11 +11,12 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Web_API.Controllers;
 
+[ApiController]
 public class OrderController(
     IMediator mediator, 
     IAuthorizationService authorizationService) : ControllerBase
 {
-    [HttpPost("/{login}/order")]
+    [HttpPost("/order/{login}")]
     public async Task<IActionResult> CreateOrder(string login, OrderedGood[] orderedGoods)
     {
         var authorizationResult = await authorizationService.AuthorizeAsync(User, login, "HaveAccess");
@@ -36,7 +37,7 @@ public class OrderController(
     }
     
     [Authorize(Roles = "admin")]
-    [HttpPut("/{orderId:int}/status")]
+    [HttpPut("/order/{orderId:int}/status")]
     public async Task<IActionResult> UpdateOrderStatus(int orderId, bool isDone)
     {
         var order = await mediator.Send(new GetOrderQuery(orderId));
@@ -57,7 +58,7 @@ public class OrderController(
         return Ok(orders);
     }
     
-    [HttpGet("/{login}/orders")]
+    [HttpGet("/orders/{login}")]
     public async Task<IActionResult> GetUserOrders(string login)
     {
         var authorizationResult = await authorizationService.AuthorizeAsync(User, login, "HaveAccess");
@@ -70,7 +71,7 @@ public class OrderController(
         return Ok(orders);
     }
     
-    [HttpGet("/{orderId:int}")]
+    [HttpGet("order/{orderId:int}")]
     public async Task<IActionResult> GetOrder(int orderId)
     {
         var order = await mediator.Send(new GetOrderQuery(orderId));

@@ -1,13 +1,10 @@
-using Application;
+using Application.Extensions;
 using Hangfire;
 using Hangfire.PostgreSql;
-using Hangfire.SqlServer;
-using Infrastructure;
+using Infrastructure.Extensions;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
-using Persistence;
-using Persistence.Context;
+using Persistence.Extensions;
 using Web_API.Requirements.AccessRequirement;
 using Web_API.Requirements.AccessRequirement.Handlers;
 

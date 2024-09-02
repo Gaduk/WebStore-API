@@ -76,7 +76,7 @@
         }
       }
     },
-    "/{login}/order": {
+    "/order/{login}": {
       "post": {
         "tags": ["User"],
         "summary": "Оформление заказа",
@@ -128,7 +128,7 @@
         }
       }
     },
-    "/{login}": {
+    "/user/{login}": {
       "get": {
         "tags": ["User"],
         "summary": "Получение информации о пользователе",
@@ -160,9 +160,31 @@
             "description": "Пользователь не найден"
           }
         }
+      },
+      "delete": {
+        "tags": ["Admin"],
+        "summary": "Удаление пользователя вместе с информацией о его заказах",
+        "parameters": [
+          {
+            "name": "login",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Пользователь удален"
+          },
+          "404": {
+            "description": "Пользователь не найден"
+          }
+        }
       }
     },
-    "/{login}/orders": {
+    "/orders/{login}": {
       "get": {
         "tags": ["User"],
         "summary": "Получение списка заказов пользователя",
@@ -196,10 +218,11 @@
         }
       }
     },
-    "/{orderId}": {
+    
+    "/orderedGoods/{orderId}": {
       "get": {
         "tags": ["User"],
-        "summary": "Получение информации о конкретном заказе",
+        "summary": "Получение списка товаров по заданному id заказа",
         "parameters": [
           {
             "name": "orderID",
@@ -212,7 +235,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Информация о заказе",
+            "description": "Список товаров по заданному id заказа",
             "content": {
               "application/json": {
                 "schema": {
@@ -230,7 +253,41 @@
         }
       }
     },
-    "/{login}/{orderId}/status": {
+    "/order/{orderId}": {
+      "get": {
+        "tags": ["User"],
+        "summary": "Получение информации о заказе по заданному id",
+        "parameters": [
+          {
+            "name": "orderId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Информация о заказе по заданному id",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Order"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Доступ запрещен. Пользователь не имеет доступа к запрашиваемому ресурсу."
+          },
+          "404": {
+            "description": "Заказ не найден."
+          }
+        }
+      }
+    },
+    "/order/{orderId}/status": {
       "put": {
         "tags": ["Admin"],
         "summary": "Изменение статуса заказа",
@@ -273,7 +330,7 @@
         }
       }
     },
-    "/{login}/makeAdmin": {
+    "/user/{login}/isAdmin": {
       "put": {
         "tags": ["Admin"],
         "summary": "Назначение прав администратора пользователю",
@@ -298,30 +355,6 @@
               "description": "Пользователь уже является администратором"
             }
           }
-      }
-    },
-    "/user/{login}": {
-      "delete": {
-        "tags": ["Admin"],
-        "summary": "Удаление пользователя вместе с информацией о его заказах",
-        "parameters": [
-          {
-            "name": "login",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Пользователь удален"
-          },
-          "404": {
-            "description": "Пользователь не найден"
-          }
-        }
       }
     },
     "/users": {

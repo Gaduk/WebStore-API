@@ -1,9 +1,9 @@
 using Application.Interfaces;
 using Infrastructure.Services;
 
-namespace Infrastructure;
+namespace Infrastructure.Extensions;
 
-public static class DependencyInjection
+public static class ServiceCollectionExtensions
 {
     public static void AddInfrastructure(this IServiceCollection services)
     {

@@ -1,8 +1,8 @@
 using System.Reflection;
 
-namespace Application;
+namespace Application.Extensions;
 
-public static class DependencyInjection
+public static class ServiceCollectionExtensions
 {
     public static void AddApplication(this IServiceCollection services)
     {

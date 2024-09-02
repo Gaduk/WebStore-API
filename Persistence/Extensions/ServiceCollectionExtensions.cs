@@ -1,13 +1,12 @@
 using Application.Interfaces;
 using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
-using Npgsql;
 using Persistence.Context;
 using Persistence.Repositories;
 
-namespace Persistence;
+namespace Persistence.Extensions;
 
-public static class DependencyInjection
+public static class ServiceCollectionExtensions
 {
     public static void AddPersistence(this IServiceCollection services, IConfiguration configuration)
     {

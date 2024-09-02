@@ -2,7 +2,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Web_API.Extensions;
 
-public static class IHostExtensions
+public static class HostExtensions
 {
     public static IHost MigrateDatabase<T>(this IHost host) where T : DbContext
     {

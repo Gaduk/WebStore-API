@@ -4,5 +4,5 @@ namespace Application.Interfaces;
 
 public interface IMailService
 {
-    void SendMessage(string login);
+    void SendMessage(string login, string email);
 }

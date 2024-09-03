@@ -57,11 +57,6 @@ public class UserController(
         };
         await userManager.AddClaimsAsync(user, claims);
         
-        //Подключаем рассылку
-        RecurringJob.AddOrUpdate(
-            $"SendEmailMinutelyTo_{input.Login}", 
-            () => mailService.SendMessage(input.Email), 
-            Cron.Minutely);
         
         return Ok($"Пользователь {user.UserName} успешно зарегистрирован");
     }
@@ -82,10 +77,6 @@ public class UserController(
         var result = resultTask.Result;
         var claims = claimsTask.Result;
 
-        if (claims.IsNullOrEmpty() && login == "admin")
-        {
-            
-        }
         
         if(!result.Succeeded) 
         {

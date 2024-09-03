@@ -13,10 +13,10 @@ public static class ServiceCollectionExtensions
         var connection = configuration.GetConnectionString("DefaultConnection");
         services.AddDbContext<ApplicationDbContext>(options => options.UseNpgsql(connection));
         
-        services.AddTransient<IUserRepository, UserRepository>();
-        services.AddTransient<IOrderRepository, OrderRepository>();
-        services.AddTransient<IOrderedGoodRepository, OrderedGoodRepository>();
-        services.AddTransient<IGoodRepository, GoodRepository>();
+        services.AddScoped<IUserRepository, UserRepository>();
+        services.AddScoped<IOrderRepository, OrderRepository>();
+        services.AddScoped<IOrderedGoodRepository, OrderedGoodRepository>();
+        services.AddScoped<IGoodRepository, GoodRepository>();
         
         services.AddDefaultIdentity<User>(options =>
             {

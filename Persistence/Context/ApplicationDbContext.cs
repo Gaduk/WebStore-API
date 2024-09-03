@@ -34,12 +34,13 @@ public class ApplicationDbContext : IdentityDbContext<User>, IApplicationDbConte
         modelBuilder.Entity<User>().HasData(
             new User 
             {
-                Id = "admin",
                 UserName = "admin",
                 PasswordHash = hasher.HashPassword(null!, "admin"),
                 
+                Id = "admin",
                 FirstName = "Иван",
                 LastName = "Иванов",
+                IsAdmin = true,
                 NormalizedUserName = "admin".ToUpper(),
                 Email = "admin@mail.ru",
                 NormalizedEmail = "admin@mail.ru".ToUpper(),

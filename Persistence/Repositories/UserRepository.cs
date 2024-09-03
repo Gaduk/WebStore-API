@@ -39,14 +39,27 @@ public class UserRepository(ApplicationDbContext dbContext) : IUserRepository
         await dbContext.SaveChangesAsync();
     }
 
-    public async Task<List<User>> GetAllUsers()
+    public async Task<List<UserDto>> GetAllUserDtos()
     {
-        return await dbContext.Users.ToListAsync();
+        return await dbContext.Users.Select(user => new UserDto(
+            user.UserName,
+            user.FirstName,
+            user.LastName,
+            user.Email,
+            user.PhoneNumber,
+            user.IsAdmin
+        )).ToListAsync();
     }
 
-    public async Task<User?> GetUser(string login)
+    public async Task<UserDto?> GetUserDto(string login)
     {
-        var user = await dbContext.Users.FirstOrDefaultAsync(u => u.UserName == login);
-        return user;
+        return await dbContext.Users.Select(user => new UserDto(
+            user.UserName,
+            user.FirstName,
+            user.LastName,
+            user.Email,
+            user.PhoneNumber,
+            user.IsAdmin
+        )).FirstOrDefaultAsync();
     }
 }

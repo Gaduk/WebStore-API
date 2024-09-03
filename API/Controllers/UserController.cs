@@ -1,18 +1,16 @@
 using System.Security.Claims;
 using Application.Features.User.Commands.DeleteUser;
 using Application.Features.User.Commands.UpdateUserRole;
-using Application.Features.User.Queries.GetAllUsers;
-using Application.Features.User.Queries.GetUserByLogin;
+using Application.Features.User.Queries.GetAllUserDtos;
+using Application.Features.User.Queries.GetUserDto;
 using Application.Interfaces;
 using Domain.Entities;
-using Hangfire;
 using MediatR;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.Tokens;
 using Web_API.Inputs;
 
 namespace Web_API.Controllers;
@@ -29,7 +27,8 @@ public class UserController(
     [HttpPost("/register")]
     public async Task<IActionResult> CreateUser(RegisterInput input)
     {
-        var userWithSameLogin = await mediator.Send(new GetUserByLoginQuery(input.Login));
+        //var userWithSameLogin = await mediator.Send(new GetUserDtoQuery(input.Login));
+        var userWithSameLogin = userManager.FindByNameAsync(input.Login).Result;
         if (userWithSameLogin != null)
         {
             return Conflict("Пользователь с таким логином уже существует");
@@ -57,6 +56,8 @@ public class UserController(
         };
         await userManager.AddClaimsAsync(user, claims);
         
+        //Подключаем рассылку
+        mailService.SendMessage(input.Login, input.Email);
         
         return Ok($"Пользователь {user.UserName} успешно зарегистрирован");
     }
@@ -107,7 +108,9 @@ public class UserController(
     [HttpPut("/user/{login}/isAdmin")]
     public async Task<IActionResult> MakeAdmin(string login)
     {
-        var user = await mediator.Send(new GetUserByLoginQuery(login));
+        //var user = await mediator.Send(new GetUserDtoQuery(login));
+        var user = userManager.FindByNameAsync(login).Result;
+        
         if (user == null)
         {
             return NotFound("Пользователь не найден");
@@ -141,7 +144,8 @@ public class UserController(
     [HttpDelete("/user/{login}")]
     public async Task<IActionResult> DeleteUser(string login)
     {
-        var user = await mediator.Send(new GetUserByLoginQuery(login));
+        //var user = await mediator.Send(new GetUserDtoQuery(login));
+        var user = userManager.FindByNameAsync(login).Result;
         if (user == null)
         {
             return NotFound("Пользователь не найден");
@@ -159,7 +163,7 @@ public class UserController(
             return StatusCode(StatusCodes.Status403Forbidden);
         }
         
-        var user = await mediator.Send(new GetUserByLoginQuery(login));
+        var user = await mediator.Send(new GetUserDtoQuery(login));
         if(user == null)
         {
             return NotFound("Пользователь не найден");
@@ -171,7 +175,7 @@ public class UserController(
     [HttpGet("/users")]
     public async Task<IActionResult> GetAllUsers()
     {
-        var users = await mediator.Send(new GetAllUsersQuery());
+        var users = await mediator.Send(new GetAllUserDtosQuery());
         return Ok(users);
     }
 }

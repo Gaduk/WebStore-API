@@ -3,7 +3,7 @@ using Application.Features.Order.Commands.UpdateOrder;
 using Application.Features.Order.Queries.GetAllOrders;
 using Application.Features.Order.Queries.GetOrder;
 using Application.Features.Order.Queries.GetUserOrders;
-using Application.Features.User.Queries.GetUserByLogin;
+using Application.Features.User.Queries.GetUserDto;
 using Domain.Entities;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -25,7 +25,7 @@ public class OrderController(
             return StatusCode(StatusCodes.Status403Forbidden);
         }
         
-        var user = await mediator.Send(new GetUserByLoginQuery(login));
+        var user = await mediator.Send(new GetUserDtoQuery(login));
         if (user == null)
         {
             return NotFound("Пользователь не найден");

@@ -3,6 +3,11 @@
   &lt;Assembly Path="C:\Users\Даниил\.nuget\packages\mediatr\12.4.0\lib\net6.0\MediatR.dll" /&gt;&#xD;
   &lt;Assembly Path="C:\Program Files\dotnet\packs\Microsoft.NETCore.App.Ref\8.0.7\ref\net8.0\Microsoft.CSharp.dll" /&gt;&#xD;
 &lt;/AssemblyExplorer&gt;</s:String>
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=38c52f56_002D474c_002D46da_002D85ce_002D263a70dbeda0/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" Name="CreateUser_Returns409_WhenInputLoginIsNotUnique" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
+  &lt;TestAncestor&gt;&#xD;
+    &lt;TestId&gt;xUnit::B434DC40-0E1A-4A25-9AEF-28A582DC84DE::net8.0::Tests.UserControllerTests.CreateUser_Returns409_WhenInputLoginIsNotUnique&lt;/TestId&gt;&#xD;
+  &lt;/TestAncestor&gt;&#xD;
+&lt;/SessionState&gt;</s:String>
 	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=ff9efef3_002D6060_002D448c_002Daa0a_002Dd09889d8f0ee/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="CreateUser_Returns409_WhenInputLoginAlreadyExists" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
   &lt;TestAncestor&gt;&#xD;
     &lt;TestId&gt;xUnit::B434DC40-0E1A-4A25-9AEF-28A582DC84DE::net8.0::Tests.UserControllerTests&lt;/TestId&gt;&#xD;

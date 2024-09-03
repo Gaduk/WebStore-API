@@ -1,6 +1,8 @@
-using Application.Features.User.Queries.GetUserByLogin;
+using System.Linq.Expressions;
+using Application.Features.User.Queries.GetUserDto;
 using Application.Interfaces;
 using Domain.Entities;
+using Hangfire;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -53,7 +55,7 @@ public class UserControllerTests
             "+79990001122",
             "user@mail.ru"
         );
-        _mediatorMock.Setup(m => m.Send(It.IsAny<GetUserByLoginQuery>(), default))
+        _userManagerMock.Setup(u => u.FindByNameAsync(It.IsAny<string>()))
             .ReturnsAsync(new User
             {
                 UserName = "user",
@@ -83,7 +85,9 @@ public class UserControllerTests
             "user@mail.ru"
         );
         
-        _userManagerMock.Setup(m => m.CreateAsync(It.IsAny<User>(), It.IsAny<string>()))
+        _userManagerMock.Setup(u => u.FindByNameAsync(It.IsAny<string>()))
+            .ReturnsAsync((User?)null);
+        _userManagerMock.Setup(u => u.CreateAsync(It.IsAny<User>(), It.IsAny<string>()))
             .ReturnsAsync(IdentityResult.Failed());
         
         // Act
@@ -99,16 +103,16 @@ public class UserControllerTests
         // Arrange
         var input = new RegisterInput(
             "user2", 
-            "user", 
+            "user2", 
             "FirstName",
             "LastName",
             "+79990001122",
             "user@mail.ru"
         );
         
-        _mediatorMock.Setup(m => m.Send(It.IsAny<GetUserByLoginQuery>(), default))
+        _userManagerMock.Setup(u => u.FindByNameAsync(It.IsAny<string>()))
             .ReturnsAsync((User?)null);
-        _userManagerMock.Setup(m => m.CreateAsync(It.IsAny<User>(), It.IsAny<string>()))
+        _userManagerMock.Setup(u => u.CreateAsync(It.IsAny<User>(), It.IsAny<string>()))
             .ReturnsAsync(IdentityResult.Success);
         
         // Act

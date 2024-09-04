@@ -10,8 +10,8 @@ WORKDIR /src
 COPY ["API/API.csproj", "API/"]
 COPY ["Application/Application.csproj", "Application/"]
 COPY ["Domain/Domain.csproj", "Domain/"]
-COPY ["Persistence/Persistence.csproj", "Persistence/"]
 COPY ["Infrastructure/Infrastructure.csproj", "Infrastructure/"]
+COPY ["Persistence/Persistence.csproj", "Persistence/"]
 RUN dotnet restore "API/API.csproj"
 COPY . .
 WORKDIR "/src/API"
@@ -19,7 +19,7 @@ RUN dotnet build "API.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 FROM build AS publish
 ARG BUILD_CONFIGURATION=Release
-RUN dotnet publish "API.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false 
+RUN dotnet publish "API.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
 
 FROM base AS final
 WORKDIR /app

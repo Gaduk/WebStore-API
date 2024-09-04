@@ -29,6 +29,12 @@
         "responses": {
           "200": {
             "description": "Пользователь успешно зарегистрирован"
+          },
+          "400": {
+            "description": "Некорректное тело запроса"
+          },
+          "409": {
+            "description": "Логин занят"
           }
         }
       }
@@ -72,6 +78,9 @@
         "responses": {
           "200": {
             "description": "Произведен выход из аккаунта"
+          },
+          "405": {
+            "description": "Пользователь не авторизован"
           }
         }
       }
@@ -96,15 +105,15 @@
               "schema": {
                 "example": [
                   {
-                    "goodID": 1001,
+                    "goodId": 1001,
                     "amount": 0
                   },
                   {
-                    "goodID": 1002,
+                    "goodId": 1002,
                     "amount": 1
                   },
                   {
-                    "goodID": 1003,
+                    "goodId": 1003,
                     "amount": 2
                   }
                 ]
@@ -180,6 +189,9 @@
           },
           "404": {
             "description": "Пользователь не найден"
+          },
+          "405": {
+            "description": "Доступ запрещен"
           }
         }
       }
@@ -225,7 +237,7 @@
         "summary": "Получение списка товаров по заданному id заказа",
         "parameters": [
           {
-            "name": "orderID",
+            "name": "orderId",
             "in": "path",
             "required": true,
             "schema": {
@@ -293,15 +305,7 @@
         "summary": "Изменение статуса заказа",
         "parameters": [
           {
-            "name": "login",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "orderID",
+            "name": "orderId",
             "in": "path",
             "required": true,
             "schema": {
@@ -374,6 +378,9 @@
           },
           "403": {
             "description": "Доступ запрещен"
+          },
+          "405": {
+            "description": "Доступ запрещен"
           }
         }
       }
@@ -394,6 +401,9 @@
             }
           },
           "403": {
+            "description": "Доступ запрещен"
+          },
+          "405": {
             "description": "Доступ запрещен"
           }
         }
@@ -416,6 +426,9 @@
           },
           "403": {
             "description": "Доступ запрещен"
+          },
+          "405": {
+            "description": "Доступ запрещен"
           }
         }
       }
@@ -436,6 +449,9 @@
             }
           },
           "403": {
+            "description": "Доступ запрещен"
+          },
+          "405": {
             "description": "Доступ запрещен"
           }
         }
@@ -485,7 +501,7 @@
       "Order": {
         "type": "object",
         "properties": {
-          "ID": {
+          "Id": {
             "type": "integer"
           },
           "UserLogin": {
@@ -499,10 +515,10 @@
       "OrderedGood": {
         "type": "object",
         "properties": {
-          "OrderID": {
+          "OrderId": {
             "type": "integer"
           },
-          "GoodID": {
+          "GoodId": {
             "type": "integer"
           },
           "Amount": {
@@ -513,7 +529,7 @@
       "Good": {
         "type": "object",
         "properties": {
-          "ID": {
+          "Id": {
             "type": "integer"
           },
           "Name": {

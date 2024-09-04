@@ -27,8 +27,7 @@ public class UserController(
     [HttpPost("/register")]
     public async Task<IActionResult> CreateUser(RegisterInput input)
     {
-        //var userWithSameLogin = await mediator.Send(new GetUserDtoQuery(input.Login));
-        var userWithSameLogin = userManager.FindByNameAsync(input.Login).Result;
+        var userWithSameLogin = await userManager.FindByNameAsync(input.Login);
         if (userWithSameLogin != null)
         {
             return Conflict("Пользователь с таким логином уже существует");
@@ -108,15 +107,14 @@ public class UserController(
     [HttpPut("/user/{login}/isAdmin")]
     public async Task<IActionResult> MakeAdmin(string login)
     {
-        //var user = await mediator.Send(new GetUserDtoQuery(login));
-        var user = userManager.FindByNameAsync(login).Result;
+        var user = await userManager.FindByNameAsync(login);
         
         if (user == null)
         {
             return NotFound("Пользователь не найден");
         }
         
-        if (User.HasClaim(ClaimTypes.Role, "admin"))
+        if (user.IsAdmin)
         {
             return Conflict("Пользователь уже является администратором");
         }
@@ -144,8 +142,7 @@ public class UserController(
     [HttpDelete("/user/{login}")]
     public async Task<IActionResult> DeleteUser(string login)
     {
-        //var user = await mediator.Send(new GetUserDtoQuery(login));
-        var user = userManager.FindByNameAsync(login).Result;
+        var user = await userManager.FindByNameAsync(login);
         if (user == null)
         {
             return NotFound("Пользователь не найден");

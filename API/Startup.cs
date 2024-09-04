@@ -60,6 +60,11 @@ public class Startup(IConfiguration configuration)
         app.UseAuthentication();  
         app.UseAuthorization();
         app.UseStaticFiles();
+        
+        app.UseHangfireDashboard("/hangfire", new DashboardOptions() 
+        {
+            Authorization = new [] {new HangfireAuthorizationFilter()}
+        });
         app.UseEndpoints(
             endpoints =>
             {
@@ -67,6 +72,5 @@ public class Startup(IConfiguration configuration)
                 endpoints.MapHangfireDashboard();
             }
         );
-        app.UseHangfireDashboard();
     }
 }

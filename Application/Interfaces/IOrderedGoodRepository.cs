@@ -1,4 +1,5 @@
 using Application.Dto;
+using Application.Dto.OrderedGoods;
 using Application.Features.OrderedGood;
 using Domain.Entities;
 
@@ -6,6 +7,6 @@ namespace Application.Interfaces;
 
 public interface IOrderedGoodRepository
 {
-    Task<List<OrderedGoodDto>> GetAllOrderedGoodDtos();
-    Task<List<OrderedGoodDto>> GetOrderedGoodDtos(int orderId);
+    Task<List<OrderedGoodDto>> GetAllOrderedGoods();
+    Task<List<OrderedGoodDto>> GetOrderedGoods(int orderId);
 }

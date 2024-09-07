@@ -1,10 +1,11 @@
+using Application.Dto;
+using Application.Dto.OrderedGoods;
 using Application.Features.Order.Commands.CreateOrder;
 using Application.Features.Order.Commands.UpdateOrder;
 using Application.Features.Order.Queries.GetAllOrders;
 using Application.Features.Order.Queries.GetOrder;
 using Application.Features.Order.Queries.GetUserOrders;
-using Application.Features.User.Queries.GetUserDto;
-using Domain.Entities;
+using Application.Features.User.Queries.GetUser;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -17,7 +18,7 @@ public class OrderController(
     IAuthorizationService authorizationService) : ControllerBase
 {
     [HttpPost("/order/{login}")]
-    public async Task<IActionResult> CreateOrder(string login, OrderedGood[] orderedGoods)
+    public async Task<IActionResult> CreateOrder(string login, CreateOrderedGoodDto[] orderedGoods)
     {
         var authorizationResult = await authorizationService.AuthorizeAsync(User, login, "HaveAccess");
         if (!authorizationResult.Succeeded)
@@ -25,7 +26,7 @@ public class OrderController(
             return StatusCode(StatusCodes.Status403Forbidden);
         }
         
-        var user = await mediator.Send(new GetUserDtoQuery(login));
+        var user = await mediator.Send(new GetUserQuery(login));
         if (user == null)
         {
             return NotFound("Пользователь не найден");
@@ -80,7 +81,7 @@ public class OrderController(
             return NotFound("Заказ не найден");
         }
         
-        var authorizationResult = await authorizationService.AuthorizeAsync(User, order.UserLogin, "HaveAccess");
+        var authorizationResult = await authorizationService.AuthorizeAsync(User, order.UserName, "HaveAccess");
         if (!authorizationResult.Succeeded)
         {
             return StatusCode(StatusCodes.Status403Forbidden);

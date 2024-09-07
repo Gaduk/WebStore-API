@@ -1,5 +1,5 @@
 using System.Linq.Expressions;
-using Application.Features.User.Queries.GetUserDto;
+using Application.Dto.User;
 using Application.Interfaces;
 using Domain.Entities;
 using Hangfire;
@@ -10,7 +10,6 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using Web_API.Controllers;
-using Web_API.Inputs;
 
 namespace Tests;
 
@@ -47,7 +46,7 @@ public class UserControllerTests
     public async Task CreateUser_Returns409_WhenInputLoginIsNotUnique()
     {
         // Arrange
-        var input = new RegisterInput(
+        var input = new CreateUserDto(
             "user", 
             "user", 
             "FirstName",
@@ -76,7 +75,7 @@ public class UserControllerTests
     public async Task CreateUser_Returns400_WhenInputIsInvalid()
     {
         // Arrange
-        var input = new RegisterInput(
+        var input = new CreateUserDto(
             "user2", 
             "1", //too short password
             "FirstName",
@@ -101,7 +100,7 @@ public class UserControllerTests
     public async Task CreateUser_Returns200_WhenInputLoginIsUnique_And_InputIsValid()
     {
         // Arrange
-        var input = new RegisterInput(
+        var input = new CreateUserDto(
             "user2", 
             "user2", 
             "FirstName",

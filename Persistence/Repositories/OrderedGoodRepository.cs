@@ -1,7 +1,6 @@
 using Application.Dto;
-using Application.Features.OrderedGood;
+using Application.Dto.OrderedGoods;
 using Application.Interfaces;
-using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Persistence.Context;
 
@@ -9,26 +8,32 @@ namespace Persistence.Repositories;
 
 public class OrderedGoodRepository(ApplicationDbContext dbContext) : IOrderedGoodRepository
 {
-    public async Task<List<OrderedGoodDto>> GetAllOrderedGoodDtos()
+    public async Task<List<OrderedGoodDto>> GetAllOrderedGoods()
     {
-        var orderedGoodsDto = await dbContext.OrderedGoods
-            .Join(dbContext.Goods,
-                og => og.GoodId,
-                g => g.Id,
-                (og, g) => new OrderedGoodDto(og.OrderId, og.GoodId, og.Amount, g.Name, g.Price)
-            ).ToListAsync();
-            
-        return orderedGoodsDto;
+        return await dbContext
+            .OrderedGoods
+            .Include(og => og.Good)
+            .Select(og => new OrderedGoodDto(
+                og.OrderId,
+                og.GoodId,
+                og.Amount,
+                og.Good.Name,
+                og.Good.Price))
+            .ToListAsync();
     }
 
-    public async Task<List<OrderedGoodDto>> GetOrderedGoodDtos(int orderId)
+    public async Task<List<OrderedGoodDto>> GetOrderedGoods(int orderId)
     {
-        var allOrderedGoodsDto = await GetAllOrderedGoodDtos();
-        var orderedGoodsDto = 
-            (from og in allOrderedGoodsDto
-                where og.OrderId == orderId
-                select og).ToList();
-            
-        return orderedGoodsDto;
+        return await dbContext
+            .OrderedGoods
+            .Include(og => og.Good)
+            .Select(og => new OrderedGoodDto(
+                og.OrderId,
+                og.GoodId,
+                og.Amount,
+                og.Good.Name,
+                og.Good.Price))
+            .Where(og => og.OrderId == orderId)
+            .ToListAsync();
     }
 }

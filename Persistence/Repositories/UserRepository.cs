@@ -1,4 +1,5 @@
 using Application.Dto;
+using Application.Dto.User;
 using Application.Interfaces;
 using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
@@ -17,7 +18,7 @@ public class UserRepository(ApplicationDbContext dbContext) : IUserRepository
     public async Task DeleteUser(User user)
     {
         var orders = (from order in dbContext.Orders.AsParallel().AsOrdered()
-            where order.UserLogin == user.UserName
+            where order.UserName == user.UserName
             select order).ToList();
             
         var orderIds = orders.Select(o => o.Id).ToList(); 
@@ -39,26 +40,26 @@ public class UserRepository(ApplicationDbContext dbContext) : IUserRepository
         await dbContext.SaveChangesAsync();
     }
 
-    public async Task<List<UserDto>> GetAllUserDtos()
+    public async Task<List<UserDto>> GetAllUsers()
     {
         return await dbContext.Users.Select(user => new UserDto(
             user.UserName,
             user.FirstName,
             user.LastName,
-            user.Email,
             user.PhoneNumber,
+            user.Email,
             user.IsAdmin
         )).ToListAsync();
     }
 
-    public async Task<UserDto?> GetUserDto(string login)
+    public async Task<UserDto?> GetUser(string login)
     {
         return await dbContext.Users.Select(user => new UserDto(
             user.UserName,
             user.FirstName,
             user.LastName,
-            user.Email,
             user.PhoneNumber,
+            user.Email,
             user.IsAdmin
         )).FirstOrDefaultAsync();
     }

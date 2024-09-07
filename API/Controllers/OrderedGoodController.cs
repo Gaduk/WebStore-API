@@ -1,6 +1,6 @@
 using Application.Features.Order.Queries.GetOrder;
-using Application.Features.OrderedGood.Queries.GetAllOrderedGoodDtos;
-using Application.Features.OrderedGood.Queries.GetOrderedGoodDtos;
+using Application.Features.OrderedGood.Queries.GetAllOrderedGoods;
+using Application.Features.OrderedGood.Queries.GetOrderedGoods;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -14,7 +14,7 @@ public class OrderedGoodController(IMediator mediator, IAuthorizationService aut
     [HttpGet("/orderedGoods")]
     public async Task<IActionResult> GetAllOrderedGoodDtos()
     {
-        var orderGoods = await mediator.Send(new GetAllOrderedGoodDtosQuery());
+        var orderGoods = await mediator.Send(new GetAllOrderedGoodsQuery());
         return Ok(orderGoods);
     }
     
@@ -27,13 +27,13 @@ public class OrderedGoodController(IMediator mediator, IAuthorizationService aut
             return NotFound("Заказ не найден");
         }
         
-        var authorizationResult = await authorizationService.AuthorizeAsync(User, order.UserLogin, "HaveAccess");
+        var authorizationResult = await authorizationService.AuthorizeAsync(User, order.UserName, "HaveAccess");
         if (!authorizationResult.Succeeded)
         {
             return StatusCode(StatusCodes.Status403Forbidden);
         }
         
-        var orderGoods = await mediator.Send(new GetOrderedGoodDtosQuery(orderId));
+        var orderGoods = await mediator.Send(new GetOrderedGoodsQuery(orderId));
         return Ok(orderGoods);
     }
 }

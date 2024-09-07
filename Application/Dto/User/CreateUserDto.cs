@@ -1,6 +1,6 @@
-namespace Web_API.Inputs;
+namespace Application.Dto.User;
 
-public record RegisterInput(
+public record CreateUserDto(
     string Login,
     string Password,
     string FirstName,

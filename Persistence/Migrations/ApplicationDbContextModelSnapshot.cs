@@ -73,35 +73,48 @@ namespace Persistence.Migrations
                     b.Property<bool>("IsDone")
                         .HasColumnType("boolean");
 
-                    b.Property<string>("UserLogin")
+                    b.Property<string>("UserName")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("character varying(256)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("UserName");
 
                     b.ToTable("Orders");
                 });
 
             modelBuilder.Entity("Domain.Entities.OrderedGood", b =>
                 {
-                    b.Property<int>("OrderId")
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("Amount")
                         .HasColumnType("integer");
 
                     b.Property<int>("GoodId")
                         .HasColumnType("integer");
 
-                    b.Property<int>("Amount")
+                    b.Property<int>("OrderId")
                         .HasColumnType("integer");
 
-                    b.HasKey("OrderId", "GoodId");
+                    b.HasKey("Id");
+
+                    b.HasIndex("GoodId");
+
+                    b.HasIndex("OrderId");
 
                     b.ToTable("OrderedGoods");
                 });
 
             modelBuilder.Entity("Domain.Entities.User", b =>
                 {
-                    b.Property<string>("Id")
-                        .HasColumnType("text");
+                    b.Property<string>("UserName")
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
 
                     b.Property<int>("AccessFailedCount")
                         .HasColumnType("integer");
@@ -119,6 +132,9 @@ namespace Persistence.Migrations
 
                     b.Property<string>("FirstName")
                         .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Id")
                         .HasColumnType("text");
 
                     b.Property<bool>("IsAdmin")
@@ -157,11 +173,7 @@ namespace Persistence.Migrations
                     b.Property<bool>("TwoFactorEnabled")
                         .HasColumnType("boolean");
 
-                    b.Property<string>("UserName")
-                        .HasMaxLength(256)
-                        .HasColumnType("character varying(256)");
-
-                    b.HasKey("Id");
+                    b.HasKey("UserName");
 
                     b.HasIndex("NormalizedEmail")
                         .HasDatabaseName("EmailIndex");
@@ -175,22 +187,23 @@ namespace Persistence.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "admin",
+                            UserName = "admin",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "2e89036d-7391-4a29-b6d7-dcbc95041e38",
+                            ConcurrencyStamp = "c3d0065f-76c8-4ba4-86ab-87af8702a769",
                             Email = "admin@mail.ru",
                             EmailConfirmed = true,
                             FirstName = "Иван",
-                            IsAdmin = false,
+                            Id = "admin",
+                            IsAdmin = true,
                             LastName = "Иванов",
                             LockoutEnabled = false,
                             NormalizedEmail = "ADMIN@MAIL.RU",
                             NormalizedUserName = "ADMIN",
-                            PasswordHash = "AQAAAAIAAYagAAAAEOcZj1TqZJsmFgQ+PuXAeNdeAhkxDBT0K5o/YZuxs8HH5WlHOtPUzu39RZqCOYCY9g==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEOmGmK4rhDxv5s1Nyczfv3RRXoQL61dshSdBmychVaByuN2bJrYOqlHwME06vOhjNA==",
+                            PhoneNumber = "+71112223344",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "18d74696-c8ed-4601-95c0-71f09c7130dd",
-                            TwoFactorEnabled = false,
-                            UserName = "admin"
+                            SecurityStamp = "2c64610a-0d21-4297-9207-e362b5f7239f",
+                            TwoFactorEnabled = false
                         });
                 });
 
@@ -261,7 +274,7 @@ namespace Persistence.Migrations
 
                     b.Property<string>("UserId")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("character varying(256)");
 
                     b.HasKey("Id");
 
@@ -308,7 +321,7 @@ namespace Persistence.Migrations
 
                     b.Property<string>("UserId")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("character varying(256)");
 
                     b.HasKey("LoginProvider", "ProviderKey");
 
@@ -320,7 +333,7 @@ namespace Persistence.Migrations
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<string>", b =>
                 {
                     b.Property<string>("UserId")
-                        .HasColumnType("text");
+                        .HasColumnType("character varying(256)");
 
                     b.Property<string>("RoleId")
                         .HasColumnType("text");
@@ -335,7 +348,7 @@ namespace Persistence.Migrations
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
                 {
                     b.Property<string>("UserId")
-                        .HasColumnType("text");
+                        .HasColumnType("character varying(256)");
 
                     b.Property<string>("LoginProvider")
                         .HasMaxLength(128)
@@ -351,6 +364,32 @@ namespace Persistence.Migrations
                     b.HasKey("UserId", "LoginProvider", "Name");
 
                     b.ToTable("AspNetUserTokens", (string)null);
+                });
+
+            modelBuilder.Entity("Domain.Entities.Order", b =>
+                {
+                    b.HasOne("Domain.Entities.User", null)
+                        .WithMany("Orders")
+                        .HasForeignKey("UserName")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Domain.Entities.OrderedGood", b =>
+                {
+                    b.HasOne("Domain.Entities.Good", "Good")
+                        .WithMany()
+                        .HasForeignKey("GoodId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Domain.Entities.Order", null)
+                        .WithMany("OrderedGoods")
+                        .HasForeignKey("OrderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Good");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -402,6 +441,16 @@ namespace Persistence.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("Domain.Entities.Order", b =>
+                {
+                    b.Navigation("OrderedGoods");
+                });
+
+            modelBuilder.Entity("Domain.Entities.User", b =>
+                {
+                    b.Navigation("Orders");
                 });
 #pragma warning restore 612, 618
         }

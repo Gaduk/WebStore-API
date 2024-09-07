@@ -1,8 +1,9 @@
 using System.Security.Claims;
+using Application.Dto.User;
 using Application.Features.User.Commands.DeleteUser;
 using Application.Features.User.Commands.UpdateUserRole;
-using Application.Features.User.Queries.GetAllUserDtos;
-using Application.Features.User.Queries.GetUserDto;
+using Application.Features.User.Queries.GetAllUsers;
+using Application.Features.User.Queries.GetUser;
 using Application.Interfaces;
 using Domain.Entities;
 using MediatR;
@@ -11,7 +12,6 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Web_API.Inputs;
 
 namespace Web_API.Controllers;
 
@@ -25,7 +25,7 @@ public class UserController(
     IMailService mailService) : ControllerBase
 {
     [HttpPost("/register")]
-    public async Task<IActionResult> CreateUser(RegisterInput input)
+    public async Task<IActionResult> CreateUser(CreateUserDto input)
     {
         var userWithSameLogin = await userManager.FindByNameAsync(input.Login);
         if (userWithSameLogin != null)
@@ -160,7 +160,7 @@ public class UserController(
             return StatusCode(StatusCodes.Status403Forbidden);
         }
         
-        var user = await mediator.Send(new GetUserDtoQuery(login));
+        var user = await mediator.Send(new GetUserQuery(login));
         if(user == null)
         {
             return NotFound("Пользователь не найден");
@@ -172,7 +172,7 @@ public class UserController(
     [HttpGet("/users")]
     public async Task<IActionResult> GetAllUsers()
     {
-        var users = await mediator.Send(new GetAllUserDtosQuery());
+        var users = await mediator.Send(new GetAllUsersQuery());
         return Ok(users);
     }
 }

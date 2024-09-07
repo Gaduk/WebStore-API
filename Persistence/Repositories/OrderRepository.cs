@@ -1,3 +1,5 @@
+using Application.Dto;
+using Application.Dto.OrderedGoods;
 using Application.Interfaces;
 using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
@@ -7,11 +9,11 @@ namespace Persistence.Repositories;
 
 public class OrderRepository(ApplicationDbContext dbContext) : IOrderRepository
 {
-    public async Task<int> CreateOrder(string login, OrderedGood[] orderedGoods)
+    public async Task<int> CreateOrder(string login, CreateOrderedGoodDto[] orderedGoods)
     {
         var order = new Order
         {
-            UserLogin = login,
+            UserName = login,
             IsDone = false
         };
         await dbContext.Orders.AddAsync(order);
@@ -20,11 +22,14 @@ public class OrderRepository(ApplicationDbContext dbContext) : IOrderRepository
 
         foreach (var orderedGood in orderedGoods)
         {
-            if (orderedGood.Amount != 0)
+            if (orderedGood.Amount == 0) continue;
+            var newOrderedGood = new OrderedGood
             {
-                orderedGood.OrderId = orderId;
-                await dbContext.OrderedGoods.AddAsync(orderedGood);
-            }
+                OrderId = orderId,
+                GoodId = orderedGood.GoodId,
+                Amount = orderedGood.Amount
+            }; 
+            await dbContext.OrderedGoods.AddAsync(newOrderedGood);
         }
         await dbContext.SaveChangesAsync();
         return orderId;
@@ -43,9 +48,11 @@ public class OrderRepository(ApplicationDbContext dbContext) : IOrderRepository
 
     public async Task<List<Order>> GetUserOrders(string login)
     {
-        var orders = (from order in dbContext.Orders.AsParallel().AsOrdered()
-            where order.UserLogin == login
-            select order).ToList();
+        var orders = await dbContext
+            .Orders
+            .Where(o => o.UserName == login)
+            .ToListAsync();
+
         return orders;
     }
 

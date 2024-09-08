@@ -1,4 +1,4 @@
-using Application.Features.Good.Queries.GetAllGoods;
+using Application.Features.Good.Queries.GetAllGoodEntities;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -12,7 +12,7 @@ public class GoodController(IMediator mediator) : ControllerBase
     [HttpGet("/goods")]
     public async Task<IActionResult> GetAllGoods()
     {
-        var goods = await mediator.Send(new GetAllGoodsQuery());
+        var goods = await mediator.Send(new GetAllGoodEntitiesQuery());
         return Ok(goods);
     }
 }

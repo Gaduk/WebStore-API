@@ -1,7 +1,9 @@
 using Application.Dto;
+using Application.Dto.Order;
 using Application.Dto.OrderedGoods;
 using Application.Interfaces;
 using Domain.Entities;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Persistence.Context;
 
@@ -9,11 +11,11 @@ namespace Persistence.Repositories;
 
 public class OrderRepository(ApplicationDbContext dbContext) : IOrderRepository
 {
-    public async Task<int> CreateOrder(string login, CreateOrderedGoodDto[] orderedGoods)
+    public async Task<int> CreateOrder(string userId, CreateOrderedGoodDto[] orderedGoods)
     {
         var order = new Order
         {
-            UserName = login,
+            UserId = userId,
             IsDone = false
         };
         await dbContext.Orders.AddAsync(order);
@@ -41,24 +43,39 @@ public class OrderRepository(ApplicationDbContext dbContext) : IOrderRepository
         await dbContext.SaveChangesAsync();
     }
 
-    public async Task<List<Order>> GetAllOrders()
+    public async Task<List<OrderDto>> GetAllOrders()
     {
-        return await dbContext.Orders.ToListAsync();
-    }
-
-    public async Task<List<Order>> GetUserOrders(string login)
-    {
-        var orders = await dbContext
+        return await dbContext
             .Orders
-            .Where(o => o.UserName == login)
+            .Select(o => new OrderDto(o.Id, o.User.UserName, o.IsDone))
             .ToListAsync();
-
-        return orders;
     }
 
-    public async Task<Order?> GetOrder(int orderId)
+    public async Task<List<OrderDto>> GetUserOrders(string login)
     {
-        var order = await dbContext.Orders.FirstOrDefaultAsync(o => o.Id == orderId);
-        return order;
+        return await dbContext
+            .Orders
+            .Include(o => o.User)
+            .Where(o => o.User.UserName == login)
+            .Select(o => new OrderDto(o.Id, o.User.UserName, o.IsDone))
+            .ToListAsync();
+    }
+
+    public async Task<OrderDto?> GetOrder(int orderId)
+    {
+        return await dbContext
+            .Orders
+            .Where(o => o.Id == orderId)
+            .Include(o => o.User)
+            .Select(o => new OrderDto(o.Id, o.User.UserName, o.IsDone))
+            .FirstOrDefaultAsync();
+    }
+    
+    public async Task<Order?> GetOrderEntity(int orderId)
+    {
+        return await dbContext
+            .Orders
+            .Where(o => o.Id == orderId)
+            .FirstOrDefaultAsync();
     }
 }

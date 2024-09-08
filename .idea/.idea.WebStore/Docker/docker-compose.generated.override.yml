@@ -2,7 +2,7 @@
 services:
   api:
     build:
-      context: "C:\\Projects\\WebStore-API"
+      context: "C:\\Projects\\Web-API"
       dockerfile: "API/Dockerfile"
       target: "base"
     command: []
@@ -15,7 +15,7 @@ services:
     image: "api:dev"
     ports: []
     volumes:
-    - "C:\\Users\\admin\\.nuget\\packages:/home/app/.nuget/packages"
-    - "C:\\Projects\\WebStore-API\\API:/app:rw"
-    - "C:\\Projects\\WebStore-API:/src:rw"
+    - "C:\\Users\\Даниил\\.nuget\\packages:/home/app/.nuget/packages"
+    - "C:\\Projects\\Web-API\\API:/app:rw"
+    - "C:\\Projects\\Web-API:/src:rw"
     working_dir: "/app"

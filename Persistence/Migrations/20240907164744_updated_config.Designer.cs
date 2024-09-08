@@ -12,8 +12,8 @@ using Persistence.Context;
 namespace Persistence.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240905193736_added_config_classes")]
-    partial class added_config_classes
+    [Migration("20240907164744_updated_config")]
+    partial class updated_config
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -76,27 +76,39 @@ namespace Persistence.Migrations
                     b.Property<bool>("IsDone")
                         .HasColumnType("boolean");
 
-                    b.Property<string>("UserLogin")
+                    b.Property<string>("UserId")
                         .IsRequired()
                         .HasColumnType("text");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("Orders");
                 });
 
             modelBuilder.Entity("Domain.Entities.OrderedGood", b =>
                 {
-                    b.Property<int>("OrderId")
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("Amount")
                         .HasColumnType("integer");
 
                     b.Property<int>("GoodId")
                         .HasColumnType("integer");
 
-                    b.Property<int>("Amount")
+                    b.Property<int>("OrderId")
                         .HasColumnType("integer");
 
-                    b.HasKey("OrderId", "GoodId");
+                    b.HasKey("Id");
+
+                    b.HasIndex("GoodId");
+
+                    b.HasIndex("OrderId");
 
                     b.ToTable("OrderedGoods");
                 });
@@ -180,7 +192,7 @@ namespace Persistence.Migrations
                         {
                             Id = "admin",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "cd2408dc-22a7-41a8-bf57-63a63f9788eb",
+                            ConcurrencyStamp = "e68fb2be-5f7a-40ba-8947-b1b195c3ef82",
                             Email = "admin@mail.ru",
                             EmailConfirmed = true,
                             FirstName = "Иван",
@@ -189,9 +201,10 @@ namespace Persistence.Migrations
                             LockoutEnabled = false,
                             NormalizedEmail = "ADMIN@MAIL.RU",
                             NormalizedUserName = "ADMIN",
-                            PasswordHash = "AQAAAAIAAYagAAAAEDtEiPjzm1649kOOhjzQtKx9CLW4lbChj9+JX55hjzw9Q3GZFxG4GSSuNXUBOMMu7A==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEHG1W6MylQcjbF7acVreojNZLf5IjsN5EgnObFuNBfFhEMnxFPPd2fqIjGpULh3QDQ==",
+                            PhoneNumber = "+71112223344",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "3a798554-bf07-40b7-a67b-010c45875360",
+                            SecurityStamp = "a24c3f06-bf09-4df9-b069-bf8a8b1a6b9f",
                             TwoFactorEnabled = false,
                             UserName = "admin"
                         });
@@ -356,6 +369,34 @@ namespace Persistence.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("Domain.Entities.Order", b =>
+                {
+                    b.HasOne("Domain.Entities.User", "User")
+                        .WithMany("Orders")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Domain.Entities.OrderedGood", b =>
+                {
+                    b.HasOne("Domain.Entities.Good", "Good")
+                        .WithMany()
+                        .HasForeignKey("GoodId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Domain.Entities.Order", null)
+                        .WithMany("OrderedGoods")
+                        .HasForeignKey("OrderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Good");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
@@ -405,6 +446,16 @@ namespace Persistence.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("Domain.Entities.Order", b =>
+                {
+                    b.Navigation("OrderedGoods");
+                });
+
+            modelBuilder.Entity("Domain.Entities.User", b =>
+                {
+                    b.Navigation("Orders");
                 });
 #pragma warning restore 612, 618
         }

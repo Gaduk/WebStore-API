@@ -17,6 +17,7 @@ public class UserRepository(ApplicationDbContext dbContext) : IUserRepository
 
     public async Task DeleteUser(User user)
     {
+        /*
         var orders = (from order in dbContext.Orders.AsParallel().AsOrdered()
             where order.UserName == user.UserName
             select order).ToList();
@@ -31,6 +32,9 @@ public class UserRepository(ApplicationDbContext dbContext) : IUserRepository
         dbContext.Orders.RemoveRange(orders);
         dbContext.Users.Remove(user);
         await dbContext.SaveChangesAsync();
+        */
+        dbContext.Users.Remove(user);
+        await dbContext.SaveChangesAsync();
     }
 
     public async Task UpdateUserRole(User user, bool isAdmin)
@@ -42,25 +46,29 @@ public class UserRepository(ApplicationDbContext dbContext) : IUserRepository
 
     public async Task<List<UserDto>> GetAllUsers()
     {
-        return await dbContext.Users.Select(user => new UserDto(
-            user.UserName,
-            user.FirstName,
-            user.LastName,
-            user.PhoneNumber,
-            user.Email,
-            user.IsAdmin
-        )).ToListAsync();
+        return await dbContext.Users
+            .Select(user => new UserDto(
+                user.UserName,
+                user.FirstName,
+                user.LastName,
+                user.PhoneNumber,
+                user.Email,
+                user.IsAdmin
+            )).ToListAsync();
     }
 
     public async Task<UserDto?> GetUser(string login)
     {
-        return await dbContext.Users.Select(user => new UserDto(
-            user.UserName,
-            user.FirstName,
-            user.LastName,
-            user.PhoneNumber,
-            user.Email,
-            user.IsAdmin
-        )).FirstOrDefaultAsync();
+        return await dbContext.Users
+            .Where(u => u.UserName == login)
+            .Select(user => new UserDto(
+                user.UserName, 
+                user.FirstName,
+                user.LastName,
+                user.PhoneNumber,
+                user.Email,
+                user.IsAdmin
+            ))
+            .FirstOrDefaultAsync();
     }
 }

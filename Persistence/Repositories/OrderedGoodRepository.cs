@@ -27,13 +27,13 @@ public class OrderedGoodRepository(ApplicationDbContext dbContext) : IOrderedGoo
         return await dbContext
             .OrderedGoods
             .Include(og => og.Good)
+            .Where(og => og.OrderId == orderId)
             .Select(og => new OrderedGoodDto(
                 og.OrderId,
                 og.GoodId,
                 og.Amount,
                 og.Good.Name,
                 og.Good.Price))
-            .Where(og => og.OrderId == orderId)
             .ToListAsync();
     }
 }

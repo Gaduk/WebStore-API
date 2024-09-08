@@ -12,8 +12,8 @@ using Persistence.Context;
 namespace Persistence.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240905210324_added_navigation_properties")]
-    partial class added_navigation_properties
+    [Migration("20240907170340_added_ordered_good_id_column")]
+    partial class added_ordered_good_id_column
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -77,9 +77,6 @@ namespace Persistence.Migrations
                         .HasColumnType("boolean");
 
                     b.Property<string>("UserId")
-                        .HasColumnType("text");
-
-                    b.Property<string>("UserName")
                         .IsRequired()
                         .HasColumnType("text");
 
@@ -195,7 +192,7 @@ namespace Persistence.Migrations
                         {
                             Id = "admin",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "4eb503c0-ac54-41d6-b451-38044164adec",
+                            ConcurrencyStamp = "c815e4fd-8c3a-4b51-86d9-fad6fd3f9d93",
                             Email = "admin@mail.ru",
                             EmailConfirmed = true,
                             FirstName = "Иван",
@@ -204,9 +201,10 @@ namespace Persistence.Migrations
                             LockoutEnabled = false,
                             NormalizedEmail = "ADMIN@MAIL.RU",
                             NormalizedUserName = "ADMIN",
-                            PasswordHash = "AQAAAAIAAYagAAAAEIK4kAGQL/h1gU7Be2h/1dFJy/Db74ZwP/HaHnL18lUtgntWgBHu/68BIceQzhc+2g==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEGwOWpYUvdK2ZuJUsKceVeQ+wLNi81nErs+gHiG40mzsXEXeq/Mr5afGu6La3PSxvA==",
+                            PhoneNumber = "+71112223344",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "06861d69-abbf-4e3b-ac50-946948465d9d",
+                            SecurityStamp = "f748bd13-eb68-4a52-9ba7-98be1373373b",
                             TwoFactorEnabled = false,
                             UserName = "admin"
                         });
@@ -373,9 +371,13 @@ namespace Persistence.Migrations
 
             modelBuilder.Entity("Domain.Entities.Order", b =>
                 {
-                    b.HasOne("Domain.Entities.User", null)
+                    b.HasOne("Domain.Entities.User", "User")
                         .WithMany("Orders")
-                        .HasForeignKey("UserId");
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Domain.Entities.OrderedGood", b =>

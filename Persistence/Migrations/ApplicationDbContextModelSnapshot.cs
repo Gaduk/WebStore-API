@@ -73,13 +73,13 @@ namespace Persistence.Migrations
                     b.Property<bool>("IsDone")
                         .HasColumnType("boolean");
 
-                    b.Property<string>("UserName")
+                    b.Property<string>("UserId")
                         .IsRequired()
-                        .HasColumnType("character varying(256)");
+                        .HasColumnType("text");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("UserName");
+                    b.HasIndex("UserId");
 
                     b.ToTable("Orders");
                 });
@@ -112,9 +112,8 @@ namespace Persistence.Migrations
 
             modelBuilder.Entity("Domain.Entities.User", b =>
                 {
-                    b.Property<string>("UserName")
-                        .HasMaxLength(256)
-                        .HasColumnType("character varying(256)");
+                    b.Property<string>("Id")
+                        .HasColumnType("text");
 
                     b.Property<int>("AccessFailedCount")
                         .HasColumnType("integer");
@@ -132,9 +131,6 @@ namespace Persistence.Migrations
 
                     b.Property<string>("FirstName")
                         .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("Id")
                         .HasColumnType("text");
 
                     b.Property<bool>("IsAdmin")
@@ -173,7 +169,11 @@ namespace Persistence.Migrations
                     b.Property<bool>("TwoFactorEnabled")
                         .HasColumnType("boolean");
 
-                    b.HasKey("UserName");
+                    b.Property<string>("UserName")
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.HasKey("Id");
 
                     b.HasIndex("NormalizedEmail")
                         .HasDatabaseName("EmailIndex");
@@ -187,23 +187,23 @@ namespace Persistence.Migrations
                     b.HasData(
                         new
                         {
-                            UserName = "admin",
+                            Id = "admin",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "c3d0065f-76c8-4ba4-86ab-87af8702a769",
+                            ConcurrencyStamp = "c815e4fd-8c3a-4b51-86d9-fad6fd3f9d93",
                             Email = "admin@mail.ru",
                             EmailConfirmed = true,
                             FirstName = "Иван",
-                            Id = "admin",
                             IsAdmin = true,
                             LastName = "Иванов",
                             LockoutEnabled = false,
                             NormalizedEmail = "ADMIN@MAIL.RU",
                             NormalizedUserName = "ADMIN",
-                            PasswordHash = "AQAAAAIAAYagAAAAEOmGmK4rhDxv5s1Nyczfv3RRXoQL61dshSdBmychVaByuN2bJrYOqlHwME06vOhjNA==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEGwOWpYUvdK2ZuJUsKceVeQ+wLNi81nErs+gHiG40mzsXEXeq/Mr5afGu6La3PSxvA==",
                             PhoneNumber = "+71112223344",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "2c64610a-0d21-4297-9207-e362b5f7239f",
-                            TwoFactorEnabled = false
+                            SecurityStamp = "f748bd13-eb68-4a52-9ba7-98be1373373b",
+                            TwoFactorEnabled = false,
+                            UserName = "admin"
                         });
                 });
 
@@ -274,7 +274,7 @@ namespace Persistence.Migrations
 
                     b.Property<string>("UserId")
                         .IsRequired()
-                        .HasColumnType("character varying(256)");
+                        .HasColumnType("text");
 
                     b.HasKey("Id");
 
@@ -321,7 +321,7 @@ namespace Persistence.Migrations
 
                     b.Property<string>("UserId")
                         .IsRequired()
-                        .HasColumnType("character varying(256)");
+                        .HasColumnType("text");
 
                     b.HasKey("LoginProvider", "ProviderKey");
 
@@ -333,7 +333,7 @@ namespace Persistence.Migrations
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<string>", b =>
                 {
                     b.Property<string>("UserId")
-                        .HasColumnType("character varying(256)");
+                        .HasColumnType("text");
 
                     b.Property<string>("RoleId")
                         .HasColumnType("text");
@@ -348,7 +348,7 @@ namespace Persistence.Migrations
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
                 {
                     b.Property<string>("UserId")
-                        .HasColumnType("character varying(256)");
+                        .HasColumnType("text");
 
                     b.Property<string>("LoginProvider")
                         .HasMaxLength(128)
@@ -368,11 +368,13 @@ namespace Persistence.Migrations
 
             modelBuilder.Entity("Domain.Entities.Order", b =>
                 {
-                    b.HasOne("Domain.Entities.User", null)
+                    b.HasOne("Domain.Entities.User", "User")
                         .WithMany("Orders")
-                        .HasForeignKey("UserName")
+                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Domain.Entities.OrderedGood", b =>

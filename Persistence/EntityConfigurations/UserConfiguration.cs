@@ -10,11 +10,9 @@ public class UserConfiguration: IEntityTypeConfiguration<User>
 {
     public void Configure(EntityTypeBuilder<User> builder)
     {
-        builder.HasKey(user => user.UserName);
         builder
             .HasMany(u => u.Orders)
-            .WithOne(o=> o.User)
-            .HasForeignKey(o => o.UserName);
+            .WithOne(o => o.User);
         
         var hasher = new PasswordHasher<User>();
         builder.HasData(

@@ -1,6 +1,6 @@
-using Application.Dto;
 using Application.Dto.OrderedGoods;
 using Application.Interfaces;
+using Dapper;
 using Microsoft.EntityFrameworkCore;
 using Persistence.Context;
 
@@ -12,7 +12,7 @@ public class OrderedGoodRepository(ApplicationDbContext dbContext) : IOrderedGoo
     {
         return await dbContext
             .OrderedGoods
-            .Include(og => og.Good)
+            .OrderBy(og => og.Id)
             .Select(og => new OrderedGoodDto(
                 og.OrderId,
                 og.GoodId,
@@ -24,16 +24,16 @@ public class OrderedGoodRepository(ApplicationDbContext dbContext) : IOrderedGoo
 
     public async Task<List<OrderedGoodDto>> GetOrderedGoods(int orderId)
     {
-        return await dbContext
-            .OrderedGoods
-            .Include(og => og.Good)
-            .Where(og => og.OrderId == orderId)
-            .Select(og => new OrderedGoodDto(
-                og.OrderId,
-                og.GoodId,
-                og.Amount,
-                og.Good.Name,
-                og.Good.Price))
-            .ToListAsync();
+        var connection = dbContext.Database.GetDbConnection();
+        
+        const string query = @"
+                SELECT og.""OrderId"", og.""GoodId"", og.""Amount"", g.""Name"", g.""Price""
+                FROM ""OrderedGoods"" og
+                INNER JOIN ""Goods"" g ON og.""GoodId"" = g.""Id""
+                WHERE og.""OrderId"" = @OrderId
+                ORDER BY og.""Id""";
+        var parameters = new { OrderId = orderId };
+        var result = await connection.QueryAsync<OrderedGoodDto>(query, parameters);
+        return result.ToList();
     }
 }

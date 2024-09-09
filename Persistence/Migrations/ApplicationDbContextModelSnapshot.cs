@@ -189,7 +189,7 @@ namespace Persistence.Migrations
                         {
                             Id = "admin",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "c815e4fd-8c3a-4b51-86d9-fad6fd3f9d93",
+                            ConcurrencyStamp = "0e9884da-3e86-4c98-afe0-7340d7cc7042",
                             Email = "admin@mail.ru",
                             EmailConfirmed = true,
                             FirstName = "Иван",
@@ -198,10 +198,10 @@ namespace Persistence.Migrations
                             LockoutEnabled = false,
                             NormalizedEmail = "ADMIN@MAIL.RU",
                             NormalizedUserName = "ADMIN",
-                            PasswordHash = "AQAAAAIAAYagAAAAEGwOWpYUvdK2ZuJUsKceVeQ+wLNi81nErs+gHiG40mzsXEXeq/Mr5afGu6La3PSxvA==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEEg7XXW9rqZGe/h8AamYfD9zWVus03D/xfYH3Pzmr3hi6CXmcojT4I9BFZFffvfqfQ==",
                             PhoneNumber = "+71112223344",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "f748bd13-eb68-4a52-9ba7-98be1373373b",
+                            SecurityStamp = "89e3013e-42d9-4d72-b4c3-69d9ea808cd1",
                             TwoFactorEnabled = false,
                             UserName = "admin"
                         });

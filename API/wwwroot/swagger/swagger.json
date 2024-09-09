@@ -478,9 +478,6 @@
           "Login": {
             "type": "string"
           },
-          "Password": {
-            "type": "string"
-          },
           "FirstName": {
             "type": "string"
           },
@@ -504,7 +501,7 @@
           "Id": {
             "type": "integer"
           },
-          "UserLogin": {
+          "UserName": {
             "type": "string"
           },
           "IsDone": {
@@ -523,6 +520,12 @@
           },
           "Amount": {
             "type": "integer"
+          },
+          "Name": {
+            "type": "string"
+          },
+          "Price": {
+            "type": "number"
           }
         }
       },
@@ -536,7 +539,7 @@
             "type": "string"
           },
           "Price": {
-            "type": "integer"
+            "type": "number"
           }
         }
       }

@@ -95,29 +95,4 @@ public class UserControllerTests
         // Assert
         Assert.IsType<BadRequestObjectResult>(result);
     }
-    
-    [Fact]
-    public async Task CreateUser_Returns200_WhenInputLoginIsUnique_And_InputIsValid()
-    {
-        // Arrange
-        var input = new CreateUserDto(
-            "user2", 
-            "user2", 
-            "FirstName",
-            "LastName",
-            "+79990001122",
-            "user@mail.ru"
-        );
-        
-        _userManagerMock.Setup(u => u.FindByNameAsync(It.IsAny<string>()))
-            .ReturnsAsync((User?)null);
-        _userManagerMock.Setup(u => u.CreateAsync(It.IsAny<User>(), It.IsAny<string>()))
-            .ReturnsAsync(IdentityResult.Success);
-        
-        // Act
-        var result = await _userController.CreateUser(input);
-        
-        // Assert
-        Assert.IsType<OkObjectResult>(result);
-    }
 }

@@ -6,6 +6,7 @@ using Application.Features.User.Queries.GetAllUsers;
 using Application.Features.User.Queries.GetUser;
 using Application.Interfaces;
 using Domain.Entities;
+using Hangfire;
 using MediatR;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -56,7 +57,10 @@ public class UserController(
         await userManager.AddClaimsAsync(user, claims);
         
         //Подключаем рассылку
-        mailService.SendMessage(input.Login, input.Email);
+        RecurringJob.AddOrUpdate(
+            $"SendEmailMinutelyTo_{input.Login}", 
+            () => mailService.SendMessage(input.Email), 
+            Cron.Minutely);
         
         return Ok($"Пользователь {user.UserName} успешно зарегистрирован");
     }

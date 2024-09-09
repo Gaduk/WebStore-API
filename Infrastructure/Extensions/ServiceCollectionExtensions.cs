@@ -7,6 +7,6 @@ public static class ServiceCollectionExtensions
 {
     public static void AddInfrastructure(this IServiceCollection services)
     {
-        services.AddScoped<IMailService, MailService>();
+        services.AddSingleton<IMailService, MailService>();
     }
 }

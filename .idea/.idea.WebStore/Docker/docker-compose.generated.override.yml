@@ -15,6 +15,7 @@ services:
     image: "api:dev"
     ports: []
     volumes:
+    - "C:\\Users\\Даниил\\AppData\\Roaming\\Microsoft\\UserSecrets:/home/app/.microsoft/usersecrets"
     - "C:\\Users\\Даниил\\.nuget\\packages:/home/app/.nuget/packages"
     - "C:\\Projects\\Web-API\\API:/app:rw"
     - "C:\\Projects\\Web-API:/src:rw"

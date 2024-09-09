@@ -1,5 +1,3 @@
-using Application.Dto;
-using Application.Dto.Order;
 using Application.Dto.OrderedGoods;
 using Application.Features.Order.Commands.CreateOrder;
 using Application.Features.Order.Commands.UpdateOrder;
@@ -7,7 +5,6 @@ using Application.Features.Order.Queries.GetAllOrders;
 using Application.Features.Order.Queries.GetOrder;
 using Application.Features.Order.Queries.GetOrderEntity;
 using Application.Features.Order.Queries.GetUserOrders;
-using Application.Features.User.Queries.GetUser;
 using Domain.Entities;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -71,6 +68,12 @@ public class OrderController(
         if (!authorizationResult.Succeeded)
         {
             return StatusCode(StatusCodes.Status403Forbidden);
+        }
+
+        var user = await userManager.FindByNameAsync(login);
+        if (user == null)
+        {
+            return NotFound("Пользователь не найден");
         }
         
         var orders = await mediator.Send(new GetUserOrdersQuery(login));

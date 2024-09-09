@@ -9,6 +9,9 @@ public class GoodRepository(ApplicationDbContext dbContext) : IGoodRepository
 {
     public async Task<List<Good>> GetAllGoods()
     {
-        return await dbContext.Goods.ToListAsync();
+        return await dbContext.Goods
+            .AsNoTracking()
+            .OrderBy(g => g.Id)
+            .ToListAsync();
     }
 }

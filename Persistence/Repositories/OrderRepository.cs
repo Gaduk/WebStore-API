@@ -1,9 +1,7 @@
-using Application.Dto;
 using Application.Dto.Order;
 using Application.Dto.OrderedGoods;
 using Application.Interfaces;
 using Domain.Entities;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Persistence.Context;
 
@@ -47,7 +45,8 @@ public class OrderRepository(ApplicationDbContext dbContext) : IOrderRepository
     {
         return await dbContext
             .Orders
-            .Select(o => new OrderDto(o.Id, o.User.UserName, o.IsDone))
+            .OrderBy(o => o.Id)
+            .Select(o => new OrderDto{Id = o.Id, UserName = o.User.UserName, IsDone = o.IsDone })
             .ToListAsync();
     }
 
@@ -55,9 +54,9 @@ public class OrderRepository(ApplicationDbContext dbContext) : IOrderRepository
     {
         return await dbContext
             .Orders
-            .Include(o => o.User)
             .Where(o => o.User.UserName == login)
-            .Select(o => new OrderDto(o.Id, o.User.UserName, o.IsDone))
+            .OrderBy(o => o.Id)
+            .Select(o => new OrderDto {Id = o.Id, UserName = o.User.UserName, IsDone = o.IsDone })
             .ToListAsync();
     }
 
@@ -65,9 +64,10 @@ public class OrderRepository(ApplicationDbContext dbContext) : IOrderRepository
     {
         return await dbContext
             .Orders
-            .Where(o => o.Id == orderId)
             .Include(o => o.User)
-            .Select(o => new OrderDto(o.Id, o.User.UserName, o.IsDone))
+            .Where(o => o.Id == orderId)
+            .OrderBy(o => o.Id)
+            .Select(o => new OrderDto {Id = o.Id, UserName = o.User.UserName, IsDone = o.IsDone })
             .FirstOrDefaultAsync();
     }
     

@@ -3,7 +3,6 @@ namespace Domain.Entities;
 public class Order
 {
     public int Id { get; set; }
-    //Внешний ключ
     public string UserId { get; set; }
     public bool IsDone { get; set; } = false;
     

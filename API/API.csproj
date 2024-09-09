@@ -7,6 +7,7 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <RootNamespace>Web_API</RootNamespace>
         <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+        <UserSecretsId>3228a57a-5217-4ac6-8dcc-6996cc1dd84a</UserSecretsId>
     </PropertyGroup>
 
     <ItemGroup>

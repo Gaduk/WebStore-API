@@ -1,4 +1,3 @@
-using Application.Dto;
 using Application.Dto.User;
 using Application.Interfaces;
 using Domain.Entities;
@@ -17,22 +16,6 @@ public class UserRepository(ApplicationDbContext dbContext) : IUserRepository
 
     public async Task DeleteUser(User user)
     {
-        /*
-        var orders = (from order in dbContext.Orders.AsParallel().AsOrdered()
-            where order.UserName == user.UserName
-            select order).ToList();
-            
-        var orderIds = orders.Select(o => o.Id).ToList(); 
-            
-        var orderedGoods = (from orderedGood in dbContext.OrderedGoods.AsParallel().AsOrdered()
-            where orderIds.Contains(orderedGood.OrderId)
-            select orderedGood).ToList();
-            
-        dbContext.OrderedGoods.RemoveRange(orderedGoods);
-        dbContext.Orders.RemoveRange(orders);
-        dbContext.Users.Remove(user);
-        await dbContext.SaveChangesAsync();
-        */
         dbContext.Users.Remove(user);
         await dbContext.SaveChangesAsync();
     }
@@ -47,6 +30,7 @@ public class UserRepository(ApplicationDbContext dbContext) : IUserRepository
     public async Task<List<UserDto>> GetAllUsers()
     {
         return await dbContext.Users
+            .OrderBy(u => u.UserName)
             .Select(user => new UserDto(
                 user.UserName,
                 user.FirstName,

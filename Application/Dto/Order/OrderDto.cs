@@ -1,17 +1,9 @@
 namespace Application.Dto.Order;
 
-public class OrderDto
+public record OrderDto(
+    int Id,
+    string UserName,
+    bool IsDone)
 {
-    public int Id { get; init; }
-    public string UserName { get; init; }
-    public bool IsDone { get; init; }
-
-    public OrderDto() { }
-
-    public OrderDto(int id, string userName, bool isDone)
-    {
-        Id = id;
-        UserName = userName;
-        IsDone = isDone;
-    }
+    public OrderDto() : this(default, default, default) { }
 }

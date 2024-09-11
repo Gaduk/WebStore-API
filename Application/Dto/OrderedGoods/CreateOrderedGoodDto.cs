@@ -1,15 +1,8 @@
 namespace Application.Dto.OrderedGoods;
 
-public class CreateOrderedGoodDto
+public record CreateOrderedGoodDto(
+    int GoodId,
+    int Amount)
 {
-    public int GoodId { get; init; }
-    public int Amount { get; init; }
-
-    public CreateOrderedGoodDto() { }
-
-    public CreateOrderedGoodDto(int goodId, int amount)
-    {
-        GoodId = goodId;
-        Amount = amount;
-    }
+    public CreateOrderedGoodDto() : this(default, default) { }
 }

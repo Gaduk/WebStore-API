@@ -1,23 +1,12 @@
 namespace Application.Dto.User;
 
-public class CreateUserDto
+public record CreateUserDto(
+    string Login,
+    string Password,
+    string FirstName,
+    string LastName,
+    string PhoneNumber,
+    string Email)
 {
-    public string Login { get; init; }
-    public string Password { get; init; }
-    public string FirstName { get; init; }
-    public string LastName { get; init; }
-    public string PhoneNumber { get; init; }
-    public string Email { get; init; }
-
-    public CreateUserDto() { }
-
-    public CreateUserDto(string login, string password, string firstName, string lastName, string phoneNumber, string email)
-    {
-        Login = login;
-        Password = password;
-        FirstName = firstName;
-        LastName = lastName;
-        PhoneNumber = phoneNumber;
-        Email = email;
-    }
+    public CreateUserDto() : this(default, default, default, default, default, default) { }
 }

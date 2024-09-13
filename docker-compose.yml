@@ -18,7 +18,7 @@
     image: api
     build:
       context: .
-      dockerfile: API/Dockerfile
+      dockerfile: Presentation/Dockerfile
     networks:
       - web_store_net
     environment:

@@ -3,20 +3,20 @@ services:
   api:
     build:
       context: "C:\\Projects\\Web-API"
-      dockerfile: "API/Dockerfile"
+      dockerfile: "Presentation/Dockerfile"
       target: "base"
     command: []
     entrypoint:
     - "dotnet"
-    - "/app/bin/Debug/net8.0/API.dll"
+    - "/app/bin/Debug/net8.0/Presentation.dll"
     environment:
-      ASPNETCORE_STATICWEBASSETS: "/app/bin/Debug/net8.0/API.staticwebassets.runtime.CT.json"
+      ASPNETCORE_STATICWEBASSETS: "/app/bin/Debug/net8.0/Presentation.staticwebassets.runtime.CT.json"
       DOTNET_USE_POLLING_FILE_WATCHER: "true"
     image: "api:dev"
     ports: []
     volumes:
     - "C:\\Users\\Даниил\\AppData\\Roaming\\Microsoft\\UserSecrets:/home/app/.microsoft/usersecrets"
     - "C:\\Users\\Даниил\\.nuget\\packages:/home/app/.nuget/packages"
-    - "C:\\Projects\\Web-API\\API:/app:rw"
+    - "C:\\Projects\\Web-API\\Presentation:/app:rw"
     - "C:\\Projects\\Web-API:/src:rw"
     working_dir: "/app"

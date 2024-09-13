@@ -1,6 +1,5 @@
-using Application.Dto;
-using Application.Dto.OrderedGoods;
-using Application.Interfaces;
+using Domain.Dto.OrderedGoods;
+using Domain.Repositories;
 using MediatR;
 
 namespace Application.Features.OrderedGood.Queries.GetAllOrderedGoods;

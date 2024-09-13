@@ -1,6 +1,5 @@
-using System.Linq.Expressions;
-using Application.Dto.User;
 using Application.Interfaces;
+using Domain.Dto.User;
 using Domain.Entities;
 using Hangfire;
 using MediatR;

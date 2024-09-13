@@ -1,7 +1,6 @@
 using Application.Extensions;
 using Hangfire;
 using Hangfire.PostgreSql;
-using Infrastructure.Extensions;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Persistence.Extensions;
@@ -16,7 +15,6 @@ public class Startup(IConfiguration configuration)
     {
         services.AddApplication();
         services.AddPersistence(configuration);
-        services.AddInfrastructure();
         
         services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(options => 
         {

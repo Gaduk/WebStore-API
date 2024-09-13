@@ -1,9 +1,6 @@
-using Application.Dto;
-using Application.Dto.OrderedGoods;
-using Application.Features.OrderedGood;
-using Domain.Entities;
+using Domain.Dto.OrderedGoods;
 
-namespace Application.Interfaces;
+namespace Domain.Repositories;
 
 public interface IOrderedGoodRepository
 {

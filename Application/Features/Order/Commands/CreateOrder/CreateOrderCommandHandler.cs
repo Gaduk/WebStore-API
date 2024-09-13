@@ -1,4 +1,4 @@
-using Application.Interfaces;
+using Domain.Repositories;
 using MediatR;
 
 namespace Application.Features.Order.Commands.CreateOrder;
@@ -7,6 +7,6 @@ public class CreateOrderCommandHandler(IOrderRepository orderRepository) : IRequ
 {
     public async Task<int> Handle(CreateOrderCommand request, CancellationToken cancellationToken)
     {
-        return await orderRepository.CreateOrder(request.userId, request.OrderedGoods);
+        return await orderRepository.CreateOrder(request.UserId, request.OrderedGoods);
     }
 }

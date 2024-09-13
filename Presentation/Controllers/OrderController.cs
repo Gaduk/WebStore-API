@@ -1,10 +1,10 @@
-using Application.Dto.OrderedGoods;
 using Application.Features.Order.Commands.CreateOrder;
 using Application.Features.Order.Commands.UpdateOrder;
 using Application.Features.Order.Queries.GetAllOrders;
 using Application.Features.Order.Queries.GetOrder;
 using Application.Features.Order.Queries.GetOrderEntity;
 using Application.Features.Order.Queries.GetUserOrders;
+using Domain.Dto.OrderedGoods;
 using Domain.Entities;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;

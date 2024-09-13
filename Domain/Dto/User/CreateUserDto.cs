@@ -1,4 +1,4 @@
-namespace Application.Dto.User;
+namespace Domain.Dto.User;
 
 public record CreateUserDto(
     string Login,

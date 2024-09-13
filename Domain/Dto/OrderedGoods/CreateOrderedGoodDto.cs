@@ -1,4 +1,4 @@
-namespace Application.Dto.OrderedGoods;
+namespace Domain.Dto.OrderedGoods;
 
 public record CreateOrderedGoodDto(
     int GoodId,

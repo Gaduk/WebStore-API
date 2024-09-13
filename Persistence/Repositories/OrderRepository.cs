@@ -1,7 +1,7 @@
-using Application.Dto.Order;
-using Application.Dto.OrderedGoods;
-using Application.Interfaces;
+using Domain.Dto.Order;
+using Domain.Dto.OrderedGoods;
 using Domain.Entities;
+using Domain.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Persistence.Context;
 

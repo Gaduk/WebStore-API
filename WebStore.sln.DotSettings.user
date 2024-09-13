@@ -13,4 +13,5 @@
   &lt;TestAncestor&gt;&#xD;
     &lt;TestId&gt;xUnit::B434DC40-0E1A-4A25-9AEF-28A582DC84DE::net8.0::Tests.UserControllerTests&lt;/TestId&gt;&#xD;
   &lt;/TestAncestor&gt;&#xD;
-&lt;/SessionState&gt;</s:String></wpf:ResourceDictionary>
+&lt;/SessionState&gt;</s:String>
+	</wpf:ResourceDictionary>

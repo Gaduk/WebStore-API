@@ -1,4 +1,4 @@
-namespace Application.Dto.Order;
+namespace Domain.Dto.Order;
 
 public record OrderDto(
     int Id,

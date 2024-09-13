@@ -1,5 +1,4 @@
-using Application.Features.Order.Queries.GetOrder;
-using Application.Interfaces;
+using Domain.Repositories;
 using MediatR;
 
 namespace Application.Features.Order.Queries.GetOrderEntity;

@@ -1,6 +1,5 @@
-using Application.Dto;
-using Application.Dto.User;
-using Application.Interfaces;
+using Domain.Dto.User;
+using Domain.Repositories;
 using MediatR;
 
 namespace Application.Features.User.Queries.GetAllUsers;

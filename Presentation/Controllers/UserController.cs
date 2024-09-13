@@ -1,10 +1,10 @@
 using System.Security.Claims;
-using Application.Dto.User;
 using Application.Features.User.Commands.DeleteUser;
 using Application.Features.User.Commands.UpdateUserRole;
 using Application.Features.User.Queries.GetAllUsers;
 using Application.Features.User.Queries.GetUser;
 using Application.Interfaces;
+using Domain.Dto.User;
 using Domain.Entities;
 using Hangfire;
 using MediatR;

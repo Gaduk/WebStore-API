@@ -1,6 +1,6 @@
-using Application.Dto.User;
-using Application.Interfaces;
+using Domain.Dto.User;
 using Domain.Entities;
+using Domain.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Persistence.Context;
 

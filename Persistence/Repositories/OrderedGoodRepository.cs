@@ -1,6 +1,6 @@
-using Application.Dto.OrderedGoods;
-using Application.Interfaces;
 using Dapper;
+using Domain.Dto.OrderedGoods;
+using Domain.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Persistence.Context;
 

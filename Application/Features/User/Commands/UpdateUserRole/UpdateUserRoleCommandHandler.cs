@@ -1,4 +1,4 @@
-using Application.Interfaces;
+using Domain.Repositories;
 using MediatR;
 
 namespace Application.Features.User.Commands.UpdateUserRole;

@@ -1,5 +1,5 @@
-using Application.Dto.Order;
-using Application.Interfaces;
+using Domain.Dto.Order;
+using Domain.Repositories;
 using MediatR;
 
 namespace Application.Features.Order.Queries.GetOrder;

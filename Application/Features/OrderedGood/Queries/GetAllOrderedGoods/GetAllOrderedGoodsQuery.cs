@@ -1,5 +1,4 @@
-using Application.Dto;
-using Application.Dto.OrderedGoods;
+using Domain.Dto.OrderedGoods;
 using MediatR;
 
 namespace Application.Features.OrderedGood.Queries.GetAllOrderedGoods;

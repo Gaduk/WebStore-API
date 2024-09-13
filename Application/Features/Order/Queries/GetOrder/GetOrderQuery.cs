@@ -1,4 +1,4 @@
-using Application.Dto.Order;
+using Domain.Dto.Order;
 using MediatR;
 
 namespace Application.Features.Order.Queries.GetOrder;

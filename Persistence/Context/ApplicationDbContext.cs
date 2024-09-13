@@ -1,14 +1,11 @@
 using System.Reflection;
-using System.Security.Claims;
-using Application.Interfaces;
 using Domain.Entities;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace Persistence.Context;
 
-public class ApplicationDbContext : IdentityDbContext<User>, IApplicationDbContext
+public class ApplicationDbContext : IdentityDbContext<User>
 {
     public DbSet<Order> Orders { get; set; } = null!;
     public DbSet<Good> Goods { get; set; } = null!;

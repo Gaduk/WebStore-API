@@ -1,6 +1,6 @@
 using Domain.Entities;
 
-namespace Application.Interfaces;
+namespace Domain.Repositories;
 
 public interface IGoodRepository
 {

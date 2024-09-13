@@ -1,8 +1,7 @@
-using Application.Dto;
-using Application.Dto.User;
+using Domain.Dto.User;
 using Domain.Entities;
 
-namespace Application.Interfaces;
+namespace Domain.Repositories;
 
 public interface IUserRepository
 {

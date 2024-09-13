@@ -3,4 +3,4 @@ using MediatR;
 
 namespace Application.Features.Order.Commands.CreateOrder;
 
-public record CreateOrderCommand(string UserId, CreateOrderedGoodDto[] OrderedGoods) : IRequest<int>;
+public record CreateOrderCommand(string UserId, ShortOrderedGoodDto[] OrderedGoods) : IRequest<int>;

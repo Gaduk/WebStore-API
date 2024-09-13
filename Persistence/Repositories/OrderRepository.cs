@@ -9,7 +9,7 @@ namespace Persistence.Repositories;
 
 public class OrderRepository(ApplicationDbContext dbContext) : IOrderRepository
 {
-    public async Task<int> CreateOrder(string userId, CreateOrderedGoodDto[] orderedGoods)
+    public async Task<int> CreateOrder(string userId, ShortOrderedGoodDto[] orderedGoods)
     {
         var order = new Order
         {
@@ -18,7 +18,7 @@ public class OrderRepository(ApplicationDbContext dbContext) : IOrderRepository
         };
         await dbContext.Orders.AddAsync(order);
         await dbContext.SaveChangesAsync();
-        int orderId = order.Id; 
+        var orderId = order.Id; 
 
         foreach (var orderedGood in orderedGoods)
         {
@@ -35,7 +35,7 @@ public class OrderRepository(ApplicationDbContext dbContext) : IOrderRepository
         return orderId;
     }
 
-    public async Task UpdateOrder(Order order, bool isDone)
+    public async Task UpdateOrder(Order order)
     {
         dbContext.Orders.Update(order);
         await dbContext.SaveChangesAsync();
@@ -46,7 +46,12 @@ public class OrderRepository(ApplicationDbContext dbContext) : IOrderRepository
         return await dbContext
             .Orders
             .OrderBy(o => o.Id)
-            .Select(o => new OrderDto{Id = o.Id, UserName = o.User.UserName, IsDone = o.IsDone })
+            .Select(o => new OrderDto
+            (
+                o.Id, 
+                o.User.UserName, 
+                o.IsDone
+            ))
             .ToListAsync();
     }
 
@@ -56,7 +61,12 @@ public class OrderRepository(ApplicationDbContext dbContext) : IOrderRepository
             .Orders
             .Where(o => o.User.UserName == login)
             .OrderBy(o => o.Id)
-            .Select(o => new OrderDto {Id = o.Id, UserName = o.User.UserName, IsDone = o.IsDone })
+            .Select(o => new OrderDto 
+            (
+                o.Id, 
+                o.User.UserName, 
+                o.IsDone
+            ))
             .ToListAsync();
     }
 
@@ -67,7 +77,12 @@ public class OrderRepository(ApplicationDbContext dbContext) : IOrderRepository
             .Include(o => o.User)
             .Where(o => o.Id == orderId)
             .OrderBy(o => o.Id)
-            .Select(o => new OrderDto {Id = o.Id, UserName = o.User.UserName, IsDone = o.IsDone })
+            .Select(o => new OrderDto 
+            (
+                o.Id, 
+                o.User.UserName, 
+                o.IsDone
+            ))
             .FirstOrDefaultAsync();
     }
     

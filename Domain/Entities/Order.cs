@@ -2,11 +2,11 @@ namespace Domain.Entities;
 
 public class Order
 {
-    public int Id { get; set; }
-    public string UserId { get; set; }
-    public bool IsDone { get; set; } = false;
+    public int Id { get; init; }
+    public string? UserId { get; init; }
+    public bool IsDone { get; set; }
     
     //Навигационные свойства
-    public ICollection<OrderedGood> OrderedGoods { get; set; }
-    public User User { get; set; }
+    public ICollection<OrderedGood>? OrderedGoods { get; init; }
+    public User User { get; init; } = null!;
 }

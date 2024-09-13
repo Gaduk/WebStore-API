@@ -5,7 +5,7 @@ public class RequestLoginIsUserLoginHandler : AuthorizationHandler<AccessRequire
 {
     protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, AccessRequirement requirement, string resource)
     {
-        string? name = context.User.Identity?.Name;
+        var name = context.User.Identity?.Name;
         if (name == resource)
         {
             context.Succeed(requirement);

@@ -4,7 +4,7 @@ public record OrderedGoodDto(
     int OrderId,
     int GoodId,
     int Amount,
-    string Name,
+    string? Name,
     float Price)
 {
     public OrderedGoodDto() : this(default, default, default, default, default) { }

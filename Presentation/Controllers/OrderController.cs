@@ -20,7 +20,7 @@ public class OrderController(
     UserManager<User> userManager) : ControllerBase
 {
     [HttpPost("/order/{login}")]
-    public async Task<IActionResult> CreateOrder(string login, CreateOrderedGoodDto[] orderedGoods)
+    public async Task<IActionResult> CreateOrder(string login, ShortOrderedGoodDto[] orderedGoods)
     {
         var authorizationResult = await authorizationService.AuthorizeAsync(User, login, "HaveAccess");
         if (!authorizationResult.Succeeded)
@@ -49,7 +49,7 @@ public class OrderController(
             return NotFound("Заказ не найден");
         }
         order.IsDone = isDone;
-        await mediator.Send(new UpdateOrderCommand(order, isDone));
+        await mediator.Send(new UpdateOrderCommand(order));
         return Ok("Статус заказа обновлен");
     }
     

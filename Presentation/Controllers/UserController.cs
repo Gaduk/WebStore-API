@@ -51,8 +51,8 @@ public class UserController(
         
         var claims = new List<Claim>
         {
-            new Claim(ClaimTypes.Name, input.Login),
-            new Claim(ClaimTypes.Role, "user")
+            new(ClaimTypes.Name, input.Login),
+            new(ClaimTypes.Role, "user")
         };
         await userManager.AddClaimsAsync(user, claims);
         
@@ -125,7 +125,7 @@ public class UserController(
 
         var claims = new List<Claim>
         {
-            new Claim(ClaimTypes.Role, "admin")
+            new(ClaimTypes.Role, "admin")
         };
         await userManager.AddClaimsAsync(user, claims);
         var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);

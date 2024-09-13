@@ -8,12 +8,6 @@ namespace Persistence.Repositories;
 
 public class UserRepository(ApplicationDbContext dbContext) : IUserRepository
 {
-    public async Task CreateUser(User user)
-    {
-        await dbContext.Users.AddAsync(user);
-        await dbContext.SaveChangesAsync();
-    }
-
     public async Task DeleteUser(User user)
     {
         dbContext.Users.Remove(user);

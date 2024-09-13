@@ -1,7 +1,6 @@
 using Application.Interfaces;
 using Domain.Dto.User;
 using Domain.Entities;
-using Hangfire;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -15,7 +14,6 @@ namespace Tests;
 public class UserControllerTests
 {
     private readonly Mock<IMediator> _mediatorMock = new();
-    private readonly Mock<SignInManager<User>> _signInManagerMock;
     private readonly Mock<UserManager<User>> _userManagerMock;
     private readonly Mock<IAuthorizationService> _authorizationServiceMock = new();
     private readonly Mock<IMailService> _mailServiceMock = new();
@@ -25,17 +23,17 @@ public class UserControllerTests
     {
         _userManagerMock = new Mock<UserManager<User>>(
             Mock.Of<IUserStore<User>>(), 
-            null, null, null, null, null, null, null, null);
+            null!, null!, null!, null!, null!, null!, null!, null!);
         
-        _signInManagerMock = new Mock<SignInManager<User>>(
+        Mock<SignInManager<User>> signInManagerMock = new(
             _userManagerMock.Object,
             Mock.Of<IHttpContextAccessor>(),
             Mock.Of<IUserClaimsPrincipalFactory<User>>(), 
-            null, null, null, null);
+            null!, null!, null!, null!);
         
         _userController = new UserController(
             _mediatorMock.Object , 
-            _signInManagerMock.Object,
+            signInManagerMock.Object,
             _userManagerMock.Object,
             _authorizationServiceMock.Object,
             _mailServiceMock.Object);

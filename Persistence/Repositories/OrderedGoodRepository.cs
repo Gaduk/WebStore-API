@@ -26,12 +26,14 @@ public class OrderedGoodRepository(ApplicationDbContext dbContext) : IOrderedGoo
     {
         var connection = dbContext.Database.GetDbConnection();
         
-        const string query = @"
-                SELECT og.""OrderId"", og.""GoodId"", og.""Amount"", g.""Name"", g.""Price""
-                FROM ""OrderedGoods"" og
-                INNER JOIN ""Goods"" g ON og.""GoodId"" = g.""Id""
-                WHERE og.""OrderId"" = @OrderId
-                ORDER BY og.""Id""";
+        const string query = """
+                             
+                                             SELECT og."OrderId", og."GoodId", og."Amount", g."Name", g."Price"
+                                             FROM "OrderedGoods" og
+                                             INNER JOIN "Goods" g ON og."GoodId" = g."Id"
+                                             WHERE og."OrderId" = @OrderId
+                                             ORDER BY og."Id"
+                             """;
         var parameters = new { OrderId = orderId };
         var result = await connection.QueryAsync<OrderedGoodDto>(query, parameters);
         return result.ToList();

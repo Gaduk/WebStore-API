@@ -1,14 +1,16 @@
+using Application.Services;
 using Domain.Entities;
 using Domain.Repositories;
+using Infrastructure.Persistence.Context;
+using Infrastructure.Persistence.Repositories;
+using Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
-using Persistence.Context;
-using Persistence.Repositories;
 
-namespace Persistence.Extensions;
+namespace Infrastructure.Extensions;
 
 public static class ServiceCollectionExtensions
 {
-    public static void AddPersistence(this IServiceCollection services, IConfiguration configuration)
+    public static void AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
         var connection = configuration.GetConnectionString("DefaultConnection");
         services.AddDbContext<ApplicationDbContext>(options => options.UseNpgsql(connection));
@@ -27,5 +29,7 @@ public static class ServiceCollectionExtensions
                 options.Password.RequiredLength = 3;
             })
             .AddEntityFrameworkStores<ApplicationDbContext>();
+        
+        services.AddSingleton<IMailService, MailService>();
     }
 }

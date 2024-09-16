@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Persistence.EntityConfigurations;
+namespace Infrastructure.Persistence.EntityConfigurations;
 
 public class UserConfiguration: IEntityTypeConfiguration<User>
 {

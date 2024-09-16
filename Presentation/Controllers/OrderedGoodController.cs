@@ -14,7 +14,7 @@ public class OrderedGoodController(IMediator mediator, IAuthorizationService aut
     [HttpGet("/ordered-goods")]
     public async Task<IActionResult> GetAllOrderedGoods(CancellationToken cancellationToken)
     {
-        var orderGoods = await mediator.Send(new GetAllOrderedGoodsQuery());
+        var orderGoods = await mediator.Send(new GetAllOrderedGoodsQuery(), cancellationToken);
         return Ok(orderGoods);
     }
     

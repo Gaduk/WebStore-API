@@ -3,8 +3,8 @@ using Hangfire;
 using Hangfire.PostgreSql;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
-using Persistence.Context;
-using Persistence.Extensions;
+using Infrastructure.Extensions;
+using Infrastructure.Persistence.Context;
 using Web_API.Requirements.AccessRequirement;
 using Web_API.Requirements.AccessRequirement.Handlers;
 
@@ -17,7 +17,7 @@ public static class Program
         var builder = WebApplication.CreateBuilder(args);
         
         builder.Services.AddApplication();
-        builder.Services.AddPersistence(builder.Configuration);
+        builder.Services.AddInfrastructure(builder.Configuration);
         
         builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(options => 
         {

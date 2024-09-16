@@ -1,9 +1,9 @@
 using Domain.Entities;
 using Domain.Repositories;
+using Infrastructure.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
-using Persistence.Context;
 
-namespace Persistence.Repositories;
+namespace Infrastructure.Persistence.Repositories;
 
 public class GoodRepository(ApplicationDbContext dbContext) : IGoodRepository
 {

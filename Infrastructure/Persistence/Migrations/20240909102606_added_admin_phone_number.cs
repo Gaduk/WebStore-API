@@ -2,7 +2,7 @@
 
 #nullable disable
 
-namespace Persistence.Migrations
+namespace Infrastructure.Migrations
 {
     /// <inheritdoc />
     public partial class added_admin_phone_number : Migration

@@ -1,7 +1,6 @@
-using Application.Interfaces;
-using Microsoft.Extensions.Logging;
+using Application.Services;
 
-namespace Application.Services;
+namespace Infrastructure.Services;
 
 public class MailService(ILogger<MailService> logger) : IMailService
 {

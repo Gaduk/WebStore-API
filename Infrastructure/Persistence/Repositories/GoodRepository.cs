@@ -7,11 +7,11 @@ namespace Persistence.Repositories;
 
 public class GoodRepository(ApplicationDbContext dbContext) : IGoodRepository
 {
-    public async Task<List<Good>> GetAllGoods()
+    public async Task<List<Good>> GetAllGoods(CancellationToken cancellationToken)
     {
         return await dbContext.Goods
             .AsNoTracking()
             .OrderBy(g => g.Id)
-            .ToListAsync();
+            .ToListAsync(cancellationToken);
     }
 }

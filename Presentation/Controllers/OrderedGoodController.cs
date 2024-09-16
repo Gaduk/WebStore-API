@@ -11,17 +11,17 @@ namespace Web_API.Controllers;
 public class OrderedGoodController(IMediator mediator, IAuthorizationService authorizationService) : ControllerBase
 {
     [Authorize(Roles = "admin")]
-    [HttpGet("/orderedGoods")]
-    public async Task<IActionResult> GetAllOrderedGoodDtos()
+    [HttpGet("/ordered-goods")]
+    public async Task<IActionResult> GetAllOrderedGoods(CancellationToken cancellationToken)
     {
         var orderGoods = await mediator.Send(new GetAllOrderedGoodsQuery());
         return Ok(orderGoods);
     }
     
-    [HttpGet("/orderedGoods/{orderId:int}")]
-    public async Task<IActionResult> GetOrderedGoodDtos(int orderId)
+    [HttpGet("/ordered-goods/{orderId:int}")]
+    public async Task<IActionResult> GetOrderedGoods(int orderId, CancellationToken cancellationToken)
     {
-        var order = await mediator.Send(new GetOrderQuery(orderId));
+        var order = await mediator.Send(new GetOrderQuery(orderId), cancellationToken);
         if (order == null)
         {
             return NotFound("Заказ не найден");
@@ -33,7 +33,7 @@ public class OrderedGoodController(IMediator mediator, IAuthorizationService aut
             return StatusCode(StatusCodes.Status403Forbidden);
         }
         
-        var orderGoods = await mediator.Send(new GetOrderedGoodsQuery(orderId));
+        var orderGoods = await mediator.Send(new GetOrderedGoodsQuery(orderId), cancellationToken);
         return Ok(orderGoods);
     }
 }

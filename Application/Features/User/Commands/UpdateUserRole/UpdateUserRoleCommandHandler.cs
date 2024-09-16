@@ -7,6 +7,6 @@ public class UpdateUserRoleCommandHandler(IUserRepository userRepository) : IReq
 {
     public async Task Handle(UpdateUserRoleCommand request, CancellationToken cancellationToken)
     {
-        await userRepository.UpdateUserRole(request.User, request.IsAdmin);
+        await userRepository.UpdateUserRole(request.User, request.IsAdmin, cancellationToken);
     }
 }

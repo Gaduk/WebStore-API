@@ -8,6 +8,6 @@ public class GetOrderQueryHandler(IOrderRepository orderRepository) : IRequestHa
 {
     public async Task<OrderDto?> Handle(GetOrderQuery request, CancellationToken cancellationToken)
     {
-        return await orderRepository.GetOrder(request.OrderId);
+        return await orderRepository.GetOrder(request.OrderId, cancellationToken);
     }
 }

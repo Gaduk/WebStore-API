@@ -8,6 +8,6 @@ public class GetAllUsersQueryHandler(IUserRepository userRepository) : IRequestH
 {
     public async Task<List<UserDto>> Handle(GetAllUsersQuery request, CancellationToken cancellationToken)
     {
-        return await userRepository.GetAllUsers();
+        return await userRepository.GetAllUsers(cancellationToken);
     }
 }

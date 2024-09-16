@@ -8,6 +8,6 @@ public class UpdateOrderCommandHandler(IOrderRepository orderRepository)
 {
     public async Task Handle(UpdateOrderCommand request, CancellationToken cancellationToken)
     {
-        await orderRepository.UpdateOrder(request.Order);
+        await orderRepository.UpdateOrder(request.Order, cancellationToken);
     }
 }

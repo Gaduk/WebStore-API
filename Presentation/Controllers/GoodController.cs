@@ -10,9 +10,9 @@ public class GoodController(IMediator mediator) : ControllerBase
 {
     [Authorize(Roles = "admin")]
     [HttpGet("/goods")]
-    public async Task<IActionResult> GetAllGoods()
+    public async Task<IActionResult> GetAllGoods(CancellationToken cancellationToken)
     {
-        var goods = await mediator.Send(new GetAllGoodEntitiesQuery());
+        var goods = await mediator.Send(new GetAllGoodEntitiesQuery(), cancellationToken);
         return Ok(goods);
     }
 }

@@ -20,7 +20,7 @@ public class OrderController(
     UserManager<User> userManager) : ControllerBase
 {
     [HttpPost("/order/{login}")]
-    public async Task<IActionResult> CreateOrder(string login, ShortOrderedGoodDto[] orderedGoods)
+    public async Task<IActionResult> CreateOrder(string login, ShortOrderedGoodDto[] orderedGoods, CancellationToken cancellationToken)
     {
         var authorizationResult = await authorizationService.AuthorizeAsync(User, login, "HaveAccess");
         if (!authorizationResult.Succeeded)
@@ -34,35 +34,35 @@ public class OrderController(
             return NotFound("Пользователь не найден");
         }
         
-        await mediator.Send(new CreateOrderCommand(user.Id, orderedGoods));
+        await mediator.Send(new CreateOrderCommand(user.Id, orderedGoods), cancellationToken);
         
         return Ok("Заказ создан");
     }
     
     [Authorize(Roles = "admin")]
     [HttpPut("/order/{orderId:int}/status")]
-    public async Task<IActionResult> UpdateOrderStatus(int orderId, bool isDone)
+    public async Task<IActionResult> UpdateOrderStatus(int orderId, bool isDone, CancellationToken cancellationToken)
     {
-        var order = await mediator.Send(new GetOrderEntityQuery(orderId));
+        var order = await mediator.Send(new GetOrderEntityQuery(orderId), cancellationToken);
         if (order == null)
         {
             return NotFound("Заказ не найден");
         }
         order.IsDone = isDone;
-        await mediator.Send(new UpdateOrderCommand(order));
+        await mediator.Send(new UpdateOrderCommand(order), cancellationToken);
         return Ok("Статус заказа обновлен");
     }
     
     [Authorize(Roles = "admin")]
     [HttpGet("/orders")]
-    public async Task<IActionResult> GetAllOrders()
+    public async Task<IActionResult> GetAllOrders(CancellationToken cancellationToken)
     {
-        var orders = await mediator.Send(new GetAllOrdersQuery());
+        var orders = await mediator.Send(new GetAllOrdersQuery(), cancellationToken);
         return Ok(orders);
     }
     
-    [HttpGet("/orders/{login}")]
-    public async Task<IActionResult> GetUserOrders(string login)
+    [HttpGet("orders/{login}")]
+    public async Task<IActionResult> GetUserOrders(string login, CancellationToken cancellationToken)
     {
         var authorizationResult = await authorizationService.AuthorizeAsync(User, login, "HaveAccess");
         if (!authorizationResult.Succeeded)
@@ -76,14 +76,14 @@ public class OrderController(
             return NotFound("Пользователь не найден");
         }
         
-        var orders = await mediator.Send(new GetUserOrdersQuery(login));
+        var orders = await mediator.Send(new GetUserOrdersQuery(login), cancellationToken);
         return Ok(orders);
     }
     
     [HttpGet("order/{orderId:int}")]
-    public async Task<IActionResult> GetOrder(int orderId)
+    public async Task<IActionResult> GetOrder(int orderId, CancellationToken cancellationToken)
     {
-        var order = await mediator.Send(new GetOrderQuery(orderId));
+        var order = await mediator.Send(new GetOrderQuery(orderId), cancellationToken);
         if (order == null)
         {
             return NotFound("Заказ не найден");

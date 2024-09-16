@@ -1,27 +1,27 @@
 using Domain.Dto.User;
 using Domain.Entities;
 using Domain.Repositories;
+using Infrastructure.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
-using Persistence.Context;
 
-namespace Persistence.Repositories;
+namespace Infrastructure.Persistence.Repositories;
 
 public class UserRepository(ApplicationDbContext dbContext) : IUserRepository
 {
-    public async Task DeleteUser(User user)
+    public async Task DeleteUser(User user, CancellationToken cancellationToken)
     {
         dbContext.Users.Remove(user);
-        await dbContext.SaveChangesAsync();
+        await dbContext.SaveChangesAsync(cancellationToken);
     }
 
-    public async Task UpdateUserRole(User user, bool isAdmin)
+    public async Task UpdateUserRole(User user, bool isAdmin, CancellationToken cancellationToken)
     {
         user.IsAdmin = isAdmin;
         dbContext.Users.Update(user);
-        await dbContext.SaveChangesAsync();
+        await dbContext.SaveChangesAsync(cancellationToken);
     }
 
-    public async Task<List<UserDto>> GetAllUsers()
+    public async Task<List<UserDto>> GetAllUsers(CancellationToken cancellationToken)
     {
         return await dbContext.Users
             .OrderBy(u => u.UserName)
@@ -32,10 +32,10 @@ public class UserRepository(ApplicationDbContext dbContext) : IUserRepository
                 user.PhoneNumber,
                 user.Email,
                 user.IsAdmin
-            )).ToListAsync();
+            )).ToListAsync(cancellationToken);
     }
 
-    public async Task<UserDto?> GetUser(string login)
+    public async Task<UserDto?> GetUser(string login, CancellationToken cancellationToken)
     {
         return await dbContext.Users
             .Where(u => u.UserName == login)
@@ -47,6 +47,6 @@ public class UserRepository(ApplicationDbContext dbContext) : IUserRepository
                 user.Email,
                 user.IsAdmin
             ))
-            .FirstOrDefaultAsync();
+            .FirstOrDefaultAsync(cancellationToken);
     }
 }

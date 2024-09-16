@@ -1,10 +1,10 @@
 using System.Security.Claims;
+using Application.Features.User.Commands.CreateUser;
 using Application.Features.User.Commands.DeleteUser;
 using Application.Features.User.Commands.UpdateUserRole;
 using Application.Features.User.Queries.GetAllUsers;
 using Application.Features.User.Queries.GetUser;
-using Application.Interfaces;
-using Domain.Dto.User;
+using Application.Services;
 using Domain.Entities;
 using Hangfire;
 using MediatR;
@@ -80,16 +80,10 @@ public class UserController(
         
         var result = resultTask.Result;
         var claims = claimsTask.Result;
-
         
         if(!result.Succeeded) 
         {
             return Unauthorized("Неверный пароль");
-        }
-        
-        foreach (var claim in claims)
-        {
-            Console.WriteLine(claim.Value);
         }
         
         var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
@@ -108,8 +102,8 @@ public class UserController(
     }
     
     [Authorize(Roles = "admin")]
-    [HttpPut("/user/{login}/isAdmin")]
-    public async Task<IActionResult> MakeAdmin(string login)
+    [HttpPut("/user/{login}/admin-status")]
+    public async Task<IActionResult> MakeAdmin(string login, CancellationToken cancellationToken)
     {
         var user = await userManager.FindByNameAsync(login);
         
@@ -131,12 +125,12 @@ public class UserController(
         var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
         User.AddIdentity(claimsIdentity);
         
-        await mediator.Send(new UpdateUserRoleCommand(user, true));
+        await mediator.Send(new UpdateUserRoleCommand(user, true), cancellationToken);
         
         return Ok($"Пользователю {login} выданы права администратора");
     }
     
-    [HttpGet("/accessDenied")]
+    [HttpGet("/access-denied")]
     public IActionResult DenyAccess()
     {
         return StatusCode(StatusCodes.Status403Forbidden);
@@ -144,19 +138,19 @@ public class UserController(
     
     [Authorize(Roles = "admin")]
     [HttpDelete("/user/{login}")]
-    public async Task<IActionResult> DeleteUser(string login)
+    public async Task<IActionResult> DeleteUser(string login, CancellationToken cancellationToken)
     {
         var user = await userManager.FindByNameAsync(login);
         if (user == null)
         {
             return NotFound("Пользователь не найден");
         }
-        await mediator.Send(new DeleteUserCommand(user));
+        await mediator.Send(new DeleteUserCommand(user), cancellationToken);
         return Ok($"Пользователь {user.UserName} удален");
     }
     
     [HttpGet("user/{login}")]
-    public async Task<IActionResult> GetUser(string login)
+    public async Task<IActionResult> GetUser(string login, CancellationToken cancellationToken)
     {
         var authorizationResult = await authorizationService.AuthorizeAsync(User, login, "HaveAccess");
         if (!authorizationResult.Succeeded)
@@ -164,7 +158,7 @@ public class UserController(
             return StatusCode(StatusCodes.Status403Forbidden);
         }
         
-        var user = await mediator.Send(new GetUserQuery(login));
+        var user = await mediator.Send(new GetUserQuery(login), cancellationToken);
         if(user == null)
         {
             return NotFound("Пользователь не найден");
@@ -174,9 +168,9 @@ public class UserController(
     
     [Authorize(Roles = "admin")]
     [HttpGet("/users")]
-    public async Task<IActionResult> GetAllUsers()
+    public async Task<IActionResult> GetAllUsers(CancellationToken cancellationToken)
     {
-        var users = await mediator.Send(new GetAllUsersQuery());
+        var users = await mediator.Send(new GetAllUsersQuery(), cancellationToken);
         return Ok(users);
     }
 }

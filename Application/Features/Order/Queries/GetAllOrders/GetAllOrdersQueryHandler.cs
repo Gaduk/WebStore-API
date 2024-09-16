@@ -9,6 +9,6 @@ public class GetAllOrdersQueryHandler(IOrderRepository orderRepository) :
 {
     public async Task<List<OrderDto>> Handle(GetAllOrdersQuery request, CancellationToken cancellationToken)
     {
-        return await orderRepository.GetAllOrders();
+        return await orderRepository.GetAllOrders(cancellationToken);
     }
 }

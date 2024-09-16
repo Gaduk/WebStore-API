@@ -2,22 +2,22 @@ using Domain.Dto.Order;
 using Domain.Dto.OrderedGoods;
 using Domain.Entities;
 using Domain.Repositories;
+using Infrastructure.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
-using Persistence.Context;
 
-namespace Persistence.Repositories;
+namespace Infrastructure.Persistence.Repositories;
 
 public class OrderRepository(ApplicationDbContext dbContext) : IOrderRepository
 {
-    public async Task<int> CreateOrder(string userId, ShortOrderedGoodDto[] orderedGoods)
+    public async Task<int> CreateOrder(string userId, ShortOrderedGoodDto[] orderedGoods, CancellationToken cancellationToken)
     {
         var order = new Order
         {
             UserId = userId,
             IsDone = false
         };
-        await dbContext.Orders.AddAsync(order);
-        await dbContext.SaveChangesAsync();
+        await dbContext.Orders.AddAsync(order, cancellationToken);
+        await dbContext.SaveChangesAsync(cancellationToken);
         var orderId = order.Id; 
 
         foreach (var orderedGood in orderedGoods)
@@ -29,19 +29,19 @@ public class OrderRepository(ApplicationDbContext dbContext) : IOrderRepository
                 GoodId = orderedGood.GoodId,
                 Amount = orderedGood.Amount
             }; 
-            await dbContext.OrderedGoods.AddAsync(newOrderedGood);
+            await dbContext.OrderedGoods.AddAsync(newOrderedGood, cancellationToken);
         }
-        await dbContext.SaveChangesAsync();
+        await dbContext.SaveChangesAsync(cancellationToken);
         return orderId;
     }
 
-    public async Task UpdateOrder(Order order)
+    public async Task UpdateOrder(Order order, CancellationToken cancellationToken)
     {
         dbContext.Orders.Update(order);
-        await dbContext.SaveChangesAsync();
+        await dbContext.SaveChangesAsync(cancellationToken);
     }
 
-    public async Task<List<OrderDto>> GetAllOrders()
+    public async Task<List<OrderDto>> GetAllOrders(CancellationToken cancellationToken)
     {
         return await dbContext
             .Orders
@@ -52,10 +52,10 @@ public class OrderRepository(ApplicationDbContext dbContext) : IOrderRepository
                 o.User.UserName, 
                 o.IsDone
             ))
-            .ToListAsync();
+            .ToListAsync(cancellationToken);
     }
 
-    public async Task<List<OrderDto>> GetUserOrders(string login)
+    public async Task<List<OrderDto>> GetUserOrders(string login, CancellationToken cancellationToken)
     {
         return await dbContext
             .Orders
@@ -67,14 +67,13 @@ public class OrderRepository(ApplicationDbContext dbContext) : IOrderRepository
                 o.User.UserName, 
                 o.IsDone
             ))
-            .ToListAsync();
+            .ToListAsync(cancellationToken);
     }
 
-    public async Task<OrderDto?> GetOrder(int orderId)
+    public async Task<OrderDto?> GetOrder(int orderId, CancellationToken cancellationToken)
     {
         return await dbContext
             .Orders
-            .Include(o => o.User)
             .Where(o => o.Id == orderId)
             .OrderBy(o => o.Id)
             .Select(o => new OrderDto 
@@ -83,14 +82,14 @@ public class OrderRepository(ApplicationDbContext dbContext) : IOrderRepository
                 o.User.UserName, 
                 o.IsDone
             ))
-            .FirstOrDefaultAsync();
+            .FirstOrDefaultAsync(cancellationToken);
     }
     
-    public async Task<Order?> GetOrderEntity(int orderId)
+    public async Task<Order?> GetOrderEntity(int orderId, CancellationToken cancellationToken)
     {
         return await dbContext
             .Orders
             .Where(o => o.Id == orderId)
-            .FirstOrDefaultAsync();
+            .FirstOrDefaultAsync(cancellationToken);
     }
 }

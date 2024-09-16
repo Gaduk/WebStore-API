@@ -231,7 +231,7 @@
       }
     },
     
-    "/orderedGoods/{orderId}": {
+    "/ordered-goods/{orderId}": {
       "get": {
         "tags": ["User"],
         "summary": "Получение списка товаров по заданному id заказа",
@@ -334,7 +334,7 @@
         }
       }
     },
-    "/user/{login}/isAdmin": {
+    "/user/{login}/admin-status": {
       "put": {
         "tags": ["Admin"],
         "summary": "Назначение прав администратора пользователю",
@@ -457,7 +457,7 @@
         }
       }
     },
-    "/accessDenied": {
+    "/access-denied": {
       "get": {
         "tags": ["Other"],
         "summary": "Сообщение о запрете доступа",

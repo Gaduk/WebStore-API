@@ -26,9 +26,9 @@ public class UserController(
     IMailService mailService) : ControllerBase
 {
     [HttpPost("/register")]
-    public async Task<IActionResult> CreateUser(CreateUserDto input)
+    public async Task<IActionResult> CreateUser(CreateUserCommand command)
     {
-        var userWithSameLogin = await userManager.FindByNameAsync(input.Login);
+        var userWithSameLogin = await userManager.FindByNameAsync(command.Login);
         if (userWithSameLogin != null)
         {
             return Conflict("Пользователь с таким логином уже существует");
@@ -36,14 +36,14 @@ public class UserController(
 
         var user = new User
         {
-            UserName = input.Login,
-            FirstName = input.FirstName,
-            LastName = input.LastName,
-            PhoneNumber = input.PhoneNumber,
-            Email = input.Email
+            UserName = command.Login,
+            FirstName = command.FirstName,
+            LastName = command.LastName,
+            PhoneNumber = command.PhoneNumber,
+            Email = command.Email
         };
         
-        var result = await userManager.CreateAsync(user, input.Password);
+        var result = await userManager.CreateAsync(user, command.Password);
         if (!result.Succeeded)
         {
             return BadRequest(result.Errors);
@@ -51,15 +51,15 @@ public class UserController(
         
         var claims = new List<Claim>
         {
-            new(ClaimTypes.Name, input.Login),
+            new(ClaimTypes.Name, command.Login),
             new(ClaimTypes.Role, "user")
         };
         await userManager.AddClaimsAsync(user, claims);
         
         //Подключаем рассылку
         RecurringJob.AddOrUpdate(
-            $"SendEmailMinutelyTo_{input.Login}", 
-            () => mailService.SendMessage(input.Email), 
+            $"SendEmailMinutelyTo_{command.Login}", 
+            () => mailService.SendMessage(command.Email), 
             Cron.Minutely);
         
         return Ok($"Пользователь {user.UserName} успешно зарегистрирован");

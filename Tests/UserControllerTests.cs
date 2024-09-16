@@ -1,5 +1,5 @@
-using Application.Interfaces;
-using Domain.Dto.User;
+using Application.Features.User.Commands.CreateUser;
+using Application.Services;
 using Domain.Entities;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -43,7 +43,7 @@ public class UserControllerTests
     public async Task CreateUser_Returns409_WhenInputLoginIsNotUnique()
     {
         // Arrange
-        var input = new CreateUserDto(
+        var input = new CreateUserCommand(
             "user", 
             "user", 
             "FirstName",
@@ -72,7 +72,7 @@ public class UserControllerTests
     public async Task CreateUser_Returns400_WhenInputIsInvalid()
     {
         // Arrange
-        var input = new CreateUserDto(
+        var input = new CreateUserCommand(
             "user2", 
             "1", //too short password
             "FirstName",

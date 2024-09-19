@@ -19,6 +19,8 @@ public static class Program
         builder.Services.AddApplication();
         builder.Services.AddInfrastructure(builder.Configuration);
         
+        builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+        
         builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(options => 
         {
             options.LoginPath = "/login";
@@ -55,10 +57,11 @@ public static class Program
                 c.RoutePrefix = "swagger";
             });
         }
+        app.UseExceptionHandler();
+        app.UseStaticFiles();
         app.UseRouting();
         app.UseAuthentication();  
         app.UseAuthorization();
-        app.UseStaticFiles();
         
         app.UseHangfireDashboard("/hangfire", new DashboardOptions
         {

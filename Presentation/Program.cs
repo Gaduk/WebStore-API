@@ -20,6 +20,7 @@ public static class Program
         builder.Services.AddInfrastructure(builder.Configuration);
         
         builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+        builder.Services.AddProblemDetails();
         
         builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(options => 
         {

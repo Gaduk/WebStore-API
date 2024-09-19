@@ -17,7 +17,6 @@ public class OrderRepository(ApplicationDbContext dbContext) : IOrderRepository
             IsDone = false
         };
         await dbContext.Orders.AddAsync(order, cancellationToken);
-        await dbContext.SaveChangesAsync(cancellationToken);
         var orderId = order.Id; 
 
         foreach (var orderedGood in orderedGoods)

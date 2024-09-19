@@ -9,6 +9,6 @@ public class GetOrderedGoodsQueryHandler(IOrderedGoodRepository orderedGoodRepos
 {
     public async Task<List<OrderedGoodDto>> Handle(GetOrderedGoodsQuery request, CancellationToken cancellationToken)
     {
-        return await orderedGoodRepository.GetOrderedGoods(request.OrderId);
+        return await orderedGoodRepository.GetOrderedGoods(request.OrderId, cancellationToken);
     }
 }

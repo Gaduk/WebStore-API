@@ -2,6 +2,7 @@ using Dapper;
 using Domain.Dto.OrderedGoods;
 using Domain.Repositories;
 using Infrastructure.Persistence.Context;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Persistence.Repositories;
@@ -22,10 +23,9 @@ public class OrderedGoodRepository(ApplicationDbContext dbContext) : IOrderedGoo
             .ToListAsync(cancellationToken);
     }
 
-    public async Task<List<OrderedGoodDto>> GetOrderedGoods(int orderId)
+    public async Task<List<OrderedGoodDto>> GetOrderedGoods(int orderId, CancellationToken cancellationToken)
     {
         var connection = dbContext.Database.GetDbConnection();
-        
         const string query = """
                              SELECT og."OrderId", og."GoodId", og."Amount", g."Name", g."Price"
                              FROM "OrderedGoods" og
@@ -34,7 +34,8 @@ public class OrderedGoodRepository(ApplicationDbContext dbContext) : IOrderedGoo
                              ORDER BY og."Id"
                              """;
         var parameters = new { OrderId = orderId };
-        var result = await connection.QueryAsync<OrderedGoodDto>(query, parameters);
+        var command = new CommandDefinition(query, parameters, cancellationToken: cancellationToken);
+        var result = await connection.QueryAsync<OrderedGoodDto>(command);
         return result.ToList();
     }
 }

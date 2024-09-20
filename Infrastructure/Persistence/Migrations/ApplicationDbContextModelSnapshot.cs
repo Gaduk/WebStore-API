@@ -31,7 +31,6 @@ namespace Infrastructure.Migrations
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Name")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<int>("Price")
@@ -130,14 +129,12 @@ namespace Infrastructure.Migrations
                         .HasColumnType("boolean");
 
                     b.Property<string>("FirstName")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<bool>("IsAdmin")
                         .HasColumnType("boolean");
 
                     b.Property<string>("LastName")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<bool>("LockoutEnabled")
@@ -189,7 +186,7 @@ namespace Infrastructure.Migrations
                         {
                             Id = "admin",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "0e9884da-3e86-4c98-afe0-7340d7cc7042",
+                            ConcurrencyStamp = "ab2d68bb-8d6c-45bf-836c-dbda6ca7fb85",
                             Email = "admin@mail.ru",
                             EmailConfirmed = true,
                             FirstName = "Иван",
@@ -198,10 +195,10 @@ namespace Infrastructure.Migrations
                             LockoutEnabled = false,
                             NormalizedEmail = "ADMIN@MAIL.RU",
                             NormalizedUserName = "ADMIN",
-                            PasswordHash = "AQAAAAIAAYagAAAAEEg7XXW9rqZGe/h8AamYfD9zWVus03D/xfYH3Pzmr3hi6CXmcojT4I9BFZFffvfqfQ==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEKI3gox0NZiIcKa/s4hI0LCVvdXuGIiQ4ctZuR5GGamODmjHx8bb8NMRStmz9vjlIA==",
                             PhoneNumber = "+71112223344",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "89e3013e-42d9-4d72-b4c3-69d9ea808cd1",
+                            SecurityStamp = "e6dceb80-712e-4728-80ec-8a1a63258413",
                             TwoFactorEnabled = false,
                             UserName = "admin"
                         });

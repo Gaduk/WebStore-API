@@ -8,5 +8,5 @@ public class OrderedGood
     public int Amount { get; init; }
     
     //Навигационное свойство
-    public Good Good { get; init; } = null!;
+    public Good? Good { get; init; }
 }

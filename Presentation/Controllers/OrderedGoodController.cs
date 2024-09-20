@@ -17,23 +17,4 @@ public class OrderedGoodController(IMediator mediator, IAuthorizationService aut
         var orderGoods = await mediator.Send(new GetAllOrderedGoodsQuery(), cancellationToken);
         return Ok(orderGoods);
     }
-    
-    [HttpGet("/ordered-goods/{orderId:int}")]
-    public async Task<IActionResult> GetOrderedGoods(int orderId, CancellationToken cancellationToken)
-    {
-        var order = await mediator.Send(new GetOrderQuery(orderId), cancellationToken);
-        if (order == null)
-        {
-            return NotFound("Заказ не найден");
-        }
-        
-        var authorizationResult = await authorizationService.AuthorizeAsync(User, order.UserName, "HaveAccess");
-        if (!authorizationResult.Succeeded)
-        {
-            return StatusCode(StatusCodes.Status403Forbidden);
-        }
-        
-        var orderGoods = await mediator.Send(new GetOrderedGoodsQuery(orderId), cancellationToken);
-        return Ok(orderGoods);
-    }
 }

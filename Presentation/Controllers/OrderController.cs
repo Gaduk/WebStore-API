@@ -16,28 +16,8 @@ namespace Web_API.Controllers;
 [ApiController]
 public class OrderController(
     IMediator mediator, 
-    IAuthorizationService authorizationService,
-    UserManager<User> userManager) : ControllerBase
+    IAuthorizationService authorizationService) : ControllerBase
 {
-    [HttpPost("/order/{login}")]
-    public async Task<IActionResult> CreateOrder(string login, ShortOrderedGoodDto[] orderedGoods, CancellationToken cancellationToken)
-    {
-        var authorizationResult = await authorizationService.AuthorizeAsync(User, login, "HaveAccess");
-        if (!authorizationResult.Succeeded)
-        {
-            return StatusCode(StatusCodes.Status403Forbidden);
-        }
-
-        var user = await userManager.FindByNameAsync(login);
-        if (user == null)
-        {
-            return NotFound("Пользователь не найден");
-        }
-        
-        await mediator.Send(new CreateOrderCommand(user.Id, orderedGoods), cancellationToken);
-        
-        return Ok("Заказ создан");
-    }
     
     [Authorize(Roles = "admin")]
     [HttpPut("/order/{orderId:int}/status")]

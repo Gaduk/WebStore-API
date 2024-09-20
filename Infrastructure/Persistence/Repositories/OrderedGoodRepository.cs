@@ -1,14 +1,29 @@
 using Dapper;
 using Domain.Dto.OrderedGoods;
+using Domain.Entities;
 using Domain.Repositories;
 using Infrastructure.Persistence.Context;
-using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Persistence.Repositories;
 
 public class OrderedGoodRepository(ApplicationDbContext dbContext) : IOrderedGoodRepository
 {
+    public async Task CreateOrderedGoods(int orderId, ShortOrderedGoodDto[] orderedGoods, CancellationToken cancellationToken)
+    {
+        foreach (var orderedGood in orderedGoods)
+        {
+            if (orderedGood.Amount == 0) continue;
+            var newOrderedGood = new OrderedGood
+            {
+                OrderId = orderId,
+                GoodId = orderedGood.GoodId,
+                Amount = orderedGood.Amount
+            }; 
+            await dbContext.OrderedGoods.AddAsync(newOrderedGood, cancellationToken);
+        }
+        await dbContext.SaveChangesAsync(cancellationToken);
+    }
     public async Task<List<OrderedGoodDto>> GetAllOrderedGoods(CancellationToken cancellationToken)
     {
         return await dbContext

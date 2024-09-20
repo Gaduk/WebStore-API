@@ -1,5 +1,4 @@
 using Domain.Dto.Order;
-using Domain.Dto.OrderedGoods;
 using Domain.Entities;
 using Domain.Repositories;
 using Infrastructure.Persistence.Context;
@@ -9,7 +8,7 @@ namespace Infrastructure.Persistence.Repositories;
 
 public class OrderRepository(ApplicationDbContext dbContext) : IOrderRepository
 {
-    public async Task<int> CreateOrder(string userId, ShortOrderedGoodDto[] orderedGoods, CancellationToken cancellationToken)
+    public async Task<int> CreateOrder(string userId, CancellationToken cancellationToken)
     {
         var order = new Order
         {
@@ -17,21 +16,9 @@ public class OrderRepository(ApplicationDbContext dbContext) : IOrderRepository
             IsDone = false
         };
         await dbContext.Orders.AddAsync(order, cancellationToken);
-        var orderId = order.Id; 
-
-        foreach (var orderedGood in orderedGoods)
-        {
-            if (orderedGood.Amount == 0) continue;
-            var newOrderedGood = new OrderedGood
-            {
-                OrderId = orderId,
-                GoodId = orderedGood.GoodId,
-                Amount = orderedGood.Amount
-            }; 
-            await dbContext.OrderedGoods.AddAsync(newOrderedGood, cancellationToken);
-        }
         await dbContext.SaveChangesAsync(cancellationToken);
-        return orderId;
+        
+        return order.Id;
     }
 
     public async Task UpdateOrder(Order order, CancellationToken cancellationToken)

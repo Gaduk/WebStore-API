@@ -27,25 +27,14 @@ public class OrderRepository(ApplicationDbContext dbContext) : IOrderRepository
         await dbContext.SaveChangesAsync(cancellationToken);
     }
 
-    public async Task<List<OrderDto>> GetAllOrders(CancellationToken cancellationToken)
+    public async Task<List<OrderDto>> GetOrders(string? login, CancellationToken cancellationToken)
     {
-        return await dbContext
-            .Orders
-            .OrderBy(o => o.Id)
-            .Select(o => new OrderDto
-            (
-                o.Id, 
-                o.User.UserName, 
-                o.IsDone
-            ))
-            .ToListAsync(cancellationToken);
-    }
-
-    public async Task<List<OrderDto>> GetUserOrders(string login, CancellationToken cancellationToken)
-    {
-        return await dbContext
-            .Orders
-            .Where(o => o.User.UserName == login)
+        var orders = dbContext.Orders.AsQueryable();
+        if (login != null)
+        {
+            orders = orders.Where(o => o.User.UserName == login);
+        }
+        return await orders
             .OrderBy(o => o.Id)
             .Select(o => new OrderDto 
             (

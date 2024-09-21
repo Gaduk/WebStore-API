@@ -8,7 +8,7 @@
   "paths": {
     "/register": {
       "post": {
-        "tags": ["Guest"],
+        "tags": ["User"],
         "summary": "Регистрация нового пользователя",
         "requestBody": {
           "content": {
@@ -41,7 +41,7 @@
     },
     "/login": {
       "post": {
-        "tags": ["Guest"],
+        "tags": ["User"],
         "summary": "Вход в аккаунт",
         "parameters": [
           {
@@ -85,15 +85,118 @@
         }
       }
     },
-    "/order/{login}": {
-      "post": {
+    "/accessDenied": {
+      "get": {
         "tags": ["User"],
-        "summary": "Оформление заказа",
+        "summary": "Сообщение о запрете доступа",
+        "description": "Сюда перенаправляются пользователи, не имеющие доступа к ресурсу",
+        "responses": {
+          "403": {
+            "description": "Доступ запрещен"
+          }
+        }
+      }
+    },
+    "/users/{login}": {
+      "get": {
+        "tags": ["User"],
+        "summary": "Получение информации о пользователе",
         "parameters": [
           {
             "name": "login",
             "in": "path",
             "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Информация о пользователе",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Доступ запрещен"
+          },
+          "404": {
+            "description": "Пользователь не найден"
+          }
+        }
+      },
+      "delete": {
+        "tags": ["User"],
+        "summary": "Удаление пользователя вместе с информацией о его заказах",
+        "parameters": [
+          {
+            "name": "login",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Пользователь удален"
+          },
+          "404": {
+            "description": "Пользователь не найден"
+          },
+          "405": {
+            "description": "Доступ запрещен"
+          }
+        }
+      }
+    },
+    "/orders": {
+      "get": {
+        "tags": ["Order"],
+        "summary": "Получение списка заказов пользователя",
+        "parameters": [
+          {
+            "name": "login",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Список заказов",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Order"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Доступ запрещен"
+          },
+          "404": {
+            "description": "Пользователь не найден"
+          }
+        }
+      },
+      "post": {
+        "tags": ["Order"],
+        "summary": "Оформление заказа",
+        "parameters": [
+          {
+            "name": "login",
+            "in": "query",
+            "required": false,
             "schema": {
               "type": "string"
             }
@@ -137,10 +240,10 @@
         }
       }
     },
-    "/user/{login}": {
-      "get": {
+    "/users/{login}/adminStatus": {
+      "put": {
         "tags": ["User"],
-        "summary": "Получение информации о пользователе",
+        "summary": "Назначение прав администратора пользователю",
         "parameters": [
           {
             "name": "login",
@@ -153,7 +256,24 @@
         ],
         "responses": {
           "200": {
-            "description": "Информация о пользователе",
+            "description": "Права администратора успешно назначены"
+          },
+          "404": {
+            "description": "Пользователь не найден"
+          },
+          "409": {
+            "description": "Пользователь уже является администратором"
+          }
+        }
+      }
+    },
+    "/users": {
+      "get": {
+        "tags": ["User"],
+        "summary": "Получение списка пользователей",
+        "responses": {
+          "200": {
+            "description": "Список пользователей",
             "content": {
               "application/json": {
                 "schema": {
@@ -165,143 +285,16 @@
           "403": {
             "description": "Доступ запрещен"
           },
-          "404": {
-            "description": "Пользователь не найден"
-          }
-        }
-      },
-      "delete": {
-        "tags": ["Admin"],
-        "summary": "Удаление пользователя вместе с информацией о его заказах",
-        "parameters": [
-          {
-            "name": "login",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Пользователь удален"
-          },
-          "404": {
-            "description": "Пользователь не найден"
-          },
           "405": {
             "description": "Доступ запрещен"
           }
         }
       }
     },
-    "/orders/{login}": {
-      "get": {
-        "tags": ["User"],
-        "summary": "Получение списка заказов пользователя",
-        "parameters": [
-          {
-            "name": "login",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Список заказов",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Order"
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "Доступ запрещен"
-          },
-          "404": {
-            "description": "Пользователь не найден"
-          }
-        }
-      }
-    },
-    
-    "/ordered-goods/{orderId}": {
-      "get": {
-        "tags": ["User"],
-        "summary": "Получение списка товаров по заданному id заказа",
-        "parameters": [
-          {
-            "name": "orderId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Список товаров по заданному id заказа",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/OrderedGood"
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "Доступ запрещен"
-          },
-          "404": {
-            "description": "Заказ не найден / Пользователь не найден"
-          }
-        }
-      }
-    },
-    "/order/{orderId}": {
-      "get": {
-        "tags": ["User"],
-        "summary": "Получение информации о заказе по заданному id",
-        "parameters": [
-          {
-            "name": "orderId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Информация о заказе по заданному id",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Order"
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "Доступ запрещен. Пользователь не имеет доступа к запрашиваемому ресурсу."
-          },
-          "404": {
-            "description": "Заказ не найден."
-          }
-        }
-      }
-    },
-    "/order/{orderId}/status": {
+
+    "/orders/{orderId}/status": {
       "put": {
-        "tags": ["Admin"],
+        "tags": ["Order"],
         "summary": "Изменение статуса заказа",
         "parameters": [
           {
@@ -334,64 +327,23 @@
         }
       }
     },
-    "/user/{login}/admin-status": {
-      "put": {
-        "tags": ["Admin"],
-        "summary": "Назначение прав администратора пользователю",
+    "/orders/{orderId}": {
+      "get": {
+        "tags": ["Order"],
+        "summary": "Получение информации о заказе по заданному id",
         "parameters": [
           {
-            "name": "login",
+            "name": "orderId",
             "in": "path",
             "required": true,
             "schema": {
-              "type": "string"
+              "type": "integer"
             }
           }
         ],
         "responses": {
           "200": {
-            "description": "Права администратора успешно назначены"
-          },
-          "404": {
-            "description": "Пользователь не найден"
-          },
-            "409": {
-              "description": "Пользователь уже является администратором"
-            }
-          }
-      }
-    },
-    "/users": {
-      "get": {
-        "tags": ["Admin"],
-        "summary": "Получение списка пользователей",
-        "responses": {
-          "200": {
-            "description": "Список пользователей",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/User"
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "Доступ запрещен"
-          },
-          "405": {
-            "description": "Доступ запрещен"
-          }
-        }
-      }
-    },
-    "/orders": {
-      "get": {
-        "tags": ["Admin"],
-        "summary": "Получение списка всех заказов",
-        "responses": {
-          "200": {
-            "description": "Список заказов",
+            "description": "Информация о заказе по заданному id",
             "content": {
               "application/json": {
                 "schema": {
@@ -401,21 +353,32 @@
             }
           },
           "403": {
-            "description": "Доступ запрещен"
+            "description": "Доступ запрещен. Пользователь не имеет доступа к запрашиваемому ресурсу."
           },
-          "405": {
-            "description": "Доступ запрещен"
+          "404": {
+            "description": "Заказ не найден."
           }
         }
       }
     },
+    
     "/orderedGoods": {
       "get": {
-        "tags": ["Admin"],
-        "summary": "Получение списка всех заказанных товаров",
+        "tags": ["OrderedGoods"],
+        "summary": "Получение списка товаров по заданному id заказа",
+        "parameters": [
+          {
+            "name": "orderId",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
         "responses": {
           "200": {
-            "description": "Список заказанных товаров",
+            "description": "Список товаров по заданному id заказа",
             "content": {
               "application/json": {
                 "schema": {
@@ -427,15 +390,16 @@
           "403": {
             "description": "Доступ запрещен"
           },
-          "405": {
-            "description": "Доступ запрещен"
+          "404": {
+            "description": "Заказ не найден / Пользователь не найден"
           }
         }
       }
     },
+    
     "/goods": {
       "get": {
-        "tags": ["Admin"],
+        "tags": ["Goods"],
         "summary": "Получение списка товаров",
         "responses": {
           "200": {
@@ -456,20 +420,9 @@
           }
         }
       }
-    },
-    "/access-denied": {
-      "get": {
-        "tags": ["Other"],
-        "summary": "Сообщение о запрете доступа",
-        "description": "Сюда перенаправляются пользователи, не имеющие доступа к ресурсу",
-        "responses": {
-          "403": {
-            "description": "Доступ запрещен"
-          }
-        }
-      }
     }
   },
+  
   "components": {
     "schemas": {
       "User": {

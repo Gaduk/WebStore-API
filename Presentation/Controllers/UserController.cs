@@ -1,14 +1,10 @@
 using System.Security.Claims;
-using Application.Features.Order.Commands.CreateOrder;
-using Application.Features.Order.Queries.GetUserOrders;
-using Application.Features.OrderedGood.CreateOrderedGoods;
 using Application.Features.User.Commands.CreateUser;
 using Application.Features.User.Commands.DeleteUser;
 using Application.Features.User.Commands.UpdateUserRole;
 using Application.Features.User.Queries.GetAllUsers;
 using Application.Features.User.Queries.GetUser;
 using Application.Services;
-using Domain.Dto.OrderedGoods;
 using Domain.Entities;
 using Hangfire;
 using MediatR;
@@ -111,6 +107,36 @@ public class UserController(
         return StatusCode(StatusCodes.Status403Forbidden);
     }
     
+    [HttpGet("/users/{login}")]
+    public async Task<IActionResult> GetUser(string login, CancellationToken cancellationToken)
+    {
+        var authorizationResult = await authorizationService.AuthorizeAsync(User, login, "HaveAccess");
+        if (!authorizationResult.Succeeded)
+        {
+            return StatusCode(StatusCodes.Status403Forbidden);
+        }
+        
+        var user = await mediator.Send(new GetUserQuery(login), cancellationToken);
+        if(user == null)
+        {
+            return NotFound("Пользователь не найден");
+        }
+        return Ok(user);
+    }
+    
+    [Authorize(Roles = "admin")]
+    [HttpDelete("/users/{login}")]
+    public async Task<IActionResult> DeleteUser(string login, CancellationToken cancellationToken)
+    {
+        var user = await userManager.FindByNameAsync(login);
+        if (user == null)
+        {
+            return NotFound("Пользователь не найден");
+        }
+        await mediator.Send(new DeleteUserCommand(user), cancellationToken);
+        return Ok($"Пользователь {user.UserName} удален");
+    }
+    
     [Authorize(Roles = "admin")]
     [HttpPut("/users/{login}/adminStatus")]
     public async Task<IActionResult> MakeAdmin(string login, CancellationToken cancellationToken)
@@ -138,75 +164,6 @@ public class UserController(
         await mediator.Send(new UpdateUserRoleCommand(user, true), cancellationToken);
         
         return Ok($"Пользователю {login} выданы права администратора");
-    }
-    
-    [Authorize(Roles = "admin")]
-    [HttpDelete("/users/{login}")]
-    public async Task<IActionResult> DeleteUser(string login, CancellationToken cancellationToken)
-    {
-        var user = await userManager.FindByNameAsync(login);
-        if (user == null)
-        {
-            return NotFound("Пользователь не найден");
-        }
-        await mediator.Send(new DeleteUserCommand(user), cancellationToken);
-        return Ok($"Пользователь {user.UserName} удален");
-    }
-    
-    [HttpPost("/users/{login}/order")]
-    public async Task<IActionResult> CreateUserOrder(string login, ShortOrderedGoodDto[] orderedGoods, CancellationToken cancellationToken)
-    {
-        var authorizationResult = await authorizationService.AuthorizeAsync(User, login, "HaveAccess");
-        if (!authorizationResult.Succeeded)
-        {
-            return StatusCode(StatusCodes.Status403Forbidden);
-        }
-
-        var user = await userManager.FindByNameAsync(login);
-        if (user == null)
-        {
-            return NotFound("Пользователь не найден");
-        }
-        var orderId = await mediator.Send(new CreateOrderCommand(user.Id), cancellationToken);
-        await mediator.Send(new CreateOrderedGoodsCommand(orderId, orderedGoods), cancellationToken);
-        
-        return Ok("Заказ создан");
-    }
-    
-    [HttpGet("/users/{login}/orders")]
-    public async Task<IActionResult> GetUserOrders(string login, CancellationToken cancellationToken)
-    {
-        var authorizationResult = await authorizationService.AuthorizeAsync(User, login, "HaveAccess");
-        if (!authorizationResult.Succeeded)
-        {
-            return StatusCode(StatusCodes.Status403Forbidden);
-        }
-
-        var user = await userManager.FindByNameAsync(login);
-        if (user == null)
-        {
-            return NotFound("Пользователь не найден");
-        }
-        
-        var orders = await mediator.Send(new GetUserOrdersQuery(login), cancellationToken);
-        return Ok(orders);
-    }
-    
-    [HttpGet("/users/{login}")]
-    public async Task<IActionResult> GetUser(string login, CancellationToken cancellationToken)
-    {
-        var authorizationResult = await authorizationService.AuthorizeAsync(User, login, "HaveAccess");
-        if (!authorizationResult.Succeeded)
-        {
-            return StatusCode(StatusCodes.Status403Forbidden);
-        }
-        
-        var user = await mediator.Send(new GetUserQuery(login), cancellationToken);
-        if(user == null)
-        {
-            return NotFound("Пользователь не найден");
-        }
-        return Ok(user);
     }
     
     [Authorize(Roles = "admin")]

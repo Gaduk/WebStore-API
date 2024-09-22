@@ -21,10 +21,10 @@ public class OrderController(
     UserManager<User> userManager) : ControllerBase
 {
     [Authorize(Roles = "admin")]
-    [HttpPut("/orders/{orderId:int}/status")]
+    [HttpPatch("/orders/{orderId:int}")]
     public async Task<IActionResult> UpdateOrderStatus(int orderId, bool isDone, CancellationToken cancellationToken)
     {
-        logger.LogInformation("HTTP PUT /orders/{orderId}/status", orderId);
+        logger.LogInformation("HTTP PATCH /orders/{orderId}", orderId);
         
         var order = await mediator.Send(new GetOrderEntityQuery(orderId), cancellationToken);
         if (order == null)

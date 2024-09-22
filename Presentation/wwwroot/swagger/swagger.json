@@ -298,41 +298,6 @@
       }
     },
 
-    "/orders/{orderId}/status": {
-      "put": {
-        "tags": ["Order"],
-        "summary": "Изменение статуса заказа",
-        "parameters": [
-          {
-            "name": "orderId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer"
-            }
-          },
-          {
-            "name": "isDone",
-            "in": "query",
-            "required": true,
-            "schema": {
-              "type": "boolean"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Статус заказа обновлен"
-          },
-          "404": {
-            "description": "Заказ не найден / Пользователь не найден"
-          },
-          "405": {
-            "description": "Доступ запрещен"
-          }
-        }
-      }
-    },
     "/orders/{orderId}": {
       "get": {
         "tags": ["Order"],
@@ -363,6 +328,39 @@
           },
           "404": {
             "description": "Заказ не найден."
+          }
+        }
+      },
+      "patch": {
+        "tags": ["Order"],
+        "summary": "Изменение статуса заказа",
+        "parameters": [
+          {
+            "name": "orderId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "isDone",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Статус заказа обновлен"
+          },
+          "404": {
+            "description": "Заказ не найден / Пользователь не найден"
+          },
+          "405": {
+            "description": "Доступ запрещен"
           }
         }
       }

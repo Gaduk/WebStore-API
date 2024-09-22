@@ -116,13 +116,6 @@ public class UserController(
         return Ok($"User {login} is signed out");
     }
     
-    [HttpGet("/accessDenied")]
-    public IActionResult DenyAccess()
-    {
-        logger.LogInformation("HTTP GET /accessDenied");
-        return StatusCode(StatusCodes.Status403Forbidden);
-    }
-    
     [HttpGet("/users/{login}")]
     public async Task<IActionResult> GetUser(string login, CancellationToken cancellationToken)
     {

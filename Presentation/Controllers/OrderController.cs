@@ -15,6 +15,7 @@ namespace Web_API.Controllers;
 
 [ApiController]
 public class OrderController(
+    ILogger<OrderController> logger,
     IMediator mediator, 
     IAuthorizationService authorizationService,
     UserManager<User> userManager) : ControllerBase
@@ -23,28 +24,37 @@ public class OrderController(
     [HttpPut("/orders/{orderId:int}/status")]
     public async Task<IActionResult> UpdateOrderStatus(int orderId, bool isDone, CancellationToken cancellationToken)
     {
+        logger.LogInformation("HTTP PUT /orders/{orderId}/status", orderId);
+        
         var order = await mediator.Send(new GetOrderEntityQuery(orderId), cancellationToken);
         if (order == null)
         {
-            return NotFound("Заказ не найден");
+            logger.LogWarning("NotFound. Order {orderId} is not found", orderId);
+            return NotFound("Order is not found");
         }
         order.IsDone = isDone;
         await mediator.Send(new UpdateOrderCommand(order), cancellationToken);
-        return Ok("Статус заказа обновлен");
+
+        logger.LogInformation("Status of order {orderId} is updated", order.Id);
+        return Ok($"Status of order {order.Id} is updated");
     }
     
     [HttpGet("/orders/{orderId:int}")]
     public async Task<IActionResult> GetOrder(int orderId, CancellationToken cancellationToken)
     {
+        logger.LogInformation("HTTP GET /orders/{orderId}", orderId);
+        
         var order = await mediator.Send(new GetOrderQuery(orderId), cancellationToken);
         if (order == null)
         {
-            return NotFound("Заказ не найден");
+            logger.LogWarning("NotFound. Order {orderId} is not found", orderId);
+            return NotFound("Order is not found");
         }
         
         var authorizationResult = await authorizationService.AuthorizeAsync(User, order.UserName, "HaveAccess");
         if (!authorizationResult.Succeeded)
         {
+            logger.LogWarning("Forbidden. User have no access to order {orderId}", orderId);
             return StatusCode(StatusCodes.Status403Forbidden);
         }
 
@@ -54,9 +64,12 @@ public class OrderController(
     [HttpGet("/orders")]
     public async Task<IActionResult> GetOrders(string? login, CancellationToken cancellationToken)
     {
+        logger.LogInformation("HTTP GET /orders");
+        
         var authorizationResult = await authorizationService.AuthorizeAsync(User, login, "HaveAccess");
         if (!authorizationResult.Succeeded)
         {
+            logger.LogWarning("Forbidden. No access");
             return StatusCode(StatusCodes.Status403Forbidden);
         }
 
@@ -65,7 +78,8 @@ public class OrderController(
             var user = await userManager.FindByNameAsync(login);
             if (user == null)
             {
-                return NotFound("Пользователь не найден");
+                logger.LogWarning("NotFound. User {login} is not found", login);
+                return NotFound($"User {login} is not found");
             }
         }
 
@@ -76,20 +90,25 @@ public class OrderController(
     [HttpPost("/orders")]
     public async Task<IActionResult> CreateUserOrder(string login, ShortOrderedGoodDto[] orderedGoods, CancellationToken cancellationToken)
     {
+        logger.LogInformation("HTTP POST /orders");
+        
         var authorizationResult = await authorizationService.AuthorizeAsync(User, login, "HaveAccess");
         if (!authorizationResult.Succeeded)
         {
+            logger.LogWarning("Forbidden. No access");
             return StatusCode(StatusCodes.Status403Forbidden);
         }
 
         var user = await userManager.FindByNameAsync(login);
         if (user == null)
         {
-            return NotFound("Пользователь не найден");
+            logger.LogWarning("NotFound. User {login} is not found", login);
+            return NotFound($"User {login} is not found");
         }
         var orderId = await mediator.Send(new CreateOrderCommand(user.Id), cancellationToken);
         await mediator.Send(new CreateOrderedGoodsCommand(orderId, orderedGoods), cancellationToken);
         
-        return Ok("Заказ создан");
+        logger.LogInformation("Order {orderId} is created", orderId);
+        return Ok($"Order {orderId} is created");
     }
 }

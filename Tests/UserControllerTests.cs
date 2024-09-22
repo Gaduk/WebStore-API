@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using Moq;
 using Web_API.Controllers;
 
@@ -13,6 +14,7 @@ namespace Tests;
 
 public class UserControllerTests
 {
+    private readonly Mock<ILogger<UserController>> _logger = new();
     private readonly Mock<IMediator> _mediatorMock = new();
     private readonly Mock<UserManager<User>> _userManagerMock;
     private readonly Mock<IAuthorizationService> _authorizationServiceMock = new();
@@ -32,6 +34,7 @@ public class UserControllerTests
             null!, null!, null!, null!);
         
         _userController = new UserController(
+            _logger.Object,
             _mediatorMock.Object , 
             signInManagerMock.Object,
             _userManagerMock.Object,

@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Infrastructure.Extensions;
 using Infrastructure.Persistence.Context;
+using Serilog;
 using Web_API.Requirements.AccessRequirement;
 using Web_API.Requirements.AccessRequirement.Handlers;
 
@@ -15,6 +16,11 @@ public static class Program
     public static void Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
+        
+        builder.Host.UseSerilog((context, loggerConfiguration) =>
+        {
+            loggerConfiguration.ReadFrom.Configuration(context.Configuration);
+        });
         
         builder.Services.AddApplication();
         builder.Services.AddInfrastructure(builder.Configuration);
@@ -43,7 +49,9 @@ public static class Program
             config.UsePostgreSqlStorage(options => options.UseNpgsqlConnection(connection)));
         builder.Services.AddHangfireServer();
         
+        
         var app = builder.Build();
+        
 
         using var scope = app.Services.CreateScope();
         using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
@@ -64,14 +72,16 @@ public static class Program
         app.UseAuthentication();  
         app.UseAuthorization();
         
+        app.MapControllers();
+        app.MapHangfireDashboard();
+        
         app.UseHangfireDashboard("/hangfire", new DashboardOptions
         {
             Authorization = new [] {new HangfireAuthorizationFilter()}
         });
-
-        app.MapControllers();
-        app.MapHangfireDashboard();
-
+        
+        app.UseSerilogRequestLogging();
+        
         app.Run();
     }
 }

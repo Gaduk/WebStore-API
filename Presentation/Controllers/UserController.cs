@@ -19,6 +19,7 @@ namespace Web_API.Controllers;
 
 [ApiController]
 public class UserController(
+    ILogger<UserController> logger,
     IMediator mediator, 
     SignInManager<User> signInManager, 
     UserManager<User> userManager, 
@@ -28,10 +29,13 @@ public class UserController(
     [HttpPost("/register")]
     public async Task<IActionResult> CreateUser(CreateUserCommand command)
     {
+        logger.LogInformation("HTTP POST /register");
+        
         var userWithSameLogin = await userManager.FindByNameAsync(command.Login);
         if (userWithSameLogin != null)
         {
-            return Conflict("Пользователь с таким логином уже существует");
+            logger.LogWarning("Conflict. User {login} already exist", command.Login);
+            return Conflict($"User {command.Login} already exist");
         }
 
         var user = new User
@@ -46,6 +50,7 @@ public class UserController(
         var result = await userManager.CreateAsync(user, command.Password);
         if (!result.Succeeded)
         {
+            logger.LogWarning("BadRequest\n{@errors}", result.Errors);
             return BadRequest(result.Errors);
         }
         
@@ -56,22 +61,25 @@ public class UserController(
         };
         await userManager.AddClaimsAsync(user, claims);
         
-        //Подключаем рассылку
         RecurringJob.AddOrUpdate(
             $"SendEmailMinutelyTo_{command.Login}", 
             () => mailService.SendMessage(command.Email), 
             Cron.Minutely);
         
-        return Ok($"Пользователь {user.UserName} успешно зарегистрирован");
+        logger.LogInformation("User {login} is signed up successfully", user.UserName);
+        return Ok($"User {user.UserName} is signed up successfully");
     }
     
     [HttpPost("/login")]
     public async Task<IActionResult> Login(string login, string password)
     {
+        logger.LogInformation("HTTP POST /login");
+        
         var user = await userManager.FindByNameAsync(login);
         if (user == null)
         {
-            return Unauthorized("Неверное имя пользователя");
+            logger.LogWarning("Unauthorized. Wrong login");
+            return Unauthorized("Wrong login");
         }
         
         var resultTask = signInManager.CheckPasswordSignInAsync(user, password, false);
@@ -83,43 +91,55 @@ public class UserController(
         
         if(!result.Succeeded) 
         {
-            return Unauthorized("Неверный пароль");
+            logger.LogWarning("Unauthorized. Wrong password");
+            return Unauthorized("Wrong password");
         }
         
         var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
         await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
         await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity));
-        
-        return Ok($"Выполнен вход в аккаунт {login}");
+
+        logger.LogInformation("User {login} is signed in successfully", user.UserName);
+        return Ok($"User {user.UserName} is signed in");
     }
     
     [Authorize(Roles = "user, admin")]
     [HttpGet("/logout")]
     public async Task<IActionResult> Logout()
     {
+        logger.LogInformation("HTTP GET /logout");
+
         await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-        return Ok("Выполнен выход из аккаунта");
+        
+        var login = User.Identity?.Name;
+        logger.LogInformation("User {login} is signed out", login);
+        return Ok($"User {login} is signed out");
     }
     
     [HttpGet("/accessDenied")]
     public IActionResult DenyAccess()
     {
+        logger.LogInformation("HTTP GET /accessDenied");
         return StatusCode(StatusCodes.Status403Forbidden);
     }
     
     [HttpGet("/users/{login}")]
     public async Task<IActionResult> GetUser(string login, CancellationToken cancellationToken)
     {
+        logger.LogInformation("HTTP GET /users/{login}", login);
+        
         var authorizationResult = await authorizationService.AuthorizeAsync(User, login, "HaveAccess");
         if (!authorizationResult.Succeeded)
         {
+            logger.LogWarning("Forbidden. No access");
             return StatusCode(StatusCodes.Status403Forbidden);
         }
         
         var user = await mediator.Send(new GetUserQuery(login), cancellationToken);
         if(user == null)
         {
-            return NotFound("Пользователь не найден");
+            logger.LogWarning("NotFound. User {login} is not found", login);
+            return NotFound($"User {login} is not found");
         }
         return Ok(user);
     }
@@ -128,29 +148,37 @@ public class UserController(
     [HttpDelete("/users/{login}")]
     public async Task<IActionResult> DeleteUser(string login, CancellationToken cancellationToken)
     {
+        logger.LogInformation("HTTP DELETE /users/{login}", login);
+        
         var user = await userManager.FindByNameAsync(login);
         if (user == null)
         {
-            return NotFound("Пользователь не найден");
+            logger.LogWarning("NotFound. User {login} is not found", login);
+            return NotFound($"User {login} is not found");
         }
         await mediator.Send(new DeleteUserCommand(user), cancellationToken);
-        return Ok($"Пользователь {user.UserName} удален");
+        
+        logger.LogInformation("User {login} is deleted", user.UserName);
+        return Ok($"User {user.UserName} is deleted");
     }
     
     [Authorize(Roles = "admin")]
     [HttpPut("/users/{login}/adminStatus")]
     public async Task<IActionResult> MakeAdmin(string login, CancellationToken cancellationToken)
     {
+        logger.LogInformation("HTTP PUT /users/{login}/adminStatus", login);
         var user = await userManager.FindByNameAsync(login);
         
         if (user == null)
         {
-            return NotFound("Пользователь не найден");
+            logger.LogWarning("NotFound. User {login} is not found", login);
+            return NotFound($"User {login} is not found");
         }
         
         if (user.IsAdmin)
         {
-            return Conflict("Пользователь уже является администратором");
+            logger.LogWarning("Conflict. User {login} is already admin", login);
+            return Conflict($"User {login} is already admin");
         }
 
         var claims = new List<Claim>
@@ -163,13 +191,16 @@ public class UserController(
         
         await mediator.Send(new UpdateUserRoleCommand(user, true), cancellationToken);
         
-        return Ok($"Пользователю {login} выданы права администратора");
+        logger.LogInformation("Admin rights are granted to user {login}", user.UserName);
+        return Ok($"Admin rights are granted to user {user.UserName}");
     }
     
     [Authorize(Roles = "admin")]
     [HttpGet("/users")]
     public async Task<IActionResult> GetAllUsers(CancellationToken cancellationToken)
     {
+        logger.LogInformation("HTTP GET /users");
+        
         var users = await mediator.Send(new GetAllUsersQuery(), cancellationToken);
         return Ok(users);
     }

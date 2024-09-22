@@ -202,7 +202,7 @@ public class UserController(
     
     [Authorize(Roles = "admin")]
     [HttpGet("/users")]
-    public async Task<IActionResult> GetAllUsers(CancellationToken cancellationToken)
+    public async Task<IActionResult> GetUsers(CancellationToken cancellationToken)
     {
         logger.LogInformation("HTTP GET /users");
         

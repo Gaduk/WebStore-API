@@ -88,7 +88,7 @@ public class OrderController(
     }
     
     [HttpPost("/orders")]
-    public async Task<IActionResult> CreateUserOrder(string login, ShortOrderedGoodDto[] orderedGoods, CancellationToken cancellationToken)
+    public async Task<IActionResult> CreateOrder(string login, ShortOrderedGoodDto[] orderedGoods, CancellationToken cancellationToken)
     {
         logger.LogInformation("HTTP POST /orders");
         

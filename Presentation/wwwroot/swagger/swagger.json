@@ -130,6 +130,39 @@
           }
         }
       },
+      "patch": {
+        "tags": ["User"],
+        "summary": "Назначение прав администратора пользователю",
+        "parameters": [
+          {
+            "name": "login",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "isAdmin",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Права администратора успешно назначены"
+          },
+          "404": {
+            "description": "Пользователь не найден"
+          },
+          "409": {
+            "description": "Пользователь уже является администратором"
+          }
+        }
+      },
       "delete": {
         "tags": ["User"],
         "summary": "Удаление пользователя вместе с информацией о его заказах",
@@ -236,33 +269,6 @@
           },
           "404": {
             "description": "Пользователь не найден"
-          }
-        }
-      }
-    },
-    "/users/{login}/adminStatus": {
-      "put": {
-        "tags": ["User"],
-        "summary": "Назначение прав администратора пользователю",
-        "parameters": [
-          {
-            "name": "login",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Права администратора успешно назначены"
-          },
-          "404": {
-            "description": "Пользователь не найден"
-          },
-          "409": {
-            "description": "Пользователь уже является администратором"
           }
         }
       }

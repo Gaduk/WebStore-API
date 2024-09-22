@@ -163,10 +163,11 @@ public class UserController(
     }
     
     [Authorize(Roles = "admin")]
-    [HttpPut("/users/{login}/adminStatus")]
-    public async Task<IActionResult> MakeAdmin(string login, CancellationToken cancellationToken)
+    [HttpPatch("/users/{login}")]
+    public async Task<IActionResult> UpdateUserStatus(string login, bool isAdmin, CancellationToken cancellationToken)
     {
-        logger.LogInformation("HTTP PUT /users/{login}/adminStatus", login);
+        logger.LogInformation("HTTP PATCH /users/{login}", login);
+        
         var user = await userManager.FindByNameAsync(login);
         
         if (user == null)
@@ -174,25 +175,29 @@ public class UserController(
             logger.LogWarning("NotFound. User {login} is not found", login);
             return NotFound($"User {login} is not found");
         }
-        
-        if (user.IsAdmin)
-        {
-            logger.LogWarning("Conflict. User {login} is already admin", login);
-            return Conflict($"User {login} is already admin");
-        }
 
         var claims = new List<Claim>
         {
             new(ClaimTypes.Role, "admin")
         };
-        await userManager.AddClaimsAsync(user, claims);
-        var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-        User.AddIdentity(claimsIdentity);
+        switch (isAdmin)
+        {
+            case true when !user.IsAdmin:
+            {
+                await userManager.AddClaimsAsync(user, claims);
+                var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+                User.AddIdentity(claimsIdentity);
+                break;
+            }
+            case false when user.IsAdmin:
+                await userManager.RemoveClaimsAsync(user, claims);
+                break;
+        }
+
+        await mediator.Send(new UpdateUserRoleCommand(user, isAdmin), cancellationToken);
         
-        await mediator.Send(new UpdateUserRoleCommand(user, true), cancellationToken);
-        
-        logger.LogInformation("Admin rights are granted to user {login}", user.UserName);
-        return Ok($"Admin rights are granted to user {user.UserName}");
+        logger.LogInformation("{login} rights is updated", user.UserName);
+        return Ok($"{user.UserName} rights is updated");
     }
     
     [Authorize(Roles = "admin")]

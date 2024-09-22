@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using Application.Extensions;
 using Hangfire;
 using Hangfire.PostgreSql;
@@ -30,13 +31,21 @@ public static class Program
         
         builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(options => 
         {
-            options.LoginPath = "/login";
-            options.AccessDeniedPath = "/accessDenied";
+            options.Events.OnRedirectToLogin = context =>
+            {
+                context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+                return Task.CompletedTask;
+            };
+            options.Events.OnRedirectToAccessDenied = context =>
+            {
+                context.Response.StatusCode = StatusCodes.Status403Forbidden;
+                return Task.CompletedTask;
+            };
         });
         
         builder.Services.AddSingleton<IAuthorizationHandler, RequestLoginIsUserLoginHandler>(); 
-        builder.Services.AddSingleton<IAuthorizationHandler, IsAdminHandler>(); 
-        
+        builder.Services.AddSingleton<IAuthorizationHandler, IsAdminHandler>();
+
         builder.Services.AddAuthorizationBuilder()
             .AddPolicy("HaveAccess", policy =>
                 policy.Requirements.Add(new AccessRequirement()));

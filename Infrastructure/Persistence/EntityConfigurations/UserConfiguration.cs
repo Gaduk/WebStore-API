@@ -11,7 +11,8 @@ public class UserConfiguration: IEntityTypeConfiguration<User>
     {
         builder
             .HasMany(u => u.Orders)
-            .WithOne(o => o.User);
+            .WithOne(o => o.User)
+            .HasForeignKey(o => o.UserName);
         
         var hasher = new PasswordHasher<User>();
         builder.HasData(

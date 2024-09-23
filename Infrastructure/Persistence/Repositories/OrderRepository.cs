@@ -8,11 +8,11 @@ namespace Infrastructure.Persistence.Repositories;
 
 public class OrderRepository(ApplicationDbContext dbContext) : IOrderRepository
 {
-    public async Task<int> CreateOrder(string userId, CancellationToken cancellationToken)
+    public async Task<int> CreateOrder(string username, CancellationToken cancellationToken)
     {
         var order = new Order
         {
-            UserId = userId,
+            UserName = username,
             IsDone = false
         };
         await dbContext.Orders.AddAsync(order, cancellationToken);

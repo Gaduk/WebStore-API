@@ -182,15 +182,15 @@ namespace Infrastructure.Migrations
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    UserId = table.Column<string>(type: "text", nullable: false),
+                    UserName = table.Column<string>(type: "text", nullable: false),
                     IsDone = table.Column<bool>(type: "boolean", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Orders", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Orders_AspNetUsers_UserId",
-                        column: x => x.UserId,
+                        name: "FK_Orders_AspNetUsers_UserName",
+                        column: x => x.UserName,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -226,7 +226,7 @@ namespace Infrastructure.Migrations
             migrationBuilder.InsertData(
                 table: "AspNetUsers",
                 columns: new[] { "Id", "AccessFailedCount", "ConcurrencyStamp", "Email", "EmailConfirmed", "FirstName", "IsAdmin", "LastName", "LockoutEnabled", "LockoutEnd", "NormalizedEmail", "NormalizedUserName", "PasswordHash", "PhoneNumber", "PhoneNumberConfirmed", "SecurityStamp", "TwoFactorEnabled", "UserName" },
-                values: new object[] { "admin", 0, "ab2d68bb-8d6c-45bf-836c-dbda6ca7fb85", "admin@mail.ru", true, "Иван", true, "Иванов", false, null, "ADMIN@MAIL.RU", "ADMIN", "AQAAAAIAAYagAAAAEKI3gox0NZiIcKa/s4hI0LCVvdXuGIiQ4ctZuR5GGamODmjHx8bb8NMRStmz9vjlIA==", "+71112223344", false, "e6dceb80-712e-4728-80ec-8a1a63258413", false, "admin" });
+                values: new object[] { "admin", 0, "e361314e-7149-482f-9afa-dc3e4a2afb9b", "admin@mail.ru", true, "Иван", true, "Иванов", false, null, "ADMIN@MAIL.RU", "ADMIN", "AQAAAAIAAYagAAAAELAzzWuFxlFtI7bxw0WJSSql7EMxgk0Z7I6G479dYKFBZt1sufqJ/Al7gquSIVvrtw==", "+71112223344", false, "8e848f8b-064f-4eab-911f-47d7288c9cdd", false, "admin" });
 
             migrationBuilder.InsertData(
                 table: "Goods",
@@ -296,9 +296,9 @@ namespace Infrastructure.Migrations
                 column: "OrderId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Orders_UserId",
+                name: "IX_Orders_UserName",
                 table: "Orders",
-                column: "UserId");
+                column: "UserName");
         }
 
         /// <inheritdoc />

@@ -72,13 +72,13 @@ namespace Infrastructure.Migrations
                     b.Property<bool>("IsDone")
                         .HasColumnType("boolean");
 
-                    b.Property<string>("UserId")
+                    b.Property<string>("UserName")
                         .IsRequired()
                         .HasColumnType("text");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("UserName");
 
                     b.ToTable("Orders");
                 });
@@ -186,7 +186,7 @@ namespace Infrastructure.Migrations
                         {
                             Id = "admin",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "ab2d68bb-8d6c-45bf-836c-dbda6ca7fb85",
+                            ConcurrencyStamp = "e361314e-7149-482f-9afa-dc3e4a2afb9b",
                             Email = "admin@mail.ru",
                             EmailConfirmed = true,
                             FirstName = "Иван",
@@ -195,10 +195,10 @@ namespace Infrastructure.Migrations
                             LockoutEnabled = false,
                             NormalizedEmail = "ADMIN@MAIL.RU",
                             NormalizedUserName = "ADMIN",
-                            PasswordHash = "AQAAAAIAAYagAAAAEKI3gox0NZiIcKa/s4hI0LCVvdXuGIiQ4ctZuR5GGamODmjHx8bb8NMRStmz9vjlIA==",
+                            PasswordHash = "AQAAAAIAAYagAAAAELAzzWuFxlFtI7bxw0WJSSql7EMxgk0Z7I6G479dYKFBZt1sufqJ/Al7gquSIVvrtw==",
                             PhoneNumber = "+71112223344",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "e6dceb80-712e-4728-80ec-8a1a63258413",
+                            SecurityStamp = "8e848f8b-064f-4eab-911f-47d7288c9cdd",
                             TwoFactorEnabled = false,
                             UserName = "admin"
                         });
@@ -367,7 +367,7 @@ namespace Infrastructure.Migrations
                 {
                     b.HasOne("Domain.Entities.User", "User")
                         .WithMany("Orders")
-                        .HasForeignKey("UserId")
+                        .HasForeignKey("UserName")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 

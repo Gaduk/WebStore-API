@@ -6,7 +6,7 @@ public class OrderedGood
     public int OrderId { get; init; }
     public int GoodId { get; init; }
     public int Amount { get; init; }
-    
-    //Навигационное свойство
-    public Good? Good { get; init; }
+
+    public Good Good { get; init; } = null!;
+
 }

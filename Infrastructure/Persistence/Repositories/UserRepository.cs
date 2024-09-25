@@ -1,4 +1,3 @@
-using Domain.Dto.User;
 using Domain.Entities;
 using Domain.Repositories;
 using Infrastructure.Persistence.Context;
@@ -21,32 +20,17 @@ public class UserRepository(ApplicationDbContext dbContext) : IUserRepository
         await dbContext.SaveChangesAsync(cancellationToken);
     }
 
-    public async Task<List<UserDto>> GetAllUsers(CancellationToken cancellationToken)
+    public async Task<List<User>> GetAllUsers(CancellationToken cancellationToken)
     {
         return await dbContext.Users
             .OrderBy(u => u.UserName)
-            .Select(user => new UserDto(
-                user.UserName,
-                user.FirstName,
-                user.LastName,
-                user.PhoneNumber,
-                user.Email,
-                user.IsAdmin
-            )).ToListAsync(cancellationToken);
+            .ToListAsync(cancellationToken);
     }
 
-    public async Task<UserDto?> GetUser(string login, CancellationToken cancellationToken)
+    public async Task<User?> GetUser(string login, CancellationToken cancellationToken)
     {
         return await dbContext.Users
             .Where(u => u.UserName == login)
-            .Select(user => new UserDto(
-                user.UserName, 
-                user.FirstName,
-                user.LastName,
-                user.PhoneNumber,
-                user.Email,
-                user.IsAdmin
-            ))
             .FirstOrDefaultAsync(cancellationToken);
     }
 }

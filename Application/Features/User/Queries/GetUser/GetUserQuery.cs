@@ -1,6 +1,5 @@
-using Domain.Dto.User;
 using MediatR;
 
 namespace Application.Features.User.Queries.GetUser;
 
-public record GetUserQuery(string Login) : IRequest<UserDto?>;
+public record GetUserQuery(string Login) : IRequest<Domain.Entities.User?>;

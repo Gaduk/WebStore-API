@@ -1,4 +1,4 @@
-using System.Security.Claims;
+
 using Application.Extensions;
 using Hangfire;
 using Hangfire.PostgreSql;
@@ -50,7 +50,10 @@ public static class Program
             .AddPolicy("HaveAccess", policy =>
                 policy.Requirements.Add(new AccessRequirement()));
         
-        builder.Services.AddControllers();
+        builder.Services.AddControllers()
+            .AddNewtonsoftJson(options =>
+            options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
+        
         builder.Services.AddSwaggerGen();
         
         var connection = builder.Configuration.GetConnectionString("DefaultConnection");

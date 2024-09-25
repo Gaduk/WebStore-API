@@ -9,5 +9,5 @@ public class User : IdentityUser
     public bool IsAdmin { get; set; }
 
 
-    public ICollection<Order>? Orders { get; init; }
+    public ICollection<Order> Orders { get; init; } = new List<Order>();
 }

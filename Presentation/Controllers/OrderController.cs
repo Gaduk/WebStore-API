@@ -1,10 +1,8 @@
 using Application.Features.Order.Commands.CreateOrder;
 using Application.Features.Order.Commands.UpdateOrder;
 using Application.Features.Order.Queries.GetOrder;
-using Application.Features.Order.Queries.GetOrderEntity;
 using Application.Features.Order.Queries.GetOrders;
-using Application.Features.OrderedGood.CreateOrderedGoods;
-using Domain.Dto.OrderedGoods;
+using Domain.Dto.Order;
 using Domain.Entities;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -87,27 +85,32 @@ public class OrderController(
     }
     
     [HttpPost("/orders")]
-    public async Task<IActionResult> CreateOrder(string login, ShortOrderedGoodDto[] orderedGoods, CancellationToken cancellationToken)
+    public async Task<IActionResult> CreateOrder(CreateOrderCommand command, CancellationToken cancellationToken)
     {
         logger.LogInformation("HTTP POST /orders");
         
-        var authorizationResult = await authorizationService.AuthorizeAsync(User, login, "HaveAccess");
+        var authorizationResult = await authorizationService.AuthorizeAsync(User, command.UserName, "HaveAccess");
         if (!authorizationResult.Succeeded)
         {
             logger.LogWarning("Forbidden. No access");
             return StatusCode(StatusCodes.Status403Forbidden);
         }
 
-        var user = await userManager.FindByNameAsync(login);
+        var user = await userManager.FindByNameAsync(command.UserName);
         if (user == null)
         {
-            logger.LogWarning("NotFound. User {login} is not found", login);
-            return NotFound($"User {login} is not found");
+            logger.LogWarning("NotFound. User {login} is not found", command.UserName);
+            return NotFound($"User {command.UserName} is not found");
         }
-        var orderId = await mediator.Send(new CreateOrderCommand(user.Id), cancellationToken);
-        await mediator.Send(new CreateOrderedGoodsCommand(orderId, orderedGoods), cancellationToken);
+        
+        var orderId = await mediator.Send(command, cancellationToken);
         
         logger.LogInformation("Order {orderId} is created", orderId);
-        return Ok($"Order {orderId} is created");
+        
+        return CreatedAtAction(
+            nameof(GetOrder), 
+            new { orderId },
+            new OrderDto(orderId, command.UserName,false)
+        );
     }
 }

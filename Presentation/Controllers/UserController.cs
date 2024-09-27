@@ -61,10 +61,7 @@ public class UserController(
         };
         await userManager.AddClaimsAsync(user, claims);
         
-        RecurringJob.AddOrUpdate(
-            $"SendEmailMinutelyTo_{command.Login}", 
-            () => mailService.SendMessage(command.Email), 
-            Cron.Minutely);
+        mailService.SubscribeToMailing(command.Email, command.Login);
         
         logger.LogInformation("User {login} is signed up successfully", user.UserName);
         return Ok($"User {user.UserName} is signed up successfully");

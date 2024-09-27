@@ -26,14 +26,13 @@ public class OrderController(
     {
         logger.LogInformation("HTTP PATCH /orders/{orderId}", orderId);
         
-        var order = await mediator.Send(new GetOrderEntityQuery(orderId), cancellationToken);
+        var order = await mediator.Send(new GetOrderQuery(orderId), cancellationToken);
         if (order == null)
         {
             logger.LogWarning("NotFound. Order {orderId} is not found", orderId);
             return NotFound("Order is not found");
         }
-        order.IsDone = isDone;
-        await mediator.Send(new UpdateOrderCommand(order), cancellationToken);
+        await mediator.Send(new UpdateOrderCommand(order, isDone), cancellationToken);
 
         logger.LogInformation("Status of order {orderId} is updated", order.Id);
         return Ok($"Status of order {order.Id} is updated");

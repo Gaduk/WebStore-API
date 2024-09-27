@@ -64,7 +64,18 @@ public class UserController(
         mailService.SubscribeToMailing(command.Email, command.Login);
         
         logger.LogInformation("User {login} is signed up successfully", user.UserName);
-        return Ok($"User {user.UserName} is signed up successfully");
+        return CreatedAtAction(
+            nameof(GetUser),   
+            new { login = user.UserName },
+            new UserDto(
+                user.UserName, 
+                user.FirstName,
+                user.LastName,
+                user.PhoneNumber,
+                user.Email,
+                user.IsAdmin
+                )
+        );
     }
     
     [HttpPost("/login")]

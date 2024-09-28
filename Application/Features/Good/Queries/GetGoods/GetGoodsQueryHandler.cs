@@ -1,8 +1,7 @@
-using Application.Features.Good.Queries.GetGoods;
 using Domain.Repositories;
 using MediatR;
 
-namespace Application.Features.Good.Queries.GetAllGoodEntities;
+namespace Application.Features.Good.Queries.GetGoods;
 
 public class GetGoodsQueryHandler(IGoodRepository goodRepository) : 
     IRequestHandler<GetGoodsQuery, List<Domain.Entities.Good>>

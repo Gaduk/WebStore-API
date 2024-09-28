@@ -7,7 +7,7 @@ public class SubscribeUserToMailingCommandHandler(IMailService mailService) : IR
 {
     public Task Handle(SubscribeUserToMailingCommand request, CancellationToken cancellationToken)
     {
-        mailService.SubscribeToMailing(request.Email, request.Username);
+        mailService.SubscribeToMailing(request.Email, request.UserName);
         return Task.CompletedTask;
     }
 }

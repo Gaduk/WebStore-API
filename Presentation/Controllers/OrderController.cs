@@ -58,29 +58,29 @@ public class OrderController(
     }
     
     [HttpGet("/orders")]
-    public async Task<IActionResult> GetOrders(string? login, CancellationToken cancellationToken)
+    public async Task<IActionResult> GetOrders(string? username, CancellationToken cancellationToken)
     {
         logger.LogInformation("HTTP GET /orders");
         
         var authorizationResult = await mediator.Send(
-            new CheckAccessToResourceQuery(User, login, "HaveAccess"), cancellationToken);
+            new CheckAccessToResourceQuery(User, username, "HaveAccess"), cancellationToken);
         if (!authorizationResult.Succeeded)
         {
             logger.LogWarning("Forbidden. No access");
             return StatusCode(StatusCodes.Status403Forbidden);
         }
 
-        if (login != null)
+        if (username != null)
         {
-            var user = await mediator.Send(new GetUserQuery(login), cancellationToken);
+            var user = await mediator.Send(new GetUserQuery(username), cancellationToken);
             if (user == null)
             {
-                logger.LogWarning("NotFound. User {login} is not found", login);
-                return NotFound($"User {login} is not found");
+                logger.LogWarning("NotFound. User {username} is not found", username);
+                return NotFound($"User {username} is not found");
             }
         }
 
-        var orders = await mediator.Send(new GetOrdersQuery(login), cancellationToken);
+        var orders = await mediator.Send(new GetOrdersQuery(username), cancellationToken);
         return Ok(orders);
     }
     
@@ -100,7 +100,7 @@ public class OrderController(
         var user = await mediator.Send(new GetUserQuery(command.UserName), cancellationToken);
         if (user == null)
         {
-            logger.LogWarning("NotFound. User {login} is not found", command.UserName);
+            logger.LogWarning("NotFound. User {username} is not found", command.UserName);
             return NotFound($"User {command.UserName} is not found");
         }
         

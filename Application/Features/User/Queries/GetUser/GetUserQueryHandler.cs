@@ -7,6 +7,6 @@ public class GetUserQueryHandler(IUserRepository userRepository) : IRequestHandl
 {
     public async Task<Domain.Entities.User?> Handle(GetUserQuery request, CancellationToken cancellationToken)
     {
-        return await userRepository.GetUser(request.Login, cancellationToken);
+        return await userRepository.GetUser(request.UserName, cancellationToken);
     }
 }

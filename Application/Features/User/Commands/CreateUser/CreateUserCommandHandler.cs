@@ -12,7 +12,7 @@ public class CreateUserCommandHandler(UserManager<Domain.Entities.User> userMana
     {
         var user = new Domain.Entities.User
         {
-            UserName = request.Login,
+            UserName = request.UserName,
             FirstName = request.FirstName,
             LastName = request.LastName,
             PhoneNumber = request.PhoneNumber,

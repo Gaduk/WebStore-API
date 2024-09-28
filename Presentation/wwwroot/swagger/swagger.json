@@ -15,7 +15,7 @@
             "application/json": {
               "schema": {
                 "example": {
-                  "Login": "john_doe",
+                  "UserName": "john_doe",
                   "Password": "12345",
                   "FirstName": "John",
                   "LastName": "Doe",
@@ -45,7 +45,7 @@
         "summary": "Вход в аккаунт",
         "parameters": [
           {
-            "name": "login",
+            "name": "username",
             "in": "query",
             "required": true,
             "schema": {
@@ -85,13 +85,13 @@
         }
       }
     },
-    "/users/{login}": {
+    "/users/{username}": {
       "get": {
         "tags": ["User"],
         "summary": "Получение информации о пользователе",
         "parameters": [
           {
-            "name": "login",
+            "name": "username",
             "in": "path",
             "required": true,
             "schema": {
@@ -123,7 +123,7 @@
         "summary": "Назначение прав администратора пользователю",
         "parameters": [
           {
-            "name": "login",
+            "name": "username",
             "in": "path",
             "required": true,
             "schema": {
@@ -156,7 +156,7 @@
         "summary": "Удаление пользователя вместе с информацией о его заказах",
         "parameters": [
           {
-            "name": "login",
+            "name": "username",
             "in": "path",
             "required": true,
             "schema": {
@@ -183,7 +183,7 @@
         "summary": "Получение списка заказов пользователя",
         "parameters": [
           {
-            "name": "login",
+            "name": "username",
             "in": "query",
             "required": false,
             "schema": {
@@ -413,7 +413,7 @@
       "User": {
         "type": "object",
         "properties": {
-          "Login": {
+          "UserName": {
             "type": "string"
           },
           "FirstName": {

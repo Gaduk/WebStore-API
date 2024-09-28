@@ -1,4 +1,3 @@
-using Application.Features.Good.Queries.GetAllGoodEntities;
 using Application.Features.Good.Queries.GetGoods;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;

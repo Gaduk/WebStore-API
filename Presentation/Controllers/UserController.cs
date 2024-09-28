@@ -28,11 +28,11 @@ public class UserController(
     {
         logger.LogInformation("HTTP POST /register");
         
-        var userWithSameLogin = await mediator.Send(new GetUserQuery(command.Login), cancellationToken);
-        if (userWithSameLogin != null)
+        var userWithSameName = await mediator.Send(new GetUserQuery(command.UserName), cancellationToken);
+        if (userWithSameName != null)
         {
-            logger.LogWarning("Conflict. User {login} already exist", command.Login);
-            return Conflict($"User {command.Login} already exist");
+            logger.LogWarning("Conflict. User {username} already exist", command.UserName);
+            return Conflict($"User {command.UserName} already exist");
         }
 
         var (result, user) = await mediator.Send(command, cancellationToken);
@@ -43,12 +43,12 @@ public class UserController(
         }
         await mediator.Send(new AddUserClaims(user), CancellationToken.None);
         
-        await mediator.Send(new SubscribeUserToMailingCommand(command.Email, command.Login), CancellationToken.None);
+        await mediator.Send(new SubscribeUserToMailingCommand(command.Email, command.UserName), CancellationToken.None);
         
-        logger.LogInformation("User {login} is signed up successfully", command.Login);
+        logger.LogInformation("User {username} is signed up successfully", command.UserName);
         return CreatedAtAction(
             nameof(GetUser),
-            new { login = command.Login },
+            new { username = command.UserName },
             new UserDto(
                 user.UserName, 
                 user.FirstName,
@@ -61,15 +61,15 @@ public class UserController(
     }
     
     [HttpPost("/login")]
-    public async Task<IActionResult> Login(string login, string password, CancellationToken cancellationToken)
+    public async Task<IActionResult> Login(string username, string password, CancellationToken cancellationToken)
     {
         logger.LogInformation("HTTP POST /login");
         
-        var user = await mediator.Send(new GetUserQuery(login), cancellationToken);
+        var user = await mediator.Send(new GetUserQuery(username), cancellationToken);
         if (user == null)
         {
-            logger.LogWarning("Unauthorized. Wrong login");
-            return Unauthorized("Wrong login");
+            logger.LogWarning("Unauthorized. Wrong username");
+            return Unauthorized("Wrong username");
         }
 
         var checkPasswordTask = mediator.Send(new CheckPasswordQuery(user, password), cancellationToken);
@@ -88,7 +88,7 @@ public class UserController(
         await mediator.Send(new SignOutCommand(HttpContext), cancellationToken);
         await mediator.Send(new SignInCommand(claims, HttpContext), CancellationToken.None);
 
-        logger.LogInformation("User {login} is signed in successfully", user.UserName);
+        logger.LogInformation("User {username} is signed in successfully", user.UserName);
         return Ok($"User {user.UserName} is signed in");
     }
     
@@ -100,68 +100,68 @@ public class UserController(
 
         await mediator.Send(new SignOutCommand(HttpContext), cancellationToken);
         
-        var login = User.Identity?.Name;
-        logger.LogInformation("User {login} is signed out", login);
-        return Ok($"User {login} is signed out");
+        var username = User.Identity?.Name;
+        logger.LogInformation("User {username} is signed out", username);
+        return Ok($"User {username} is signed out");
     }
     
-    [HttpGet("/users/{login}")]
-    public async Task<IActionResult> GetUser(string login, CancellationToken cancellationToken)
+    [HttpGet("/users/{username}")]
+    public async Task<IActionResult> GetUser(string username, CancellationToken cancellationToken)
     {
-        logger.LogInformation("HTTP GET /users/{login}", login);
+        logger.LogInformation("HTTP GET /users/{login}", username);
         
         var authorizationResult = await mediator.Send(
-            new CheckAccessToResourceQuery(User, login, "HaveAccess"), cancellationToken);
+            new CheckAccessToResourceQuery(User, username, "HaveAccess"), cancellationToken);
         if (!authorizationResult.Succeeded)
         {
             logger.LogWarning("Forbidden. No access");
             return StatusCode(StatusCodes.Status403Forbidden);
         }
         
-        var user = await mediator.Send(new GetUserQuery(login), cancellationToken);
+        var user = await mediator.Send(new GetUserQuery(username), cancellationToken);
         if(user == null)
         {
-            logger.LogWarning("NotFound. User {login} is not found", login);
-            return NotFound($"User {login} is not found");
+            logger.LogWarning("NotFound. User {username} is not found", username);
+            return NotFound($"User {username} is not found");
         }
         return Ok(user);
     }
     
     [Authorize(Roles = "admin")]
-    [HttpDelete("/users/{login}")]
-    public async Task<IActionResult> DeleteUser(string login, CancellationToken cancellationToken)
+    [HttpDelete("/users/{username}")]
+    public async Task<IActionResult> DeleteUser(string username, CancellationToken cancellationToken)
     {
-        logger.LogInformation("HTTP DELETE /users/{login}", login);
+        logger.LogInformation("HTTP DELETE /users/{username}", username);
         
-        var user = await mediator.Send(new GetUserQuery(login), cancellationToken);
+        var user = await mediator.Send(new GetUserQuery(username), cancellationToken);
         if (user == null)
         {
-            logger.LogWarning("NotFound. User {login} is not found", login);
-            return NotFound($"User {login} is not found");
+            logger.LogWarning("NotFound. User {username} is not found", username);
+            return NotFound($"User {username} is not found");
         }
         await mediator.Send(new DeleteUserCommand(user), cancellationToken);
         
-        logger.LogInformation("User {login} is deleted", user.UserName);
+        logger.LogInformation("User {username} is deleted", user.UserName);
         return Ok($"User {user.UserName} is deleted");
     }
     
     [Authorize(Roles = "admin")]
-    [HttpPatch("/users/{login}")]
-    public async Task<IActionResult> UpdateUserRole(string login, bool isAdmin, CancellationToken cancellationToken)
+    [HttpPatch("/users/{username}")]
+    public async Task<IActionResult> UpdateUserRole(string username, bool isAdmin, CancellationToken cancellationToken)
     {
-        logger.LogInformation("HTTP PATCH /users/{login}", login);
+        logger.LogInformation("HTTP PATCH /users/{login}", username);
         
-        var user = await mediator.Send(new GetUserQuery(login), cancellationToken);
+        var user = await mediator.Send(new GetUserQuery(username), cancellationToken);
         if (user == null)
         {
-            logger.LogWarning("NotFound. User {login} is not found", login);
-            return NotFound($"User {login} is not found");
+            logger.LogWarning("NotFound. User {username} is not found", username);
+            return NotFound($"User {username} is not found");
         }
         
         await mediator.Send(new UpdateUserRoleCommand(user, isAdmin), cancellationToken);
         await mediator.Send(new AddAdminClaimsCommand(user, isAdmin), CancellationToken.None);
         
-        logger.LogInformation("{login} rights is updated", user.UserName);
+        logger.LogInformation("{username} rights is updated", user.UserName);
         return Ok($"{user.UserName} rights is updated");
     }
     

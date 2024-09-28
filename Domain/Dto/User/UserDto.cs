@@ -1,7 +1,7 @@
 namespace Domain.Dto.User;
 
 public record UserDto(
-    string? Login,
+    string? UserName,
     string? FirstName,
     string? LastName,
     string? PhoneNumber,

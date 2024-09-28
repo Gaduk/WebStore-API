@@ -2,8 +2,8 @@ using System.Security.Claims;
 using Application.Features.Order.Queries.GetOrder;
 using Application.Features.OrderedGood.Queries.GetAllOrderedGoods;
 using Application.Features.OrderedGood.Queries.GetOrderedGoods;
+using Application.Features.User.Queries.CheckAccessToResource;
 using MediatR;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Web_API.Controllers;
@@ -11,8 +11,7 @@ namespace Web_API.Controllers;
 [ApiController]
 public class OrderedGoodController(
     ILogger<OrderedGoodController> logger, 
-    IMediator mediator, 
-    IAuthorizationService authorizationService) : ControllerBase
+    IMediator mediator) : ControllerBase
 {
     [HttpGet("/orderedGoods")]
     public async Task<IActionResult> GetOrderedGoods(int? orderId, CancellationToken cancellationToken)
@@ -36,8 +35,9 @@ public class OrderedGoodController(
             logger.LogWarning("NotFound. Order {orderId} is not found", orderId);
             return NotFound($"Order {orderId} is not found");
         }
-
-        var authorizationResult = await authorizationService.AuthorizeAsync(User, order.UserName, "HaveAccess");
+        
+        var authorizationResult = await mediator.Send(
+            new CheckAccessToResourceQuery(User, order.UserName, "HaveAccess"), cancellationToken);
         if (!authorizationResult.Succeeded)
         {
             logger.LogWarning("Forbidden. User have no access to order {orderId}", order.Id);

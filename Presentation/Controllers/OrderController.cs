@@ -2,11 +2,11 @@ using Application.Features.Order.Commands.CreateOrder;
 using Application.Features.Order.Commands.UpdateOrder;
 using Application.Features.Order.Queries.GetOrder;
 using Application.Features.Order.Queries.GetOrders;
+using Application.Features.User.Queries.CheckAccessToResource;
+using Application.Features.User.Queries.GetUser;
 using Domain.Dto.Order;
-using Domain.Entities;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Web_API.Controllers;
@@ -14,9 +14,7 @@ namespace Web_API.Controllers;
 [ApiController]
 public class OrderController(
     ILogger<OrderController> logger,
-    IMediator mediator, 
-    IAuthorizationService authorizationService,
-    UserManager<User> userManager) : ControllerBase
+    IMediator mediator) : ControllerBase
 {
     [Authorize(Roles = "admin")]
     [HttpPatch("/orders/{orderId:int}")]
@@ -48,7 +46,8 @@ public class OrderController(
             return NotFound("Order is not found");
         }
         
-        var authorizationResult = await authorizationService.AuthorizeAsync(User, order.UserName, "HaveAccess");
+        var authorizationResult = await mediator.Send(
+            new CheckAccessToResourceQuery(User, order.UserName, "HaveAccess"), cancellationToken);
         if (!authorizationResult.Succeeded)
         {
             logger.LogWarning("Forbidden. User have no access to order {orderId}", orderId);
@@ -63,7 +62,8 @@ public class OrderController(
     {
         logger.LogInformation("HTTP GET /orders");
         
-        var authorizationResult = await authorizationService.AuthorizeAsync(User, login, "HaveAccess");
+        var authorizationResult = await mediator.Send(
+            new CheckAccessToResourceQuery(User, login, "HaveAccess"), cancellationToken);
         if (!authorizationResult.Succeeded)
         {
             logger.LogWarning("Forbidden. No access");
@@ -72,7 +72,7 @@ public class OrderController(
 
         if (login != null)
         {
-            var user = await userManager.FindByNameAsync(login);
+            var user = await mediator.Send(new GetUserQuery(login), cancellationToken);
             if (user == null)
             {
                 logger.LogWarning("NotFound. User {login} is not found", login);
@@ -89,14 +89,15 @@ public class OrderController(
     {
         logger.LogInformation("HTTP POST /orders");
         
-        var authorizationResult = await authorizationService.AuthorizeAsync(User, command.UserName, "HaveAccess");
+        var authorizationResult = await mediator.Send(
+            new CheckAccessToResourceQuery(User, command.UserName, "HaveAccess"), cancellationToken);
         if (!authorizationResult.Succeeded)
         {
             logger.LogWarning("Forbidden. No access");
             return StatusCode(StatusCodes.Status403Forbidden);
         }
 
-        var user = await userManager.FindByNameAsync(command.UserName);
+        var user = await mediator.Send(new GetUserQuery(command.UserName), cancellationToken);
         if (user == null)
         {
             logger.LogWarning("NotFound. User {login} is not found", command.UserName);

@@ -1,4 +1,5 @@
 using Application.Features.Good.Queries.GetAllGoodEntities;
+using Application.Features.Good.Queries.GetGoods;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -12,7 +13,7 @@ public class GoodController(ILogger<GoodController> logger, IMediator mediator) 
     {
         logger.LogInformation("HTTP GET /goods");
         
-        var goods = await mediator.Send(new GetAllGoodEntitiesQuery(), cancellationToken);
+        var goods = await mediator.Send(new GetGoodsQuery(), cancellationToken);
         return Ok(goods);
     }
 }

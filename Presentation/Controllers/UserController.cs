@@ -8,9 +8,9 @@ using Application.Features.User.Commands.SubscribeUserToMailing;
 using Application.Features.User.Commands.UpdateUserRole;
 using Application.Features.User.Queries.CheckAccessToResource;
 using Application.Features.User.Queries.CheckPassword;
-using Application.Features.User.Queries.GetAllUsers;
 using Application.Features.User.Queries.GetUser;
 using Application.Features.User.Queries.GetUserClaims;
+using Application.Features.User.Queries.GetUsers;
 using Domain.Dto.User;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -170,7 +170,7 @@ public class UserController(
     public async Task<IActionResult> GetUsers(CancellationToken cancellationToken)
     {
         logger.LogInformation("HTTP GET /users");
-        var users = await mediator.Send(new GetAllUsersQuery(), cancellationToken);
+        var users = await mediator.Send(new GetUsersQuery(), cancellationToken);
         return Ok(users);
     }
 }

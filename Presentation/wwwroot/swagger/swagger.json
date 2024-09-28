@@ -213,34 +213,27 @@
       "post": {
         "tags": ["Order"],
         "summary": "Оформление заказа",
-        "parameters": [
-          {
-            "name": "login",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
         "requestBody": {
           "content": {
             "application/json": {
               "schema": {
-                "example": [
-                  {
-                    "goodId": 1001,
-                    "amount": 0
-                  },
-                  {
-                    "goodId": 1002,
-                    "amount": 1
-                  },
-                  {
-                    "goodId": 1003,
-                    "amount": 2
-                  }
-                ]
+                "example": {
+                  "UserName": "name",
+                  "OrderedGoods": [
+                    {
+                      "goodId": 1001,
+                      "amount": 0
+                    },
+                    {
+                      "goodId": 1002,
+                      "amount": 1
+                    },
+                    {
+                      "goodId": 1003,
+                      "amount": 2
+                    }
+                  ]
+                }
               }
             }
           }

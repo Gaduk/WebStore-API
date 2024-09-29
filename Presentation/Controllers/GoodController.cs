@@ -2,7 +2,7 @@ using Application.Features.Good.Queries.GetGoods;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Web_API.Controllers;
+namespace Presentation.Controllers;
 
 [ApiController]
 public class GoodController(ILogger<GoodController> logger, IMediator mediator) : ControllerBase

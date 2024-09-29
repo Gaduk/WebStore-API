@@ -1,16 +1,15 @@
-
 using Application.Extensions;
 using Hangfire;
 using Hangfire.PostgreSql;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authorization;
 using Infrastructure.Extensions;
 using Infrastructure.Persistence.Context;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
+using Presentation.Requirements.AccessRequirement;
+using Presentation.Requirements.AccessRequirement.Handlers;
 using Serilog;
-using Web_API.Requirements.AccessRequirement;
-using Web_API.Requirements.AccessRequirement.Handlers;
 
-namespace Web_API;
+namespace Presentation;
 
 public static class Program
 {

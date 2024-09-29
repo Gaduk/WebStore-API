@@ -1,7 +1,7 @@
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 
-namespace Web_API.Requirements.AccessRequirement.Handlers;
+namespace Presentation.Requirements.AccessRequirement.Handlers;
 
 public class IsAdminHandler : AuthorizationHandler<AccessRequirement>
 {

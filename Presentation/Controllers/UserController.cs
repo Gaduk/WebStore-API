@@ -16,7 +16,7 @@ using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Web_API.Controllers;
+namespace Presentation.Controllers;
 
 [ApiController]
 public class UserController(

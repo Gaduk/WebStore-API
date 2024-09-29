@@ -1,5 +1,5 @@
 using Microsoft.AspNetCore.Authorization;
 
-namespace Web_API.Requirements.AccessRequirement;
+namespace Presentation.Requirements.AccessRequirement;
 
 public class AccessRequirement : IAuthorizationRequirement;

@@ -6,7 +6,7 @@ using Application.Features.User.Queries.CheckAccessToResource;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Web_API.Controllers;
+namespace Presentation.Controllers;
 
 [ApiController]
 public class OrderedGoodController(

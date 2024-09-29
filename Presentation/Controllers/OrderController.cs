@@ -1,15 +1,15 @@
+using Application.Dto.Order;
 using Application.Features.Order.Commands.CreateOrder;
 using Application.Features.Order.Commands.UpdateOrder;
 using Application.Features.Order.Queries.GetOrder;
 using Application.Features.Order.Queries.GetOrders;
 using Application.Features.User.Queries.CheckAccessToResource;
 using Application.Features.User.Queries.GetUser;
-using Domain.Dto.Order;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Web_API.Controllers;
+namespace Presentation.Controllers;
 
 [ApiController]
 public class OrderController(

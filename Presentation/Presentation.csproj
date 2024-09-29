@@ -2,25 +2,15 @@
 
     <PropertyGroup>
         <TargetFramework>net8.0</TargetFramework>
-	<GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
-        <RootNamespace>Web_API</RootNamespace>
-        <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
-        <UserSecretsId>3228a57a-5217-4ac6-8dcc-6996cc1dd84a</UserSecretsId>
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Hangfire" Version="1.8.14" />
-        <PackageReference Include="Hangfire.PostgreSql" Version="1.20.9" />
-        <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="8.0.8" />
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.8">
-          <PrivateAssets>all</PrivateAssets>
-          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-        </PackageReference>
-        <PackageReference Include="Serilog.AspNetCore" Version="8.0.2" />
-        <PackageReference Include="Swashbuckle.AspNetCore" Version="6.7.1" />
-        <PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="6.7.1" />
+      <Content Include="..\.dockerignore">
+        <Link>.dockerignore</Link>
+        <DependentUpon>Dockerfile</DependentUpon>
+      </Content>
     </ItemGroup>
 
     <ItemGroup>
@@ -30,9 +20,17 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Content Include="..\.dockerignore">
-        <Link>.dockerignore</Link>
-      </Content>
+      <PackageReference Include="AutoMapper" Version="13.0.1" />
+      <PackageReference Include="Hangfire" Version="1.8.14" />
+      <PackageReference Include="Hangfire.PostgreSql" Version="1.20.9" />
+      <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="8.0.8" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.8">
+        <PrivateAssets>all</PrivateAssets>
+        <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      </PackageReference>
+      <PackageReference Include="Serilog.AspNetCore" Version="8.0.2" />
+      <PackageReference Include="Swashbuckle.AspNetCore" Version="6.7.1" />
+      <PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="6.7.1" />
     </ItemGroup>
 
 </Project>

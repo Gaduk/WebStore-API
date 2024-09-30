@@ -27,7 +27,7 @@
           }
         },
         "responses": {
-          "200": {
+          "201": {
             "description": "Пользователь успешно зарегистрирован"
           },
           "400": {
@@ -79,8 +79,49 @@
           "200": {
             "description": "Произведен выход из аккаунта"
           },
-          "405": {
+          "401": {
             "description": "Пользователь не авторизован"
+          }
+        }
+      }
+    },
+    "/users": {
+      "get": {
+        "tags": ["User"],
+        "summary": "Получение списка пользователей",
+        "responses": {
+          "200": {
+            "description": "Список пользователей",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": [
+                    {
+                      "userName": "admin",
+                      "firstName": "Иван",
+                      "lastName": "Иванов",
+                      "phoneNumber": "+71112223344",
+                      "email": "admin@mail.ru",
+                      "isAdmin": true
+                    },
+                    {
+                      "userName": "user",
+                      "firstName": "John",
+                      "lastName": "Doe",
+                      "phoneNumber": "+1234567890",
+                      "email": "john@mail.ru",
+                      "isAdmin": false
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Пользователь не авторизован"
+          },
+          "403": {
+            "description": "Доступ запрещен"
           }
         }
       }
@@ -110,6 +151,9 @@
               }
             }
           },
+          "401": {
+            "description": "Пользователь не авторизован"
+          },
           "403": {
             "description": "Доступ запрещен"
           },
@@ -121,6 +165,7 @@
       "patch": {
         "tags": ["User"],
         "summary": "Назначение прав администратора пользователю",
+        "description": "Доступно только администратору",
         "parameters": [
           {
             "name": "username",
@@ -143,17 +188,18 @@
           "200": {
             "description": "Права администратора успешно назначены"
           },
+          "401": {
+            "description": "Пользователь не авторизован"
+          },
           "404": {
             "description": "Пользователь не найден"
-          },
-          "409": {
-            "description": "Пользователь уже является администратором"
           }
         }
       },
       "delete": {
         "tags": ["User"],
         "summary": "Удаление пользователя вместе с информацией о его заказах",
+        "description": "Доступно только администратору",
         "parameters": [
           {
             "name": "username",
@@ -168,10 +214,13 @@
           "200": {
             "description": "Пользователь удален"
           },
+          "401": {
+            "description": "Пользователь не авторизован"
+          },
           "404": {
             "description": "Пользователь не найден"
           },
-          "405": {
+          "403": {
             "description": "Доступ запрещен"
           }
         }
@@ -181,7 +230,8 @@
     "/orders": {
       "get": {
         "tags": ["Order"],
-        "summary": "Получение списка заказов пользователя",
+        "summary": "Получение списка заказов",
+        "description": "Если указать username, возвращает список заказов пользователя. Если не указывать username, возвращает список всех заказов (доступно только администратору).",
         "parameters": [
           {
             "name": "username",
@@ -198,10 +248,24 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Order"
+                  "example": [
+                    {
+                      "id": 1,
+                      "userName": "admin",
+                      "isDone": false
+                    },
+                    {
+                      "id": 2,
+                      "userName": "admin",
+                      "isDone": true
+                    }
+                  ]
                 }
               }
             }
+          },
+          "401": {
+            "description": "Пользователь не авторизован"
           },
           "403": {
             "description": "Доступ запрещен"
@@ -219,19 +283,19 @@
             "application/json": {
               "schema": {
                 "example": {
-                  "UserName": "name",
+                  "UserName": "admin",
                   "OrderedGoods": [
                     {
                       "goodId": 1001,
-                      "amount": 0
-                    },
-                    {
-                      "goodId": 1002,
                       "amount": 1
                     },
                     {
-                      "goodId": 1003,
+                      "goodId": 1002,
                       "amount": 2
+                    },
+                    {
+                      "goodId": 1003,
+                      "amount": 3
                     }
                   ]
                 }
@@ -240,11 +304,14 @@
           }
         },
         "responses": {
-          "200": {
+          "201": {
             "description": "Заказ создан"
           },
           "400": {
             "description": "Ошибка в теле запроса"
+          },
+          "401": {
+            "description": "Пользователь не авторизован"
           },
           "403": {
             "description": "Доступ запрещен"
@@ -258,7 +325,7 @@
     "/orders/{orderId}": {
       "get": {
         "tags": ["Order"],
-        "summary": "Получение информации о заказе по заданному id",
+        "summary": "Получение информации о заказе",
         "parameters": [
           {
             "name": "orderId",
@@ -275,22 +342,44 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Order"
+                  "example": {
+                    "id": 1,
+                    "userName": "admin",
+                    "isDone": false,
+                    "orderedGoods": [
+                      {
+                        "goodId": 1001,
+                        "amount": 11,
+                        "name": "Товар 1",
+                        "price": 10
+                      },
+                      {
+                        "goodId": 1002,
+                        "amount": 22,
+                        "name": "Товар 2",
+                        "price": 20
+                      }
+                    ]
+                  }
                 }
               }
             }
           },
+          "401": {
+            "description": "Пользователь не авторизован"
+          },
           "403": {
-            "description": "Доступ запрещен. Пользователь не имеет доступа к запрашиваемому ресурсу."
+            "description": "Пользователь не имеет доступа к запрашиваемому ресурсу"
           },
           "404": {
-            "description": "Заказ не найден."
+            "description": "Заказ не найден"
           }
         }
       },
       "patch": {
         "tags": ["Order"],
         "summary": "Изменение статуса заказа",
+        "description": "Доступно только администратору",
         "parameters": [
           {
             "name": "orderId",
@@ -313,11 +402,14 @@
           "200": {
             "description": "Статус заказа обновлен"
           },
-          "404": {
-            "description": "Заказ не найден / Пользователь не найден"
+          "401": {
+            "description": "Пользователь не авторизован"
           },
-          "405": {
+          "403": {
             "description": "Доступ запрещен"
+          },
+          "404": {
+            "description": "Заказ не найден"
           }
         }
       }
@@ -351,16 +443,21 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Good"
+                  "example": [
+                      {
+                        "id": 1001,
+                        "name": "Товар 1",
+                        "price": 10
+                      },
+                      {
+                        "id": 1002,
+                        "name": "Товар 2",
+                        "price": 20
+                      }
+                  ]
                 }
               }
             }
-          },
-          "403": {
-            "description": "Доступ запрещен"
-          },
-          "405": {
-            "description": "Доступ запрещен"
           }
         }
       }

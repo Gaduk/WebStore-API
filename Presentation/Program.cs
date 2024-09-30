@@ -59,7 +59,8 @@ public static class Program
         builder.Services.AddHangfire(config => 
             config.UsePostgreSqlStorage(options => options.UseNpgsqlConnection(connection)));
         builder.Services.AddHangfireServer();
-        
+
+        builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
         
         var app = builder.Build();
         

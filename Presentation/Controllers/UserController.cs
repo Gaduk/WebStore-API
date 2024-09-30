@@ -1,3 +1,4 @@
+using Application.Dto.User;
 using Application.Features.User.Commands.AddAdminClaims;
 using Application.Features.User.Commands.AddUserClaims;
 using Application.Features.User.Commands.CreateUser;
@@ -11,7 +12,7 @@ using Application.Features.User.Queries.CheckPassword;
 using Application.Features.User.Queries.GetUser;
 using Application.Features.User.Queries.GetUserClaims;
 using Application.Features.User.Queries.GetUsers;
-using Domain.Dto.User;
+using AutoMapper;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -21,7 +22,8 @@ namespace Presentation.Controllers;
 [ApiController]
 public class UserController(
     ILogger<UserController> logger,
-    IMediator mediator) : ControllerBase
+    IMediator mediator,
+    IMapper mapper) : ControllerBase
 {
     [HttpPost("/register")]
     public async Task<IActionResult> CreateUser(CreateUserCommand command, CancellationToken cancellationToken)
@@ -46,17 +48,11 @@ public class UserController(
         await mediator.Send(new SubscribeUserToMailingCommand(command.Email, command.UserName), CancellationToken.None);
         
         logger.LogInformation("User {username} is signed up successfully", command.UserName);
+        
         return CreatedAtAction(
             nameof(GetUser),
             new { username = command.UserName },
-            new UserDto(
-                user.UserName, 
-                user.FirstName,
-                user.LastName,
-                user.PhoneNumber,
-                user.Email,
-                user.IsAdmin
-                )
+            null
         );
     }
     
@@ -124,7 +120,9 @@ public class UserController(
             logger.LogWarning("NotFound. User {username} is not found", username);
             return NotFound($"User {username} is not found");
         }
-        return Ok(user);
+
+        var userDto = mapper.Map<UserDto>(user);
+        return Ok(userDto);
     }
     
     [Authorize(Roles = "admin")]
@@ -170,7 +168,10 @@ public class UserController(
     public async Task<IActionResult> GetUsers(CancellationToken cancellationToken)
     {
         logger.LogInformation("HTTP GET /users");
+        
         var users = await mediator.Send(new GetUsersQuery(), cancellationToken);
-        return Ok(users);
+        
+        var usersDto = mapper.Map<List<UserDto>>(users);
+        return Ok(usersDto);
     }
 }

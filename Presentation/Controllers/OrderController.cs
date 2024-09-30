@@ -5,6 +5,7 @@ using Application.Features.Order.Queries.GetOrder;
 using Application.Features.Order.Queries.GetOrders;
 using Application.Features.User.Queries.CheckAccessToResource;
 using Application.Features.User.Queries.GetUser;
+using AutoMapper;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -14,7 +15,8 @@ namespace Presentation.Controllers;
 [ApiController]
 public class OrderController(
     ILogger<OrderController> logger,
-    IMediator mediator) : ControllerBase
+    IMediator mediator,
+    IMapper mapper) : ControllerBase
 {
     [Authorize(Roles = "admin")]
     [HttpPatch("/orders/{orderId:int}")]
@@ -53,8 +55,9 @@ public class OrderController(
             logger.LogWarning("Forbidden. User have no access to order {orderId}", orderId);
             return StatusCode(StatusCodes.Status403Forbidden);
         }
-
-        return Ok(order);
+        
+        var orderDto = mapper.Map<OrderWithOrderedGoodsDto>(order);
+        return Ok(orderDto);
     }
     
     [HttpGet("/orders")]
@@ -79,9 +82,11 @@ public class OrderController(
                 return NotFound($"User {username} is not found");
             }
         }
-
+        
         var orders = await mediator.Send(new GetOrdersQuery(username), cancellationToken);
-        return Ok(orders);
+        
+        var ordersDto = mapper.Map<List<OrderDto>>(orders);
+        return Ok(ordersDto);
     }
     
     [HttpPost("/orders")]
@@ -108,10 +113,6 @@ public class OrderController(
         
         logger.LogInformation("Order {orderId} is created", orderId);
         
-        return CreatedAtAction(
-            nameof(GetOrder), 
-            new { orderId },
-            new OrderDto(orderId, command.UserName,false)
-        );
+        return CreatedAtAction(nameof(GetOrder), new { orderId }, null);
     }
 }

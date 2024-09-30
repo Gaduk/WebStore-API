@@ -1,4 +1,4 @@
-using Domain.Dto.OrderedGoods;
+using Application.Dto.OrderedGoods;
 using MediatR;
 
 namespace Application.Features.Order.Commands.CreateOrder;

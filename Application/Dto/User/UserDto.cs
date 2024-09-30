@@ -1,4 +1,4 @@
-namespace Domain.Dto.User;
+namespace Application.Dto.User;
 
 public record UserDto(
     string? UserName,

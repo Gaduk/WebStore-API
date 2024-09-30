@@ -1,8 +1,10 @@
 using System.Security.Claims;
+using Application.Dto.OrderedGoods;
 using Application.Features.Order.Queries.GetOrder;
 using Application.Features.OrderedGood.Queries.GetAllOrderedGoods;
 using Application.Features.OrderedGood.Queries.GetOrderedGoods;
 using Application.Features.User.Queries.CheckAccessToResource;
+using AutoMapper;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -11,7 +13,8 @@ namespace Presentation.Controllers;
 [ApiController]
 public class OrderedGoodController(
     ILogger<OrderedGoodController> logger, 
-    IMediator mediator) : ControllerBase
+    IMediator mediator,
+    IMapper mapper) : ControllerBase
 {
     [HttpGet("/orderedGoods")]
     public async Task<IActionResult> GetOrderedGoods(int? orderId, CancellationToken cancellationToken)
@@ -22,7 +25,10 @@ public class OrderedGoodController(
         {
             if (User.HasClaim(ClaimTypes.Role, "admin"))
             {
-                return Ok(await mediator.Send(new GetAllOrderedGoodsQuery(), cancellationToken));
+                var allOrderedGoods = await mediator.Send(new GetAllOrderedGoodsQuery(), cancellationToken);
+                
+                var allOrderedGoodsDto = mapper.Map<List<OrderedGoodDto>>(allOrderedGoods);
+                return Ok(allOrderedGoodsDto);
             }
             
             logger.LogWarning("Forbidden. No access");
@@ -45,6 +51,8 @@ public class OrderedGoodController(
         }
 
         var orderedGoods = await mediator.Send(new GetOrderedGoodsQuery((int)orderId), cancellationToken);
-        return Ok(orderedGoods);
+        
+        var orderedGoodsDto = mapper.Map<List<OrderedGoodDto>>(orderedGoods);
+        return Ok(orderedGoodsDto);
     }
 }

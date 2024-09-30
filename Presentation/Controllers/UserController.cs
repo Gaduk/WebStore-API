@@ -88,7 +88,7 @@ public class UserController(
         return Ok($"User {user.UserName} is signed in");
     }
     
-    [Authorize(Roles = "user, admin")]
+    [Authorize(Roles = "user")]
     [HttpGet("/logout")]
     public async Task<IActionResult> Logout(CancellationToken cancellationToken)
     {
@@ -113,6 +113,7 @@ public class UserController(
         return Ok(usersDto);
     }
     
+    [Authorize(Roles = "user")]
     [HttpGet("/users/{username}")]
     public async Task<IActionResult> GetUser(string username, CancellationToken cancellationToken)
     {

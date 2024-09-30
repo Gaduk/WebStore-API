@@ -20,6 +20,7 @@ public class OrderController(
     IMediator mediator,
     IMapper mapper) : ControllerBase
 {
+    [Authorize(Roles = "user")]
     [HttpGet("/orders")]
     public async Task<IActionResult> GetOrders(string? username, CancellationToken cancellationToken)
     {
@@ -50,6 +51,7 @@ public class OrderController(
         return Ok(ordersDto);
     }
     
+    [Authorize(Roles = "user")]
     [HttpPost("/orders")]
     public async Task<IActionResult> CreateOrder(CreateOrderCommand command, CancellationToken cancellationToken)
     {
@@ -95,6 +97,7 @@ public class OrderController(
         return Ok($"Status of order {order.Id} is updated");
     }
     
+    [Authorize(Roles = "user")]
     [HttpGet("/orders/{orderId:int}")]
     public async Task<IActionResult> GetOrder(int orderId, CancellationToken cancellationToken)
     {

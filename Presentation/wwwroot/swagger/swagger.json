@@ -177,6 +177,7 @@
         }
       }
     },
+    
     "/orders": {
       "get": {
         "tags": ["Order"],
@@ -254,31 +255,6 @@
         }
       }
     },
-    "/users": {
-      "get": {
-        "tags": ["User"],
-        "summary": "Получение списка пользователей",
-        "responses": {
-          "200": {
-            "description": "Список пользователей",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/User"
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "Доступ запрещен"
-          },
-          "405": {
-            "description": "Доступ запрещен"
-          }
-        }
-      }
-    },
-
     "/orders/{orderId}": {
       "get": {
         "tags": ["Order"],

@@ -20,13 +20,9 @@ public class OrderRepository(ApplicationDbContext dbContext) : IOrderRepository
         await dbContext.SaveChangesAsync(cancellationToken);
     }
 
-    public async Task<List<Order>> GetOrders(string? login, CancellationToken cancellationToken)
+    public async Task<List<Order>> GetOrders(CancellationToken cancellationToken)
     {
         var orders = dbContext.Orders.AsQueryable();
-        if (login != null)
-        {
-            orders = orders.Where(o => o.UserName == login);
-        }
         return await orders
             .AsNoTracking()
             .OrderBy(o => o.Id)

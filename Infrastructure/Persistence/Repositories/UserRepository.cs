@@ -27,10 +27,18 @@ public class UserRepository(ApplicationDbContext dbContext) : IUserRepository
             .ToListAsync(cancellationToken);
     }
 
-    public async Task<User?> GetUser(string login, CancellationToken cancellationToken)
+    public async Task<User?> GetUser(string username, CancellationToken cancellationToken)
     {
         return await dbContext.Users
-            .Where(u => u.UserName == login)
+            .Where(u => u.UserName == username)
+            .FirstOrDefaultAsync(cancellationToken);
+    }
+    
+    public async Task<User?> GetUserWithOrders(string username, CancellationToken cancellationToken)
+    {
+        return await dbContext.Users
+            .Where(u => u.UserName == username)
+            .Include(u => u.Orders)
             .FirstOrDefaultAsync(cancellationToken);
     }
 }

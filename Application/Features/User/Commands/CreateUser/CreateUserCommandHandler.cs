@@ -1,11 +1,9 @@
-using System.Security.Claims;
-using Application.Services;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
 
 namespace Application.Features.User.Commands.CreateUser;
 
-public class CreateUserCommandHandler(UserManager<Domain.Entities.User> userManager, IMailService mailService) 
+public class CreateUserCommandHandler(UserManager<Domain.Entities.User> userManager) 
     : IRequestHandler<CreateUserCommand, (IdentityResult, Domain.Entities.User)>
 {
     public async Task<(IdentityResult, Domain.Entities.User)> Handle(CreateUserCommand request, CancellationToken cancellationToken)

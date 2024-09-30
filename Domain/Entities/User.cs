@@ -8,6 +8,5 @@ public class User : IdentityUser
     public string? LastName { get; init; }
     public bool IsAdmin { get; set; }
 
-
     public ICollection<Order> Orders { get; init; } = new List<Order>();
 }

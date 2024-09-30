@@ -101,6 +101,18 @@ public class UserController(
         return Ok($"User {username} is signed out");
     }
     
+    [Authorize(Roles = "admin")]
+    [HttpGet("/users")]
+    public async Task<IActionResult> GetUsers(CancellationToken cancellationToken)
+    {
+        logger.LogInformation("HTTP GET /users");
+        
+        var users = await mediator.Send(new GetUsersQuery(), cancellationToken);
+        
+        var usersDto = mapper.Map<List<UserDto>>(users);
+        return Ok(usersDto);
+    }
+    
     [HttpGet("/users/{username}")]
     public async Task<IActionResult> GetUser(string username, CancellationToken cancellationToken)
     {
@@ -161,17 +173,5 @@ public class UserController(
         
         logger.LogInformation("{username} rights is updated", user.UserName);
         return Ok($"{user.UserName} rights is updated");
-    }
-    
-    [Authorize(Roles = "admin")]
-    [HttpGet("/users")]
-    public async Task<IActionResult> GetUsers(CancellationToken cancellationToken)
-    {
-        logger.LogInformation("HTTP GET /users");
-        
-        var users = await mediator.Send(new GetUsersQuery(), cancellationToken);
-        
-        var usersDto = mapper.Map<List<UserDto>>(users);
-        return Ok(usersDto);
     }
 }

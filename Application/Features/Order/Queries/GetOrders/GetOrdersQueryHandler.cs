@@ -8,6 +8,6 @@ public class GetOrdersQueryHandler(IOrderRepository orderRepository) :
 {
     public async Task<List<Domain.Entities.Order>> Handle(GetOrdersQuery request, CancellationToken cancellationToken)
     {
-        return await orderRepository.GetOrders(request.Login, cancellationToken);
+        return await orderRepository.GetOrders(cancellationToken);
     }
 }

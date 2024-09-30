@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240922170950_init_db")]
+    [Migration("20240930152321_init_db")]
     partial class init_db
     {
         /// <inheritdoc />
@@ -77,7 +77,7 @@ namespace Infrastructure.Migrations
 
                     b.Property<string>("UserName")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("character varying(256)");
 
                     b.HasKey("Id");
 
@@ -170,6 +170,7 @@ namespace Infrastructure.Migrations
                         .HasColumnType("boolean");
 
                     b.Property<string>("UserName")
+                        .IsRequired()
                         .HasMaxLength(256)
                         .HasColumnType("character varying(256)");
 
@@ -189,7 +190,7 @@ namespace Infrastructure.Migrations
                         {
                             Id = "admin",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "e361314e-7149-482f-9afa-dc3e4a2afb9b",
+                            ConcurrencyStamp = "59a006df-17e8-484f-b78d-aa10c8c8632b",
                             Email = "admin@mail.ru",
                             EmailConfirmed = true,
                             FirstName = "Иван",
@@ -198,10 +199,10 @@ namespace Infrastructure.Migrations
                             LockoutEnabled = false,
                             NormalizedEmail = "ADMIN@MAIL.RU",
                             NormalizedUserName = "ADMIN",
-                            PasswordHash = "AQAAAAIAAYagAAAAELAzzWuFxlFtI7bxw0WJSSql7EMxgk0Z7I6G479dYKFBZt1sufqJ/Al7gquSIVvrtw==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEAYeLcDYlinoCess6RHRBH8NbUkrEczXJRVkq7A7kS1q+rSzT0VzZb1sA1E7s6BxWw==",
                             PhoneNumber = "+71112223344",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "8e848f8b-064f-4eab-911f-47d7288c9cdd",
+                            SecurityStamp = "e6516bd4-3eda-4b1b-a110-be52536d12f0",
                             TwoFactorEnabled = false,
                             UserName = "admin"
                         });
@@ -368,13 +369,12 @@ namespace Infrastructure.Migrations
 
             modelBuilder.Entity("Domain.Entities.Order", b =>
                 {
-                    b.HasOne("Domain.Entities.User", "User")
+                    b.HasOne("Domain.Entities.User", null)
                         .WithMany("Orders")
                         .HasForeignKey("UserName")
+                        .HasPrincipalKey("UserName")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Domain.Entities.OrderedGood", b =>

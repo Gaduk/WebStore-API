@@ -36,7 +36,7 @@ namespace Infrastructure.Migrations
                     FirstName = table.Column<string>(type: "text", nullable: true),
                     LastName = table.Column<string>(type: "text", nullable: true),
                     IsAdmin = table.Column<bool>(type: "boolean", nullable: false),
-                    UserName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
+                    UserName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
                     NormalizedUserName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
                     Email = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
                     NormalizedEmail = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
@@ -54,6 +54,7 @@ namespace Infrastructure.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_AspNetUsers", x => x.Id);
+                    table.UniqueConstraint("AK_AspNetUsers_UserName", x => x.UserName);
                 });
 
             migrationBuilder.CreateTable(
@@ -182,7 +183,7 @@ namespace Infrastructure.Migrations
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    UserName = table.Column<string>(type: "text", nullable: false),
+                    UserName = table.Column<string>(type: "character varying(256)", nullable: false),
                     IsDone = table.Column<bool>(type: "boolean", nullable: false)
                 },
                 constraints: table =>
@@ -192,7 +193,7 @@ namespace Infrastructure.Migrations
                         name: "FK_Orders_AspNetUsers_UserName",
                         column: x => x.UserName,
                         principalTable: "AspNetUsers",
-                        principalColumn: "Id",
+                        principalColumn: "UserName",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -226,7 +227,7 @@ namespace Infrastructure.Migrations
             migrationBuilder.InsertData(
                 table: "AspNetUsers",
                 columns: new[] { "Id", "AccessFailedCount", "ConcurrencyStamp", "Email", "EmailConfirmed", "FirstName", "IsAdmin", "LastName", "LockoutEnabled", "LockoutEnd", "NormalizedEmail", "NormalizedUserName", "PasswordHash", "PhoneNumber", "PhoneNumberConfirmed", "SecurityStamp", "TwoFactorEnabled", "UserName" },
-                values: new object[] { "admin", 0, "e361314e-7149-482f-9afa-dc3e4a2afb9b", "admin@mail.ru", true, "Иван", true, "Иванов", false, null, "ADMIN@MAIL.RU", "ADMIN", "AQAAAAIAAYagAAAAELAzzWuFxlFtI7bxw0WJSSql7EMxgk0Z7I6G479dYKFBZt1sufqJ/Al7gquSIVvrtw==", "+71112223344", false, "8e848f8b-064f-4eab-911f-47d7288c9cdd", false, "admin" });
+                values: new object[] { "admin", 0, "59a006df-17e8-484f-b78d-aa10c8c8632b", "admin@mail.ru", true, "Иван", true, "Иванов", false, null, "ADMIN@MAIL.RU", "ADMIN", "AQAAAAIAAYagAAAAEAYeLcDYlinoCess6RHRBH8NbUkrEczXJRVkq7A7kS1q+rSzT0VzZb1sA1E7s6BxWw==", "+71112223344", false, "e6516bd4-3eda-4b1b-a110-be52536d12f0", false, "admin" });
 
             migrationBuilder.InsertData(
                 table: "Goods",

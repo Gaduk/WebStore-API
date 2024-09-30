@@ -1,45 +1,34 @@
 using Application.Features.User.Commands.CreateUser;
-using Application.Services;
+using Application.Features.User.Queries.GetUser;
+using AutoMapper;
 using Domain.Entities;
 using MediatR;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Moq;
-using Web_API.Controllers;
+using Presentation.Controllers;
 
 namespace Tests;
 
 public class UserControllerTests
 {
+    private readonly UserController _userController;
+    
     private readonly Mock<ILogger<UserController>> _logger = new();
     private readonly Mock<IMediator> _mediatorMock = new();
-    private readonly Mock<UserManager<User>> _userManagerMock;
-    private readonly Mock<IAuthorizationService> _authorizationServiceMock = new();
-    private readonly Mock<IMailService> _mailServiceMock = new();
-    private readonly UserController _userController;
+    private readonly Mock<IMapper> _mapper = new();
+    private readonly CancellationTokenSource _cancellationTokenSource = new();
+    private readonly CancellationToken _cancellationToken;
     
     public UserControllerTests()
     {
-        _userManagerMock = new Mock<UserManager<User>>(
-            Mock.Of<IUserStore<User>>(), 
-            null!, null!, null!, null!, null!, null!, null!, null!);
-        
-        Mock<SignInManager<User>> signInManagerMock = new(
-            _userManagerMock.Object,
-            Mock.Of<IHttpContextAccessor>(),
-            Mock.Of<IUserClaimsPrincipalFactory<User>>(), 
-            null!, null!, null!, null!);
-        
         _userController = new UserController(
             _logger.Object,
-            _mediatorMock.Object , 
-            signInManagerMock.Object,
-            _userManagerMock.Object,
-            _authorizationServiceMock.Object,
-            _mailServiceMock.Object);
+            _mediatorMock.Object,
+            _mapper.Object);
+        
+        _cancellationToken = _cancellationTokenSource.Token;
     }
     
     [Fact]
@@ -54,18 +43,12 @@ public class UserControllerTests
             "+79990001122",
             "user@mail.ru"
         );
-        _userManagerMock.Setup(u => u.FindByNameAsync(It.IsAny<string>()))
-            .ReturnsAsync(new User
-            {
-                UserName = "user",
-                FirstName = "",
-                LastName = "",
-                PhoneNumber = "",
-                Email = ""
-            });
+        
+        _mediatorMock.Setup(m => m.Send(It.IsAny<GetUserQuery>(), _cancellationToken))
+            .ReturnsAsync(new User { UserName = input.UserName });
         
         // Act
-        var result = await _userController.CreateUser(input);
+        var result = await _userController.CreateUser(input, _cancellationToken);
         
         // Assert
         Assert.IsType<ConflictObjectResult>(result);
@@ -76,7 +59,7 @@ public class UserControllerTests
     {
         // Arrange
         var input = new CreateUserCommand(
-            "user2", 
+            "user", 
             "1", //too short password
             "FirstName",
             "LastName",
@@ -84,15 +67,44 @@ public class UserControllerTests
             "user@mail.ru"
         );
         
-        _userManagerMock.Setup(u => u.FindByNameAsync(It.IsAny<string>()))
+        _mediatorMock.Setup(m => m.Send(It.IsAny<GetUserQuery>(), _cancellationToken))
             .ReturnsAsync((User?)null);
-        _userManagerMock.Setup(u => u.CreateAsync(It.IsAny<User>(), It.IsAny<string>()))
-            .ReturnsAsync(IdentityResult.Failed());
+        _mediatorMock.Setup(m => m.Send(It.IsAny<CreateUserCommand>(), _cancellationToken))
+            .ReturnsAsync((
+                IdentityResult.Failed(), 
+                new User { UserName = input.UserName }));
         
         // Act
-        var result = await _userController.CreateUser(input);
+        var result = await _userController.CreateUser(input, _cancellationToken);
 
         // Assert
         Assert.IsType<BadRequestObjectResult>(result);
+    }
+    
+    [Fact]
+    public async Task CreateUser_Returns200_WhenInputLoginIsUnique_And_InputIsValid()
+    {
+        // Arrange
+        var input = new CreateUserCommand(
+            "user", 
+            "user", 
+            "FirstName",
+            "LastName",
+            "+79990001122",
+            "user@mail.ru"
+        );
+        
+        _mediatorMock.Setup(m => m.Send(It.IsAny<GetUserQuery>(), _cancellationToken))
+            .ReturnsAsync((User?)null);
+        _mediatorMock.Setup(m => m.Send(It.IsAny<CreateUserCommand>(), _cancellationToken))
+            .ReturnsAsync((
+                IdentityResult.Success, 
+                new User { UserName = input.UserName }));
+        
+        // Act
+        var result = await _userController.CreateUser(input, _cancellationToken);
+        
+        // Assert
+        Assert.IsType<CreatedAtActionResult>(result);
     }
 }

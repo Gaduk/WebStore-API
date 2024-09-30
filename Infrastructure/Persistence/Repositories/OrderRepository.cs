@@ -1,4 +1,3 @@
-using Dapper;
 using Domain.Entities;
 using Domain.Repositories;
 using Infrastructure.Persistence.Context;
@@ -26,7 +25,7 @@ public class OrderRepository(ApplicationDbContext dbContext) : IOrderRepository
         var orders = dbContext.Orders.AsQueryable();
         if (login != null)
         {
-            orders = orders.Where(o => o.User.UserName == login);
+            orders = orders.Where(o => o.UserName == login);
         }
         return await orders
             .AsNoTracking()

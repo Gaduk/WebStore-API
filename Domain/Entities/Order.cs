@@ -7,5 +7,4 @@ public class Order
     public bool IsDone { get; set; }
 
     public ICollection<OrderedGood> OrderedGoods { get; init; } = new List<OrderedGood>();
-    public User User { get; init; } = null!;
 }

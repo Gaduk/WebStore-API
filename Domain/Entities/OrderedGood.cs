@@ -8,5 +8,4 @@ public class OrderedGood
     public int Amount { get; init; }
 
     public Good Good { get; set; } = null!;
-
 }

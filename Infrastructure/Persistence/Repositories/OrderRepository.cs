@@ -1,3 +1,4 @@
+using Dapper;
 using Domain.Entities;
 using Domain.Repositories;
 using Infrastructure.Persistence.Context;
@@ -34,7 +35,7 @@ public class OrderRepository(ApplicationDbContext dbContext) : IOrderRepository
     }
 
     public async Task<Order?> GetOrder(int orderId, CancellationToken cancellationToken)
-    {
+    { 
         return await dbContext
             .Orders
             .AsNoTracking()

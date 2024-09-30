@@ -4,6 +4,5 @@ namespace Domain.Repositories;
 
 public interface IOrderedGoodRepository
 {
-    Task<List<OrderedGood>> GetAllOrderedGoods(CancellationToken cancellationToken);
-    Task<List<OrderedGood>> GetOrderedGoods(int orderId, CancellationToken cancellationToken);
+    Task<List<OrderedGood>> GetOrderedGoods(int? minPrice, int? maxPrice, CancellationToken cancellationToken);
 }

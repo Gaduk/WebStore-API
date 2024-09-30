@@ -353,7 +353,15 @@
         "summary": "Получение списка товаров по заданному id заказа",
         "parameters": [
           {
-            "name": "orderId",
+            "name": "MinPrice",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "MaxPrice",
             "in": "query",
             "required": false,
             "schema": {

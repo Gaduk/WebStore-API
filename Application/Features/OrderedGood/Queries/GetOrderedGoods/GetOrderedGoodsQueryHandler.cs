@@ -8,6 +8,6 @@ public class GetOrderedGoodsQueryHandler(IOrderedGoodRepository orderedGoodRepos
 {
     public async Task<List<Domain.Entities.OrderedGood>> Handle(GetOrderedGoodsQuery request, CancellationToken cancellationToken)
     {
-        return await orderedGoodRepository.GetOrderedGoods(request.OrderId, cancellationToken);
+        return await orderedGoodRepository.GetOrderedGoods(request.MinPrice, request.MaxPrice, cancellationToken);
     }
 }

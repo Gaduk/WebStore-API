@@ -29,7 +29,6 @@ public class OrderRepository(ApplicationDbContext dbContext) : IOrderRepository
         }
         return await orders
             .AsNoTracking()
-            .Include(o => o.User)
             .OrderBy(o => o.Id)
             .ToListAsync(cancellationToken);
     }
@@ -39,7 +38,6 @@ public class OrderRepository(ApplicationDbContext dbContext) : IOrderRepository
         return await dbContext
             .Orders
             .AsNoTracking()
-            .Include(o => o.User)
             .Include(o => o.OrderedGoods)
             .ThenInclude(og => og.Good)
             .Where(o => o.Id == orderId)

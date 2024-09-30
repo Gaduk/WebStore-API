@@ -347,49 +347,6 @@
       }
     },
     
-    "/orderedGoods": {
-      "get": {
-        "tags": ["OrderedGoods"],
-        "summary": "Получение списка товаров по заданному id заказа",
-        "parameters": [
-          {
-            "name": "MinPrice",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "integer"
-            }
-          },
-          {
-            "name": "MaxPrice",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "integer"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Список товаров по заданному id заказа",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/OrderedGood"
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "Доступ запрещен"
-          },
-          "404": {
-            "description": "Заказ не найден / Пользователь не найден"
-          }
-        }
-      }
-    },
-    
     "/goods": {
       "get": {
         "tags": ["Goods"],
@@ -470,26 +427,6 @@
           },
           "IsDone": {
             "type": "boolean"
-          }
-        }
-      },
-      "OrderedGood": {
-        "type": "object",
-        "properties": {
-          "OrderId": {
-            "type": "integer"
-          },
-          "GoodId": {
-            "type": "integer"
-          },
-          "Amount": {
-            "type": "integer"
-          },
-          "Name": {
-            "type": "string"
-          },
-          "Price": {
-            "type": "number"
           }
         }
       },

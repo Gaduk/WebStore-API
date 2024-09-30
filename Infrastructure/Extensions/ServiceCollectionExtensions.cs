@@ -17,7 +17,6 @@ public static class ServiceCollectionExtensions
         
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<IOrderRepository, OrderRepository>();
-        services.AddScoped<IOrderedGoodRepository, OrderedGoodRepository>();
         services.AddScoped<IGoodRepository, GoodRepository>();
         
         services.AddDefaultIdentity<User>(options =>

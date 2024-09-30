@@ -8,6 +8,6 @@ public class GetGoodsQueryHandler(IGoodRepository goodRepository) :
 {
     public async Task<List<Domain.Entities.Good>> Handle(GetGoodsQuery request, CancellationToken cancellationToken)
     {
-        return await goodRepository.GetAllGoods(cancellationToken);
+        return await goodRepository.GetGoods(request.MinPrice, request.MaxPrice, cancellationToken);
     }
 }

@@ -4,5 +4,5 @@ namespace Domain.Repositories;
 
 public interface IGoodRepository
 {
-    Task<List<Good>> GetAllGoods(CancellationToken cancellationToken);
+    Task<List<Good>> GetGoods(int? minPrice, int? maxPrice, CancellationToken cancellationToken);
 }

@@ -394,6 +394,24 @@
       "get": {
         "tags": ["Goods"],
         "summary": "Получение списка товаров",
+        "parameters": [
+          {
+            "name": "MinPrice",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "MaxPrice",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "Список товаров",

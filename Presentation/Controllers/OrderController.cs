@@ -23,7 +23,7 @@ public class OrderController(
     [HttpGet("/orders")]
     public async Task<IActionResult> GetOrders(string? username, CancellationToken cancellationToken)
     {
-        logger.LogInformation("HTTP GET /orders");
+        logger.LogInformation("HTTP GET /orders requested");
         
         var authorizationResult = await mediator.Send(
             new CheckAccessToResourceQuery(User, username, "HaveAccess"), cancellationToken);
@@ -54,7 +54,7 @@ public class OrderController(
     [HttpPost("/orders")]
     public async Task<IActionResult> CreateOrder(CreateOrderCommand command, CancellationToken cancellationToken)
     {
-        logger.LogInformation("HTTP POST /orders");
+        logger.LogInformation("HTTP POST /orders requested");
         
         var authorizationResult = await mediator.Send(
             new CheckAccessToResourceQuery(User, command.UserName, "HaveAccess"), cancellationToken);
@@ -82,7 +82,7 @@ public class OrderController(
     [HttpPatch("/orders/{orderId:int}")]
     public async Task<IActionResult> UpdateOrderStatus(int orderId, bool isDone, CancellationToken cancellationToken)
     {
-        logger.LogInformation("HTTP PATCH /orders/{orderId}", orderId);
+        logger.LogInformation("HTTP PATCH /orders/{orderId} requested", orderId);
         
         var order = await mediator.Send(new GetOrderQuery(orderId), cancellationToken);
         if (order == null)
@@ -100,7 +100,7 @@ public class OrderController(
     [HttpGet("/orders/{orderId:int}")]
     public async Task<IActionResult> GetOrder(int orderId, CancellationToken cancellationToken)
     {
-        logger.LogInformation("HTTP GET /orders/{orderId}", orderId);
+        logger.LogInformation("HTTP GET /orders/{orderId} requested", orderId);
         
         var order = await mediator.Send(new GetOrderQuery(orderId), cancellationToken);
         if (order == null)

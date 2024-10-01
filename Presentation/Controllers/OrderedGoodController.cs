@@ -21,7 +21,7 @@ public class OrderedGoodController(
     [HttpGet("/orderedGoods")]
     public async Task<IActionResult> GetOrderedGoods(int? orderId, CancellationToken cancellationToken)
     {
-        logger.LogInformation("HTTP GET /orderedGoods");
+        logger.LogInformation("HTTP GET /orderedGoods requested");
 
         List<OrderedGood> orderedGoods;
         if (orderId == null)

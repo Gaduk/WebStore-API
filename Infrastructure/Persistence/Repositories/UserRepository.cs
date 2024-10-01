@@ -41,7 +41,7 @@ public class UserRepository(ApplicationDbContext dbContext) : IUserRepository
         }
         var user = await users
             .Where(u => u.UserName == username)
-            .SingleAsync(cancellationToken);
+            .SingleOrDefaultAsync(cancellationToken);
         return user;
     }
 

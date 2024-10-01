@@ -41,7 +41,7 @@ public class OrderRepository(ApplicationDbContext dbContext) : IOrderRepository
         var order = await orders
             .Where(o => o.Id == orderId)
             .OrderBy(o => o.Id)
-            .SingleAsync(cancellationToken);
+            .SingleOrDefaultAsync(cancellationToken);
         return order;
     }
 }

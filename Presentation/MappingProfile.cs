@@ -14,15 +14,7 @@ public class MappingProfile : Profile
         
         CreateMap<Order, OrderDto>();
         
-        CreateMap<Order, OrderWithOrderedGoodsDto>();
-        
         CreateMap<OrderedGood, OrderedGoodDto>()
-            .ForMember(dest => dest.Name, 
-                opt => opt.MapFrom(src => src.Good.Name))
-            .ForMember(dest => dest.Price, 
-                opt => opt.MapFrom(src => src.Good.Price));
-        
-        CreateMap<OrderedGood, OrderedGoodWithoutOrderIdDto>()
             .ForMember(dest => dest.Name, 
                 opt => opt.MapFrom(src => src.Good.Name))
             .ForMember(dest => dest.Price, 

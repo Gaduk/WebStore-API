@@ -6,6 +6,7 @@ using Application.Features.User.Queries.CheckAccessToResource;
 using AutoMapper;
 using Domain.Entities;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Presentation.Controllers;
@@ -16,6 +17,7 @@ public class OrderedGoodController(
     IMediator mediator,
     IMapper mapper) : ControllerBase
 {
+    [Authorize(Roles = "user")]
     [HttpGet("/orderedGoods")]
     public async Task<IActionResult> GetOrderedGoods(int? orderId, CancellationToken cancellationToken)
     {

@@ -8,7 +8,7 @@ namespace Infrastructure.Persistence.Repositories;
 
 public class OrderedGoodRepository(ApplicationDbContext dbContext) : IOrderedGoodRepository
 {
-    public async Task<List<OrderedGood>> GetOrderedGoods(CancellationToken cancellationToken)
+    public async Task<List<OrderedGood>> GetOrderedGoods(CancellationToken cancellationToken = default)
     {
         var connection = dbContext.Database.GetDbConnection();
         

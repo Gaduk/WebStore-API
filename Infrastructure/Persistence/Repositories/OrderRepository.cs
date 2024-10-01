@@ -7,20 +7,20 @@ namespace Infrastructure.Persistence.Repositories;
 
 public class OrderRepository(ApplicationDbContext dbContext) : IOrderRepository
 {
-    public async Task<int> CreateOrder(Order order, CancellationToken cancellationToken)
+    public async Task<int> CreateOrder(Order order, CancellationToken cancellationToken = default)
     {
         await dbContext.Orders.AddAsync(order, cancellationToken);
         await dbContext.SaveChangesAsync(cancellationToken);
         return order.Id;
     }
 
-    public async Task UpdateOrder(Order order, CancellationToken cancellationToken)
+    public async Task UpdateOrder(Order order, CancellationToken cancellationToken = default)
     {
         dbContext.Orders.Update(order);
         await dbContext.SaveChangesAsync(cancellationToken);
     }
 
-    public async Task<List<Order>> GetOrders(CancellationToken cancellationToken)
+    public async Task<List<Order>> GetOrders(CancellationToken cancellationToken = default)
     {
         var orders = dbContext.Orders.AsQueryable();
         return await orders
@@ -41,7 +41,7 @@ public class OrderRepository(ApplicationDbContext dbContext) : IOrderRepository
         var order = await orders
             .Where(o => o.Id == orderId)
             .OrderBy(o => o.Id)
-            .FirstOrDefaultAsync(cancellationToken);
+            .SingleAsync(cancellationToken);
         return order;
     }
 }

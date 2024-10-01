@@ -1,8 +1,8 @@
-using System.Security.Claims;
 using Application.Dto.OrderedGoods;
 using Application.Features.Order.Queries.GetOrder;
 using Application.Features.OrderedGood.Queries.GetOrderedGoods;
 using Application.Features.User.Queries.CheckAccessToResource;
+using Application.Features.User.Queries.CheckIfUserHaveAdminClaims;
 using AutoMapper;
 using Domain.Entities;
 using MediatR;
@@ -26,7 +26,8 @@ public class OrderedGoodController(
         List<OrderedGood> orderedGoods;
         if (orderId == null)
         {
-            if (User.HasClaim(ClaimTypes.Role, "admin"))
+            var hasAdminClaim = await mediator.Send(new CheckIfUserHaveAdminClaimsQuery(User), cancellationToken);
+            if (hasAdminClaim)
             {
                 orderedGoods = await mediator.Send(new GetOrderedGoodsQuery(), cancellationToken);
             }

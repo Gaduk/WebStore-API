@@ -7,6 +7,6 @@ public class GetOrderQueryHandler(IOrderRepository orderRepository) : IRequestHa
 {
     public async Task<Domain.Entities.Order?> Handle(GetOrderQuery request, CancellationToken cancellationToken)
     {
-        return await orderRepository.GetOrder(request.OrderId, cancellationToken);
+        return await orderRepository.GetOrder(request.OrderId, request.IncludeOrderedGoods, cancellationToken);
     }
 }

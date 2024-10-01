@@ -29,15 +29,19 @@ public class OrderRepository(ApplicationDbContext dbContext) : IOrderRepository
             .ToListAsync(cancellationToken);
     }
 
-    public async Task<Order?> GetOrder(int orderId, CancellationToken cancellationToken)
-    { 
-        return await dbContext
-            .Orders
-            .AsNoTracking()
-            .Include(o => o.OrderedGoods)
-            .ThenInclude(og => og.Good)
+    public async Task<Order?> GetOrder(int orderId, bool includeOrderedGoods = false, CancellationToken cancellationToken = default)
+    {
+        var orders = dbContext.Orders.AsQueryable();
+        if (includeOrderedGoods)
+        {
+            orders = orders
+                .Include(o => o.OrderedGoods)
+                .ThenInclude(og => og.Good);
+        }
+        var order = await orders
             .Where(o => o.Id == orderId)
             .OrderBy(o => o.Id)
             .FirstOrDefaultAsync(cancellationToken);
+        return order;
     }
 }

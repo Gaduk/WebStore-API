@@ -7,5 +7,5 @@ public class OrderedGood
     public int GoodId { get; init; }
     public int Amount { get; init; }
 
-    public Good Good { get; init; } = null!;
+    public Good Good { get; set; } = null!;
 }

@@ -5,7 +5,6 @@ using Application.Features.Order.Queries.GetOrder;
 using Application.Features.Order.Queries.GetOrders;
 using Application.Features.User.Queries.CheckAccessToResource;
 using Application.Features.User.Queries.GetUser;
-using Application.Features.User.Queries.GetUserWithOrders;
 using AutoMapper;
 using Domain.Entities;
 using MediatR;
@@ -37,7 +36,7 @@ public class OrderController(
         List<Order> orders;
         if (username != null)
         {
-            var user = await mediator.Send(new GetUserWithOrdersQuery(username), cancellationToken);
+            var user = await mediator.Send(new GetUserQuery(username, IncludeOrders: true), cancellationToken);
             if (user == null)
             {
                 logger.LogWarning("NotFound. User {username} is not found", username);
@@ -118,7 +117,7 @@ public class OrderController(
             return StatusCode(StatusCodes.Status403Forbidden);
         }
         
-        var orderDto = mapper.Map<OrderWithOrderedGoodsDto>(order);
+        var orderDto = mapper.Map<OrderDto>(order);
         return Ok(orderDto);
     }
 }

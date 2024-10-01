@@ -27,18 +27,21 @@ public class UserRepository(ApplicationDbContext dbContext) : IUserRepository
             .ToListAsync(cancellationToken);
     }
 
-    public async Task<User?> GetUser(string username, CancellationToken cancellationToken)
+    public async Task<User?> GetUser(
+        string username, 
+        bool includeOrders = false, 
+        CancellationToken cancellationToken = default)
     {
-        return await dbContext.Users
+        var users = dbContext.Users.AsQueryable();
+        if (includeOrders)
+        {
+            users = users
+                .Include(u => u.Orders);
+        }
+        var user = await users
             .Where(u => u.UserName == username)
             .FirstOrDefaultAsync(cancellationToken);
+        return user;
     }
-    
-    public async Task<User?> GetUserWithOrders(string username, CancellationToken cancellationToken)
-    {
-        return await dbContext.Users
-            .Where(u => u.UserName == username)
-            .Include(u => u.Orders)
-            .FirstOrDefaultAsync(cancellationToken);
-    }
+
 }

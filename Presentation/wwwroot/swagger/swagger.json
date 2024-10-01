@@ -345,21 +345,7 @@
                   "example": {
                     "id": 1,
                     "userName": "admin",
-                    "isDone": false,
-                    "orderedGoods": [
-                      {
-                        "goodId": 1001,
-                        "amount": 11,
-                        "name": "Товар 1",
-                        "price": 10
-                      },
-                      {
-                        "goodId": 1002,
-                        "amount": 22,
-                        "name": "Товар 2",
-                        "price": 20
-                      }
-                    ]
+                    "isDone": false
                   }
                 }
               }
@@ -418,7 +404,8 @@
     "/orderedGoods": {
       "get": {
         "tags": ["OrderedGoods"],
-        "summary": "Получение списка товаров по заданному id заказа",
+        "summary": "Получение списка товаров",
+        "description": "Если указать id заказа, возвращает список позиций заказа. Если не указывать id, возвращает список всех заказанных товаров (доступно только администратору).",
         "parameters": [
           {
             "name": "OrderId",
@@ -435,16 +422,34 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/OrderedGood"
+                  "example": [
+                    {
+                      "orderId": 1,
+                      "goodId": 1001,
+                      "amount": 2,
+                      "name": "Товар 1",
+                      "price": 10
+                    },
+                    {
+                      "orderId": 2,
+                      "goodId": 1002,
+                      "amount": 1,
+                      "name": "Товар 2",
+                      "price": 20
+                    }
+                  ]
                 }
               }
             }
+          },
+          "401": {
+            "description": "Пользователь не авторизован"
           },
           "403": {
             "description": "Доступ запрещен"
           },
           "404": {
-            "description": "Заказ не найден / Пользователь не найден"
+            "description": "Заказ не найден"
           }
         }
       }

@@ -25,36 +25,47 @@ public class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logger) : IE
                 problemDetails.Extensions.Add("errors", validationErrors);
                 break;
             }
+            case BadRequestException unauthorizedException:
+            {
+                problemDetails.Title = "Bad request";
+                httpContext.Response.StatusCode = StatusCodes.Status400BadRequest;
+                problemDetails.Extensions.Add("error", unauthorizedException.Message);
+                break;
+            }
             case UnauthorizedException unauthorizedException:
             {
-                problemDetails.Title = unauthorizedException.Message;
+                problemDetails.Title = "Unauthorized";
                 httpContext.Response.StatusCode = StatusCodes.Status401Unauthorized;
+                problemDetails.Extensions.Add("error", unauthorizedException.Message);
                 break;
             }
             case ForbiddenException:
             {
+                problemDetails.Title = "Access denied";
                 httpContext.Response.StatusCode = StatusCodes.Status403Forbidden;
                 break;
             }
             case NotFoundException notFoundException:
             {
-                problemDetails.Title = notFoundException.Message;
+                problemDetails.Title = "Not found";
                 httpContext.Response.StatusCode = StatusCodes.Status404NotFound;
+                problemDetails.Extensions.Add("error", notFoundException.Message);
                 break;
             }
             case ConflictException conflictException:
             {
-                problemDetails.Title = conflictException.Message;
-                httpContext.Response.StatusCode = StatusCodes.Status404NotFound;
+                problemDetails.Title = "Conflict";
+                httpContext.Response.StatusCode = StatusCodes.Status409Conflict;
+                problemDetails.Extensions.Add("error", conflictException.Message);
                 break;
             }
             default:
-                problemDetails.Title = exception.Message;
+                problemDetails.Extensions.Add("error", exception.Message);
                 break;
         }
         problemDetails.Status = httpContext.Response.StatusCode;
         
-        logger.LogWarning("{handledErrorMessage}", problemDetails.Title);
+        logger.LogWarning("{title}. {errors}", problemDetails.Title, problemDetails.Extensions);
         await httpContext.Response.WriteAsJsonAsync(problemDetails, cancellationToken);
         return true;
     }

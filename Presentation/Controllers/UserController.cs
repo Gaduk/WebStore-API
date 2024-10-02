@@ -32,14 +32,14 @@ public class UserController(
     }
     
     [HttpPost("/login")]
-    public async Task<IActionResult> Login(LoginCommand command, CancellationToken cancellationToken)
+    public async Task<IActionResult> Login(string username, string password, CancellationToken cancellationToken)
     {
         logger.LogInformation("HTTP POST /login requested");
         
-        await mediator.Send(command, cancellationToken);
+        await mediator.Send(new LoginCommand(username, password), cancellationToken);
         
-        logger.LogInformation("User {username} is signed in successfully", command.UserName);
-        return Ok($"User {command.UserName} is signed in");
+        logger.LogInformation("User {username} is signed in successfully", username);
+        return Ok($"User {username} is signed in");
     }
     
     [Authorize(Roles = "user")]

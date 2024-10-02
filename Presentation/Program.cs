@@ -62,9 +62,12 @@ public static class Program
 
         builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
         
+        
         var app = builder.Build();
         
 
+        app.UseSerilogRequestLogging();
+        
         using var scope = app.Services.CreateScope();
         using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
         context.Database.EnsureCreated();
@@ -91,8 +94,6 @@ public static class Program
         {
             Authorization = new [] {new HangfireAuthorizationFilter()}
         });
-        
-        app.UseSerilogRequestLogging();
         
         app.Run();
     }

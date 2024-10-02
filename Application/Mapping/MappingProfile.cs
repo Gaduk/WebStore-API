@@ -1,10 +1,10 @@
-using Application.Dto.User;
 using Application.Dto.Order;
 using Application.Dto.OrderedGoods;
+using Application.Dto.User;
 using AutoMapper;
 using Domain.Entities;
 
-namespace Presentation;
+namespace Application.Mapping;
 
 public class MappingProfile : Profile
 {

@@ -1,5 +1,6 @@
+using Application.Dto.Order;
 using MediatR;
 
 namespace Application.Features.Order.Queries.GetOrders;
 
-public record GetOrdersQuery : IRequest<List<Domain.Entities.Order>>;
+public record GetOrdersQuery(string? UserName) : IRequest<List<OrderDto>>;

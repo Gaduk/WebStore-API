@@ -1,3 +1,4 @@
+using Application.Exceptions;
 using Domain.Repositories;
 using MediatR;
 
@@ -8,7 +9,12 @@ public class UpdateOrderCommandHandler(IOrderRepository orderRepository)
 {
     public async Task Handle(UpdateOrderCommand request, CancellationToken cancellationToken)
     {
-        var order = request.Order;
+        var order = await orderRepository.GetOrder(request.OrderId, cancellationToken: cancellationToken);
+        if (order == null)
+        {
+            throw new NotFoundException($"Order №{request.OrderId} is not found");
+        }
+        
         order.IsDone = request.IsDone;
         await orderRepository.UpdateOrder(order, cancellationToken);
     }

@@ -1,18 +1,10 @@
-using Application.Dto.User;
-using Application.Features.User.Commands.AddAdminClaims;
-using Application.Features.User.Commands.AddUserClaims;
 using Application.Features.User.Commands.CreateUser;
 using Application.Features.User.Commands.DeleteUser;
-using Application.Features.User.Commands.SignIn;
-using Application.Features.User.Commands.SignOut;
-using Application.Features.User.Commands.SubscribeUserToMailing;
+using Application.Features.User.Commands.Login;
+using Application.Features.User.Commands.Logout;
 using Application.Features.User.Commands.UpdateUserRole;
-using Application.Features.User.Queries.CheckAccessToResource;
-using Application.Features.User.Queries.CheckPassword;
 using Application.Features.User.Queries.GetUser;
-using Application.Features.User.Queries.GetUserClaims;
 using Application.Features.User.Queries.GetUsers;
-using AutoMapper;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -22,33 +14,16 @@ namespace Presentation.Controllers;
 [ApiController]
 public class UserController(
     ILogger<UserController> logger,
-    IMediator mediator,
-    IMapper mapper) : ControllerBase
+    IMediator mediator) : ControllerBase
 {
     [HttpPost("/register")]
     public async Task<IActionResult> CreateUser(CreateUserCommand command, CancellationToken cancellationToken)
     {
         logger.LogInformation("HTTP POST /register requested");
         
-        var userWithSameName = await mediator.Send(new GetUserQuery(command.UserName), cancellationToken);
-        if (userWithSameName != null)
-        {
-            logger.LogWarning("Conflict. User {username} already exist", command.UserName);
-            return Conflict($"User {command.UserName} already exist");
-        }
-
-        var (result, user) = await mediator.Send(command, cancellationToken);
-        if (!result.Succeeded)
-        {
-            logger.LogWarning("BadRequest\n{@errors}", result.Errors);
-            return BadRequest(result.Errors);
-        }
-        await mediator.Send(new AddUserClaims(user), CancellationToken.None);
-        
-        await mediator.Send(new SubscribeUserToMailingCommand(command.Email, command.UserName), CancellationToken.None);
+        await mediator.Send(command, cancellationToken);
         
         logger.LogInformation("User {username} is signed up successfully", command.UserName);
-        
         return CreatedAtAction(
             nameof(GetUser),
             new { username = command.UserName },
@@ -57,35 +32,14 @@ public class UserController(
     }
     
     [HttpPost("/login")]
-    public async Task<IActionResult> Login(string username, string password, CancellationToken cancellationToken)
+    public async Task<IActionResult> Login(LoginCommand command, CancellationToken cancellationToken)
     {
         logger.LogInformation("HTTP POST /login requested");
         
-        var user = await mediator.Send(new GetUserQuery(username), cancellationToken);
-        if (user == null)
-        {
-            logger.LogWarning("Unauthorized. Wrong username");
-            return Unauthorized("Wrong username");
-        }
-
-        var checkPasswordTask = mediator.Send(new CheckPasswordQuery(user, password), cancellationToken);
-        var getUserClaimsTask = mediator.Send(new GetUserClaimsQuery(user), cancellationToken);
-        await Task.WhenAll(checkPasswordTask, getUserClaimsTask);
+        await mediator.Send(command, cancellationToken);
         
-        var passwordIsRight = checkPasswordTask.Result;
-        var claims = getUserClaimsTask.Result;
-        
-        if(!passwordIsRight) 
-        {
-            logger.LogWarning("Unauthorized. Wrong password");
-            return Unauthorized("Wrong password");
-        }
-        
-        await mediator.Send(new SignOutCommand(HttpContext), cancellationToken);
-        await mediator.Send(new SignInCommand(claims, HttpContext), CancellationToken.None);
-
-        logger.LogInformation("User {username} is signed in successfully", user.UserName);
-        return Ok($"User {user.UserName} is signed in");
+        logger.LogInformation("User {username} is signed in successfully", command.UserName);
+        return Ok($"User {command.UserName} is signed in");
     }
     
     [Authorize(Roles = "user")]
@@ -94,7 +48,7 @@ public class UserController(
     {
         logger.LogInformation("HTTP GET /logout requested");
 
-        await mediator.Send(new SignOutCommand(HttpContext), cancellationToken);
+        await mediator.Send(new LogoutCommand(), cancellationToken);
         
         var username = User.Identity?.Name;
         logger.LogInformation("User {username} is signed out", username);
@@ -109,8 +63,7 @@ public class UserController(
         
         var users = await mediator.Send(new GetUsersQuery(), cancellationToken);
         
-        var usersDto = mapper.Map<List<UserDto>>(users);
-        return Ok(usersDto);
+        return Ok(users);
     }
     
     [Authorize(Roles = "user")]
@@ -119,23 +72,9 @@ public class UserController(
     {
         logger.LogInformation("HTTP GET /users/{login} requested", username);
         
-        var authorizationResult = await mediator.Send(
-            new CheckAccessToResourceQuery(User, username, "HaveAccess"), cancellationToken);
-        if (!authorizationResult.Succeeded)
-        {
-            logger.LogWarning("Forbidden. No access");
-            return StatusCode(StatusCodes.Status403Forbidden);
-        }
-        
         var user = await mediator.Send(new GetUserQuery(username), cancellationToken);
-        if(user == null)
-        {
-            logger.LogWarning("NotFound. User {username} is not found", username);
-            return NotFound($"User {username} is not found");
-        }
-
-        var userDto = mapper.Map<UserDto>(user);
-        return Ok(userDto);
+        
+        return Ok(user);
     }
     
     [Authorize(Roles = "admin")]
@@ -144,16 +83,10 @@ public class UserController(
     {
         logger.LogInformation("HTTP DELETE /users/{username} requested", username);
         
-        var user = await mediator.Send(new GetUserQuery(username), cancellationToken);
-        if (user == null)
-        {
-            logger.LogWarning("NotFound. User {username} is not found", username);
-            return NotFound($"User {username} is not found");
-        }
-        await mediator.Send(new DeleteUserCommand(user), cancellationToken);
+        await mediator.Send(new DeleteUserCommand(username), cancellationToken);
         
-        logger.LogInformation("User {username} is deleted", user.UserName);
-        return Ok($"User {user.UserName} is deleted");
+        logger.LogInformation("User {username} is deleted", username);
+        return Ok($"User {username} is deleted");
     }
     
     [Authorize(Roles = "admin")]
@@ -162,17 +95,9 @@ public class UserController(
     {
         logger.LogInformation("HTTP PATCH /users/{login} requested", username);
         
-        var user = await mediator.Send(new GetUserQuery(username), cancellationToken);
-        if (user == null)
-        {
-            logger.LogWarning("NotFound. User {username} is not found", username);
-            return NotFound($"User {username} is not found");
-        }
+        await mediator.Send(new UpdateUserRoleCommand(username, isAdmin), cancellationToken);
         
-        await mediator.Send(new UpdateUserRoleCommand(user, isAdmin), cancellationToken);
-        await mediator.Send(new AddAdminClaimsCommand(user, isAdmin), CancellationToken.None);
-        
-        logger.LogInformation("{username} rights is updated", user.UserName);
-        return Ok($"{user.UserName} rights is updated");
+        logger.LogInformation("{username} rights is updated", username);
+        return Ok($"{username} rights is updated");
     }
 }

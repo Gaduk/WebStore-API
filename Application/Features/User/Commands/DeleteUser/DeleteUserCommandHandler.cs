@@ -1,3 +1,4 @@
+using Application.Exceptions;
 using Domain.Repositories;
 using MediatR;
 
@@ -7,6 +8,11 @@ public class DeleteUserCommandHandler(IUserRepository userRepository) : IRequest
 {
     public async Task Handle(DeleteUserCommand request, CancellationToken cancellationToken)
     {
-        await userRepository.DeleteUser(request.User, cancellationToken);
+        var user = await userRepository.GetUser(request.UserName, cancellationToken: cancellationToken);
+        if (user == null)
+        {
+            throw new NotFoundException($"User {request.UserName} is not found");
+        }
+        await userRepository.DeleteUser(user, cancellationToken);
     }
 }

@@ -13,6 +13,7 @@ public class GoodController(ILogger<GoodController> logger, IMediator mediator) 
         logger.LogInformation("HTTP GET /goods requested");
         
         var goods = await mediator.Send(new GetGoodsQuery(minPrice, maxPrice), cancellationToken);
+        
         return Ok(goods);
     }
 }

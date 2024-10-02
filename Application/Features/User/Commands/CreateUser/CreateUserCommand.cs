@@ -1,4 +1,3 @@
-using Application.Dto.User;
 using MediatR;
 
 namespace Application.Features.User.Commands.CreateUser;

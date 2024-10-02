@@ -10,7 +10,7 @@ public class CreateOrderCommandHandler(
     IUserRepository userRepository,
     IOrderRepository orderRepository,
     IAuthorizationService authorizationService,
-    HttpContextAccessor httpContextAccessor) : IRequestHandler<CreateOrderCommand, int>
+    IHttpContextAccessor httpContextAccessor) : IRequestHandler<CreateOrderCommand, int>
 {
     public async Task<int> Handle(CreateOrderCommand request, CancellationToken cancellationToken)
     {

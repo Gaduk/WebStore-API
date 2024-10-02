@@ -12,7 +12,7 @@ public class GetOrderQueryHandler(
     IOrderRepository orderRepository,
     IAuthorizationService authorizationService,
     IMapper mapper,
-    HttpContextAccessor httpContextAccessor) : IRequestHandler<GetOrderQuery, OrderDto?>
+    IHttpContextAccessor httpContextAccessor) : IRequestHandler<GetOrderQuery, OrderDto?>
 {
     public async Task<OrderDto?> Handle(GetOrderQuery request, CancellationToken cancellationToken)
     {

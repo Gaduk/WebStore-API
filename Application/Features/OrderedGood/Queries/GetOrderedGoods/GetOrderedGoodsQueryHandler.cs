@@ -14,7 +14,7 @@ public class GetOrderedGoodsQueryHandler(
     IOrderRepository orderRepository,
     IAuthorizationService authorizationService,
     IMapper mapper,
-    HttpContextAccessor httpContextAccessor) :
+    IHttpContextAccessor httpContextAccessor) :
     IRequestHandler<GetOrderedGoodsQuery, List<OrderedGoodDto>>
 {
     public async Task<List<OrderedGoodDto>> Handle(GetOrderedGoodsQuery request, CancellationToken cancellationToken)

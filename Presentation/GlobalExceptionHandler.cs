@@ -15,21 +15,21 @@ public class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logger) : IE
         
         switch (exception)
         {
-            case FluentValidation.ValidationException fluentException:
+            case FluentValidation.ValidationException validationException:
             {
                 problemDetails.Title = "Validation failed";
                 httpContext.Response.StatusCode = StatusCodes.Status400BadRequest;
                 var validationErrors = 
-                    fluentException.Errors
+                    validationException.Errors
                         .Select(error => error.ErrorMessage).ToList();
                 problemDetails.Extensions.Add("errors", validationErrors);
                 break;
             }
-            case BadRequestException unauthorizedException:
+            case BadRequestException badRequestException:
             {
                 problemDetails.Title = "Bad request";
                 httpContext.Response.StatusCode = StatusCodes.Status400BadRequest;
-                problemDetails.Extensions.Add("error", unauthorizedException.Message);
+                problemDetails.Extensions.Add("error", badRequestException.Message);
                 break;
             }
             case UnauthorizedException unauthorizedException:
@@ -60,6 +60,7 @@ public class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logger) : IE
                 break;
             }
             default:
+                problemDetails.Title = exception.GetType().Name;
                 problemDetails.Extensions.Add("error", exception.Message);
                 break;
         }

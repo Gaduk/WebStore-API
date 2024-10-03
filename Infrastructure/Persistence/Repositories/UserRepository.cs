@@ -13,9 +13,8 @@ public class UserRepository(ApplicationDbContext dbContext) : IUserRepository
         await dbContext.SaveChangesAsync(cancellationToken);
     }
 
-    public async Task UpdateUserRole(User user, bool isAdmin, CancellationToken cancellationToken = default)
+    public async Task UpdateUser(User user, CancellationToken cancellationToken = default)
     {
-        user.IsAdmin = isAdmin;
         dbContext.Users.Update(user);
         await dbContext.SaveChangesAsync(cancellationToken);
     }

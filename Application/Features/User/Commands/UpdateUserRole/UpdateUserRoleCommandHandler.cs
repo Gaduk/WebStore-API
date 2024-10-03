@@ -18,8 +18,6 @@ public class UpdateUserRoleCommandHandler(
             throw new NotFoundException($"User {request.UserName} is not found");
         }
         
-        await userRepository.UpdateUserRole(user, request.IsAdmin, cancellationToken);
-        
         var claims = new List<Claim>
         {
             new(ClaimTypes.Role, "admin")
@@ -37,5 +35,8 @@ public class UpdateUserRoleCommandHandler(
                 break;
             }
         }
+        
+        user.IsAdmin = request.IsAdmin;
+        await userRepository.UpdateUser(user, cancellationToken);
     }
 }

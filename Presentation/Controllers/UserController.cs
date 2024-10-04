@@ -19,8 +19,6 @@ public class UserController(
     [HttpPost("/register")]
     public async Task<IActionResult> CreateUser(CreateUserCommand command, CancellationToken cancellationToken)
     {
-        logger.LogInformation("HTTP POST /register requested");
-        
         await mediator.Send(command, cancellationToken);
         
         logger.LogInformation("User {username} is signed up successfully", command.UserName);
@@ -34,8 +32,6 @@ public class UserController(
     [HttpPost("/login")]
     public async Task<IActionResult> Login(string username, string password, CancellationToken cancellationToken)
     {
-        logger.LogInformation("HTTP POST /login requested");
-        
         await mediator.Send(new LoginCommand(username, password), cancellationToken);
         
         logger.LogInformation("User {username} is signed in successfully", username);
@@ -46,8 +42,6 @@ public class UserController(
     [HttpGet("/logout")]
     public async Task<IActionResult> Logout(CancellationToken cancellationToken)
     {
-        logger.LogInformation("HTTP GET /logout requested");
-
         await mediator.Send(new LogoutCommand(), cancellationToken);
         
         var username = User.Identity?.Name;
@@ -59,10 +53,7 @@ public class UserController(
     [HttpGet("/users")]
     public async Task<IActionResult> GetUsers(CancellationToken cancellationToken)
     {
-        logger.LogInformation("HTTP GET /users requested");
-        
         var users = await mediator.Send(new GetUsersQuery(), cancellationToken);
-        
         return Ok(users);
     }
     
@@ -70,10 +61,7 @@ public class UserController(
     [HttpGet("/users/{username}")]
     public async Task<IActionResult> GetUser(string username, CancellationToken cancellationToken)
     {
-        logger.LogInformation("HTTP GET /users/{login} requested", username);
-        
         var user = await mediator.Send(new GetUserQuery(username), cancellationToken);
-        
         return Ok(user);
     }
     
@@ -81,8 +69,6 @@ public class UserController(
     [HttpDelete("/users/{username}")]
     public async Task<IActionResult> DeleteUser(string username, CancellationToken cancellationToken)
     {
-        logger.LogInformation("HTTP DELETE /users/{username} requested", username);
-        
         await mediator.Send(new DeleteUserCommand(username), cancellationToken);
         
         logger.LogInformation("User {username} is deleted", username);
@@ -93,8 +79,6 @@ public class UserController(
     [HttpPatch("/users/{username}")]
     public async Task<IActionResult> UpdateUserRole(string username, bool isAdmin, CancellationToken cancellationToken)
     {
-        logger.LogInformation("HTTP PATCH /users/{login} requested", username);
-        
         await mediator.Send(new UpdateUserRoleCommand(username, isAdmin), cancellationToken);
         
         logger.LogInformation("{username} rights is updated", username);

@@ -17,10 +17,7 @@ public class OrderController(
     [HttpGet("/orders")]
     public async Task<IActionResult> GetOrders(string? username, CancellationToken cancellationToken)
     {
-        logger.LogInformation("HTTP GET /orders requested");
-        
         var orders = await mediator.Send(new GetOrdersQuery(username), cancellationToken);
-        
         return Ok(orders);
     }
     
@@ -28,8 +25,6 @@ public class OrderController(
     [HttpPost("/orders")]
     public async Task<IActionResult> CreateOrder(CreateOrderCommand command, CancellationToken cancellationToken)
     {
-        logger.LogInformation("HTTP POST /orders requested");
-        
         var orderId = await mediator.Send(command, cancellationToken);
         
         logger.LogInformation("Order {orderId} is created", orderId);
@@ -40,8 +35,6 @@ public class OrderController(
     [HttpPatch("/orders/{orderId:int}")]
     public async Task<IActionResult> UpdateOrderStatus(int orderId, bool isDone, CancellationToken cancellationToken)
     {
-        logger.LogInformation("HTTP PATCH /orders/{orderId} requested", orderId);
-        
         await mediator.Send(new UpdateOrderCommand(orderId, isDone), cancellationToken);
 
         logger.LogInformation("Status of order {orderId} is updated", orderId);
@@ -52,10 +45,7 @@ public class OrderController(
     [HttpGet("/orders/{orderId:int}")]
     public async Task<IActionResult> GetOrder(int orderId, CancellationToken cancellationToken)
     {
-        logger.LogInformation("HTTP GET /orders/{orderId} requested", orderId);
-        
         var order = await mediator.Send(new GetOrderQuery(orderId), cancellationToken);
-        
         return Ok(order);
     }
 }

@@ -1,6 +1,7 @@
 using Application.Exceptions;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
+using static System.String;
 
 namespace Presentation;
 
@@ -65,8 +66,13 @@ public class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logger) : IE
                 break;
         }
         problemDetails.Status = httpContext.Response.StatusCode;
+
+        problemDetails.Extensions.TryGetValue("errors", out var errorsObj );
+        problemDetails.Extensions.TryGetValue("error", out var errorObj);
+        var errors = Join(". ", errorsObj as List<string> ?? Enumerable.Empty<string>());
+        errors = Join("", errors, errorObj);
         
-        logger.LogWarning("{title}. {errors}", problemDetails.Title, problemDetails.Extensions);
+        logger.LogWarning("{title}. {errors}", problemDetails.Title, errors);
         await httpContext.Response.WriteAsJsonAsync(problemDetails, cancellationToken);
         return true;
     }

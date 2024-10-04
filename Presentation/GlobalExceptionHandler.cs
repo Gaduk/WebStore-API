@@ -72,7 +72,7 @@ public class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logger) : IE
         var errors = Join(". ", errorsObj as List<string> ?? Enumerable.Empty<string>());
         errors = Join("", errors, errorObj);
         
-        logger.LogWarning("{title}. {errors}", problemDetails.Title, errors);
+        logger.LogWarning("{problemTitle}. {errors}", problemDetails.Title, errors);
         await httpContext.Response.WriteAsJsonAsync(problemDetails, cancellationToken);
         return true;
     }

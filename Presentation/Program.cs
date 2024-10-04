@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Authorization;
 using Presentation.Requirements.AccessRequirement;
 using Presentation.Requirements.AccessRequirement.Handlers;
 using Serilog;
+using Serilog.Events;
 
 namespace Presentation;
 
@@ -66,7 +67,12 @@ public static class Program
         var app = builder.Build();
         
 
-        app.UseSerilogRequestLogging();
+        app.UseSerilogRequestLogging(options =>
+        {
+            options.GetLevel = (httpContext, _, _) => 
+                httpContext.Request.Path.StartsWithSegments("/hangfire/stats") ? 
+                    LogEventLevel.Verbose : LogEventLevel.Information;
+        });
         
         using var scope = app.Services.CreateScope();
         using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();

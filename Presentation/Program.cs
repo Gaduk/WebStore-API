@@ -29,6 +29,18 @@ public static class Program
         builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
         builder.Services.AddProblemDetails();
         
+        builder.Services.AddCors(options =>
+        {
+            options.AddPolicy("AllowFrontend", policy =>
+            {
+                policy.WithOrigins(
+                        "http://localhost:5173", 
+                        "http://localhost:8080")
+                    .AllowAnyHeader()
+                    .AllowAnyMethod();
+            });
+        });
+        
         builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(options => 
         {
             options.Events.OnRedirectToLogin = context =>
@@ -66,6 +78,8 @@ public static class Program
         
         var app = builder.Build();
         
+        
+        app.UseCors("AllowFrontend");
 
         app.UseSerilogRequestLogging(options =>
         {

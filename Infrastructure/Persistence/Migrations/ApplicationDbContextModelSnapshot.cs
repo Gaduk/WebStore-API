@@ -30,9 +30,6 @@ namespace Infrastructure.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<byte[]>("Image")
-                        .HasColumnType("bytea");
-
                     b.Property<string>("Name")
                         .HasColumnType("text");
 
@@ -41,7 +38,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Goods");
+                    b.ToTable("Goods", (string)null);
 
                     b.HasData(
                         new
@@ -83,7 +80,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("UserName");
 
-                    b.ToTable("Orders");
+                    b.ToTable("Orders", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.OrderedGood", b =>
@@ -109,7 +106,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("OrderId");
 
-                    b.ToTable("OrderedGoods");
+                    b.ToTable("OrderedGoods", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.User", b =>
@@ -190,7 +187,7 @@ namespace Infrastructure.Migrations
                         {
                             Id = "admin",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "de171c86-2b5c-486c-a8c7-85623ebe4a08",
+                            ConcurrencyStamp = "59a006df-17e8-484f-b78d-aa10c8c8632b",
                             Email = "admin@mail.ru",
                             EmailConfirmed = true,
                             FirstName = "Иван",
@@ -199,10 +196,10 @@ namespace Infrastructure.Migrations
                             LockoutEnabled = false,
                             NormalizedEmail = "ADMIN@MAIL.RU",
                             NormalizedUserName = "ADMIN",
-                            PasswordHash = "AQAAAAIAAYagAAAAECyKrZr3crbntyhk6zSbm1ePBMsyWqaB8QO5jLmPD5euiXl+YLgJhP8JqG+6P4VmQA==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEAYeLcDYlinoCess6RHRBH8NbUkrEczXJRVkq7A7kS1q+rSzT0VzZb1sA1E7s6BxWw==",
                             PhoneNumber = "+71112223344",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "1652e845-4104-477b-aa50-f45bd8be6294",
+                            SecurityStamp = "e6516bd4-3eda-4b1b-a110-be52536d12f0",
                             TwoFactorEnabled = false,
                             UserName = "admin"
                         });

@@ -32,4 +32,8 @@
       <PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="6.7.1" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="wwwroot\goods\" />
+    </ItemGroup>
+
 </Project>

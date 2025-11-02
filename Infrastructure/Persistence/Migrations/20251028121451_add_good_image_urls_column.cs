@@ -16,7 +16,7 @@ namespace Infrastructure.Persistence.Migrations
                 table: "Goods",
                 type: "text[]",
                 nullable: false,
-                defaultValue: new List<string>());
+                defaultValue: Array.Empty<string>());
         }
 
         /// <inheritdoc />

@@ -32,4 +32,37 @@ public class GoodRepository(ApplicationDbContext dbContext) : IGoodRepository
         var result = await connection.QueryAsync<Good>(command);
         return result.ToList();
     }
+
+    public async Task<Good?> GetGood(int goodId, CancellationToken cancellationToken = default)
+    {
+        var goods = dbContext.Goods.AsQueryable();
+        var good = await goods.FirstOrDefaultAsync(g => g.Id == goodId, cancellationToken: cancellationToken);
+        
+        return good;
+    }
+
+    public async Task<int> CreateGood(Good good, CancellationToken cancellationToken = default)
+    {
+        await dbContext.Goods.AddAsync(good, cancellationToken);
+        await dbContext.SaveChangesAsync(cancellationToken);
+        return good.Id;
+    }
+
+    public async Task UpdateGood(Good good, CancellationToken cancellationToken = default)
+    {
+        dbContext.Goods.Update(good);
+        await dbContext.SaveChangesAsync(cancellationToken);
+    }
+
+    public async Task DeleteGood(int goodId, CancellationToken cancellationToken = default)
+    {
+        var goods = dbContext.Goods.AsQueryable();
+        var good = await goods.FirstOrDefaultAsync(g => g.Id == goodId, cancellationToken: cancellationToken);
+
+        if (good != null)
+        {
+            dbContext.Goods.Remove(good);
+            await dbContext.SaveChangesAsync(cancellationToken);
+        }
+    }
 }

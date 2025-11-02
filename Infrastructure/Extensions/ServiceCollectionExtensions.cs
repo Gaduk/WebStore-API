@@ -31,5 +31,6 @@ public static class ServiceCollectionExtensions
             .AddEntityFrameworkStores<ApplicationDbContext>();
         
         services.AddSingleton<IMailService, MailService>();
+        services.AddSingleton<IFileService, FileService>();
     }
 }

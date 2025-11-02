@@ -43,7 +43,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Goods");
+                    b.ToTable("Goods", (string)null);
 
                     b.HasData(
                         new
@@ -88,7 +88,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("UserName");
 
-                    b.ToTable("Orders");
+                    b.ToTable("Orders", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.OrderedGood", b =>
@@ -114,7 +114,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("OrderId");
 
-                    b.ToTable("OrderedGoods");
+                    b.ToTable("OrderedGoods", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.User", b =>

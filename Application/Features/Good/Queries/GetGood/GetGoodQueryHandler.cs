@@ -4,7 +4,7 @@ using MediatR;
 
 namespace Application.Features.Good.Queries.GetGood;
 
-public class GetOrderQueryHandler(IGoodRepository goodRepository) : IRequestHandler<GetGoodQuery, Domain.Entities.Good?>
+public class GetGoodQueryHandler(IGoodRepository goodRepository) : IRequestHandler<GetGoodQuery, Domain.Entities.Good?>
 {
     public async Task<Domain.Entities.Good?> Handle(GetGoodQuery request, CancellationToken cancellationToken)
     {   

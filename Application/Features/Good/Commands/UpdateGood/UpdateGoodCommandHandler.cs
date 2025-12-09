@@ -5,7 +5,7 @@ using MediatR;
 
 namespace Application.Features.Good.Commands.UpdateGood;
 
-public class UpdateOrderCommandHandler(IGoodRepository goodRepository, IFileService fileService)
+public class UpdateGoodCommandHandler(IGoodRepository goodRepository, IFileService fileService)
     : IRequestHandler<UpdateGoodCommand>
 {
     public async Task Handle(UpdateGoodCommand request, CancellationToken cancellationToken)

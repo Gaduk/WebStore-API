@@ -7,9 +7,10 @@ namespace Infrastructure.Persistence.Context;
 
 public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : IdentityDbContext<User>(options)
 {
-    public DbSet<Order> Orders { get; init; }
-    public DbSet<Good> Goods { get; init; }
+    public DbSet<Order>       Orders       { get; init; }
+    public DbSet<Good>        Goods        { get; init; }
     public DbSet<OrderedGood> OrderedGoods { get; init; }
+    public DbSet<BasketItem>  BasketItems  { get; init; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

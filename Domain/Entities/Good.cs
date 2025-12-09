@@ -1,5 +1,3 @@
-using System.Collections;
-
 namespace Domain.Entities;
 
 public class Good

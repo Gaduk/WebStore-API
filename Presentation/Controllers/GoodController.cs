@@ -10,7 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Presentation.Controllers;
 
 [ApiController]
-public class GoodController(ILogger<OrderController> logger, IMediator mediator) : ControllerBase
+public class GoodController(ILogger<GoodController> logger, IMediator mediator) : ControllerBase
 {
     [HttpGet("/goods")]
     public async Task<IActionResult> GetAllGoods(int? minPrice, int? maxPrice, CancellationToken cancellationToken)

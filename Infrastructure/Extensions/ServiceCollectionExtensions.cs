@@ -19,6 +19,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IOrderRepository, OrderRepository>();
         services.AddScoped<IOrderedGoodRepository, OrderedGoodRepository>();
         services.AddScoped<IGoodRepository, GoodRepository>();
+        services.AddScoped<IBasketItemRepository, BasketItemRepository>();
         
         services.AddDefaultIdentity<User>(options =>
             {

@@ -34,8 +34,8 @@ public class BasketItemController(ILogger<BasketItemController> logger, IMediato
         return CreatedAtAction(nameof(GetBasketItem), new { basketItemId }, null);
     }
     
-    [HttpPut("/basketItems")]
-    public async Task<IActionResult> UpdateBasketItem(UpdateBasketItemCommand command, CancellationToken cancellationToken)
+    [HttpPatch("/basketItems")]
+    public async Task<IActionResult> UpdateBasketItemAmount(UpdateBasketItemCommand command, CancellationToken cancellationToken)
     {
         await mediator.Send(command, cancellationToken);
         

@@ -16,13 +16,13 @@ public class BasketItemRepository(ApplicationDbContext dbContext) : IBasketItemR
             .ToListAsync(cancellationToken);
     }
 
-    public async Task<BasketItem?> GetBasketItem(int basketItemId, CancellationToken cancellationToken = default)
+    public async Task<BasketItem?> GetBasketItem(Guid basketItemId, CancellationToken cancellationToken = default)
     {
         var basketItems= dbContext.BasketItems.AsQueryable();
         return await basketItems.FirstOrDefaultAsync(bi => bi.Id == basketItemId, cancellationToken: cancellationToken);
     }
 
-    public async Task<int> CreateBasketItem(BasketItem basketItem, CancellationToken cancellationToken = default)
+    public async Task<Guid> CreateBasketItem(BasketItem basketItem, CancellationToken cancellationToken = default)
     {
         await dbContext.BasketItems.AddAsync(basketItem, cancellationToken);
         await dbContext.SaveChangesAsync(cancellationToken);
@@ -35,7 +35,7 @@ public class BasketItemRepository(ApplicationDbContext dbContext) : IBasketItemR
         await dbContext.SaveChangesAsync(cancellationToken);
     }
 
-    public async Task DeleteBasketItem(int basketItemId, CancellationToken cancellationToken = default)
+    public async Task DeleteBasketItem(Guid basketItemId, CancellationToken cancellationToken = default)
     {
         var basketItems= dbContext.BasketItems.AsQueryable();
         var basketItem = await basketItems.FirstOrDefaultAsync(bi => bi.Id == basketItemId, cancellationToken: cancellationToken);

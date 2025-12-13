@@ -2,10 +2,10 @@ namespace Domain.Entities;
 
 public class BasketItem
 {
-    public int   Id       { get; init; }
-    public int   UserName { get; set;  }
-    public int   GoodId   { get; set;  }
-    public int   Amount   { get; set;  }
+    public Guid   Id       { get; init; } = Guid.NewGuid();
+    public string UserName { get; init; } = "";
+    public int    GoodId   { get; init; }
+    public int    Amount   { get; set;  }
 
-    public Good? Good     { get; set;  } = null;
+    public Good?  Good     { get; init; }
 }

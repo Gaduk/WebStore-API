@@ -487,17 +487,182 @@
                       {
                         "id": 1001,
                         "name": "Товар 1",
-                        "price": 10
+                        "price": 10,
+                        "imageUrls": []
                       },
                       {
                         "id": 1002,
                         "name": "Товар 2",
-                        "price": 20
+                        "price": 20,
+                        "imageUrls": []
                       }
                   ]
                 }
               }
             }
+          }
+        }
+      },
+      "post": {
+        "tags": ["Goods"],
+        "summary": "Добавление нового товара",
+        "description": "Доступно только администратору",
+        "requestBody": 
+        {
+          "content": 
+          {
+            "multipart/form-data": 
+            {
+              "schema": 
+              {
+                "example": 
+                {
+                  "Name" : "good name",
+                  "Price": 100,
+                  "Image": []
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Товар создан"
+          },
+          "400": {
+            "description": "Ошибка в теле запроса"
+          },
+          "401": {
+            "description": "Пользователь не авторизован"
+          },
+          "403": {
+            "description": "Доступ запрещен"
+          }
+        }
+      },
+      "put": {
+        "tags": ["Goods"],
+        "summary": "Обновление товара",
+        "description": "Доступно только администратору",
+        "requestBody": 
+        {
+          "content": 
+          {
+            "multipart/form-data": 
+            {
+              "schema": 
+              {
+                "example": 
+                {
+                  "Id"   : 1001,
+                  "Name" : "good name",
+                  "Price": 100,
+                  "Image": []
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": 
+          {
+            "description": "Товар обновлен"
+          },
+          "400": 
+          {
+            "description": "Ошибка в теле запроса"
+          },
+          "401": 
+          {
+            "description": "Пользователь не авторизован"
+          },
+          "403": 
+          {
+            "description": "Доступ запрещен"
+          },
+          "404":
+          {
+            "description": "Товар не найден"
+          }
+        }
+      }
+    },
+
+    "/goods/{goodId}": {
+      "get": {
+        "tags": [
+          "Goods"
+        ],
+        "summary": "Получение информации о товаре",
+        "parameters": [
+          {
+            "name"    : "goodId",
+            "in"      : "path",
+            "required": true,
+            "schema"  :
+            {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": 
+        {
+          "200": 
+          {
+            "description": "Информация о товаре",
+            "content": 
+            {
+              "application/json": 
+              {
+                "schema": 
+                {
+                  "$ref": "#/components/schemas/Good"
+                }
+              }
+            }
+          },
+          "404":
+          {
+            "description": "Товар не найден"
+          }
+        }
+      },
+
+      "delete": {
+        "tags": ["Goods"],
+        "summary": "Удаление товара",
+        "description": "Доступно только администратору",
+        "parameters": [
+          {
+            "name"    : "goodId",
+            "in"      : "path",
+            "required": true,
+            "schema"  :
+            {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200":
+          {
+            "description": "Товар удален"
+          },
+          "400":
+          {
+            "description": "Ошибка в теле запроса"
+          },
+          "401":
+          {
+            "description": "Пользователь не авторизован"
+          },
+          "403":
+          {
+            "description": "Доступ запрещен"
+          },
+          "404":
+          {
+            "description": "Товар не найден"
           }
         }
       }
@@ -574,6 +739,12 @@
           },
           "Price": {
             "type": "number"
+          },
+          "ImageUrls": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
           }
         }
       }

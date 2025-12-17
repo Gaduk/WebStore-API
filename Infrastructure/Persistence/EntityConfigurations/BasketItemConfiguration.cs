@@ -8,7 +8,13 @@ public class BasketItemConfiguration : IEntityTypeConfiguration<BasketItem>
 {
     public void Configure(EntityTypeBuilder<BasketItem> builder)
     {
-        builder.HasKey(basketItem => basketItem.Id); 
+        
+        builder.HasKey(basketItem => new 
+        { 
+            basketItem.UserName, 
+            basketItem.GoodId 
+        });
+        
         builder
             .HasOne(basketItem => basketItem.Good)
             .WithMany()

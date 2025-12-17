@@ -1,8 +1,8 @@
-using Application.Features.BasketItem.Commands.CreateBasketItem;
 using Application.Features.BasketItem.Commands.DeleteBasketItem;
-using Application.Features.BasketItem.Commands.UpdateBasketItem;
+using Application.Features.BasketItem.Commands.UpsertBasketItem;
 using Application.Features.BasketItem.Queries.GetBasketItem;
 using Application.Features.BasketItem.Queries.GetBasketItems;
+using Application.Results;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -11,44 +11,46 @@ namespace Presentation.Controllers;
 [ApiController]
 public class BasketItemController(ILogger<BasketItemController> logger, IMediator mediator) : ControllerBase
 {
-    [HttpGet("/basketItems")]
-    public async Task<IActionResult> GetBasketItems(string userName, CancellationToken cancellationToken)
+    [HttpGet("/users/{username}/basketItems")]
+    public async Task<IActionResult> GetBasketItems(string username, CancellationToken cancellationToken)
     {
-        var basketItems = await mediator.Send(new GetBasketItemsQuery(userName), cancellationToken);
+        var basketItems = await mediator.Send(new GetBasketItemsQuery(username), cancellationToken);
         return Ok(basketItems);
     }
     
-    [HttpGet("/basketItems/{basketItemId:guid}")]
-    public async Task<IActionResult> GetBasketItem(Guid basketItemId, CancellationToken cancellationToken)
+    [HttpGet("/users/{username}/basketItems/{goodId:int}")]
+    public async Task<IActionResult> GetBasketItem(string username, int goodId, CancellationToken cancellationToken)
     {
-        var basketItem = await mediator.Send(new GetBasketItemQuery(basketItemId), cancellationToken);
+        var basketItem = await mediator.Send(new GetBasketItemQuery(username, goodId), cancellationToken);
         return Ok(basketItem);
     }
     
-    [HttpPost("/basketItems")]
-    public async Task<IActionResult> CreateBasketItem(CreateBasketItemCommand command, CancellationToken cancellationToken)
+    [HttpPut("/basketItems")]
+    public async Task<IActionResult> UpsertBasketItem(UpsertBasketItemCommand command, CancellationToken cancellationToken)
     {
-        var basketItemId = await mediator.Send(command, cancellationToken);
-        
-        logger.LogInformation("Basket item {basketItemId} is created", basketItemId);
-        return CreatedAtAction(nameof(GetBasketItem), new { basketItemId }, null);
+        var result = await mediator.Send(command, cancellationToken);
+
+        switch (result.status)
+        {
+            case UpsertStatus.Created:
+                logger.LogInformation("Good with ID {goodId} is added to {username}'s basket", command.GoodId, command.UserName);
+                return CreatedAtAction(nameof(GetBasketItem), new { command.UserName, command.GoodId }, null);
+            
+            case UpsertStatus.Updated:
+                logger.LogInformation("Good with ID {goodId} is updated in {username}'s basket", command.GoodId, command.UserName);
+                return Ok($"Good with ID {command.GoodId} is updated in {command.UserName}'s basket");
+
+            default:
+                return StatusCode(500);
+        }
     }
     
-    [HttpPatch("/basketItems")]
-    public async Task<IActionResult> UpdateBasketItemAmount(UpdateBasketItemCommand command, CancellationToken cancellationToken)
+    [HttpDelete("/users/{username}/basketItems/{goodId:int}")]
+    public async Task<IActionResult> DeleteBasketItem(string username, int goodId, CancellationToken cancellationToken)
     {
-        await mediator.Send(command, cancellationToken);
+        await mediator.Send(new DeleteBasketItemCommand(username, goodId), cancellationToken);
         
-        logger.LogInformation("Basket item {basketItemId} is updated", command.BasketItemId);
-        return Ok($"Basket item {command.BasketItemId} is updated");
-    }
-    
-    [HttpDelete("/basketItems/{basketItemId:guid}")]
-    public async Task<IActionResult> DeleteBasketItem(Guid basketItemId, CancellationToken cancellationToken)
-    {
-        await mediator.Send(new DeleteBasketItemCommand(basketItemId), cancellationToken);
-        
-        logger.LogInformation("Basket item {basketItemId} is deleted", basketItemId);
-        return Ok($"Basket item {basketItemId} is deleted");
+        logger.LogInformation("Good with ID {goodId} is deleted from {username}'s basket", goodId, username);
+        return Ok($"Good with ID {goodId} is deleted from {username}'s basket");
     }
 }

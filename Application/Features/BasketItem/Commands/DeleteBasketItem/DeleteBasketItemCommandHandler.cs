@@ -14,16 +14,10 @@ public class DeleteBasketItemCommandHandler(
 {
     public async Task Handle(DeleteBasketItemCommand request, CancellationToken cancellationToken)
     {   
-        var basketItem = await basketItemRepository.GetBasketItem(request.BasketItemId, cancellationToken);
-        if (basketItem == null)
-        {
-            throw new NotFoundException($"BasketItem ID {request.BasketItemId} is not found");
-        }
-        
-        var user = await userRepository.GetUser(basketItem.UserName, includeOrders: false, cancellationToken: cancellationToken);
+        var user = await userRepository.GetUser(request.UserName, cancellationToken: cancellationToken);
         if (user == null)
         {
-            throw new NotFoundException($"User {basketItem.UserName} is not found");
+            throw new NotFoundException($"User {request.UserName} is not found");
         }
         
         var context = httpContextAccessor.HttpContext;
@@ -32,12 +26,18 @@ public class DeleteBasketItemCommandHandler(
             throw new NullReferenceException("HttpContext is null");
         }
         
-        var authorizationResult = await authorizationService.AuthorizeAsync(context.User, basketItem.UserName, "HaveAccess");
+        var authorizationResult = await authorizationService.AuthorizeAsync(context.User, request.UserName, "HaveAccess");
         if (!authorizationResult.Succeeded)
         {
             throw new ForbiddenException();
         }
         
-        await basketItemRepository.DeleteBasketItem(request.BasketItemId, cancellationToken);
+        var basketItem = await basketItemRepository.GetBasketItem(request.UserName, request.GoodId, cancellationToken);
+        if (basketItem == null)
+        {
+            throw new NotFoundException($"User {request.UserName} doesn't have a good with ID {request.GoodId}");
+        }
+        
+        await basketItemRepository.DeleteBasketItem(request.UserName, request.GoodId, cancellationToken);
     }
 }

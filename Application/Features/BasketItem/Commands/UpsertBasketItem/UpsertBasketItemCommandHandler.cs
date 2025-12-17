@@ -1,4 +1,5 @@
 using Application.Exceptions;
+using Application.Results;
 using Domain.Repositories;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -10,11 +11,11 @@ public class UpsertBasketItemCommandHandler(
     IBasketItemRepository basketItemRepository,  
     IUserRepository       userRepository,
     IAuthorizationService authorizationService,
-    IHttpContextAccessor  httpContextAccessor) : IRequestHandler<UpsertBasketItemCommand>
+    IHttpContextAccessor  httpContextAccessor) : IRequestHandler<UpsertBasketItemCommand, UpsertResult>
 {
-    public async Task Handle(UpsertBasketItemCommand request, CancellationToken cancellationToken)
+    public async Task<UpsertResult> Handle(UpsertBasketItemCommand request, CancellationToken cancellationToken)
     {
-        var user = await userRepository.GetUser(request.UserName, includeOrders: false, cancellationToken: cancellationToken);
+        var user = await userRepository.GetUser(request.UserName, cancellationToken: cancellationToken);
         if (user == null)
         {
             throw new NotFoundException($"User {request.UserName} is not found");
@@ -31,14 +32,22 @@ public class UpsertBasketItemCommandHandler(
         {
             throw new ForbiddenException();
         }
+
+        var basketItem = await basketItemRepository.GetBasketItem(request.UserName, request.GoodId, cancellationToken);
         
-        var basketItem = new Domain.Entities.BasketItem
+        if (basketItem != null)
+        {
+            await basketItemRepository.UpdateBasketItem(basketItem, cancellationToken);
+            return new UpsertResult(UpsertStatus.Updated);
+        }
+        
+        basketItem = new Domain.Entities.BasketItem
         {
             UserName = request.UserName,
             GoodId   = request.GoodId,
             Amount   = request.Amount
         };
-        
-        await basketItemRepository.UpsertBasketItem(basketItem, cancellationToken);
+        await basketItemRepository.CreateBasketItem(basketItem, cancellationToken);
+        return new UpsertResult(UpsertStatus.Created);
     }
 }

@@ -1,5 +1,6 @@
+using Application.Results;
 using MediatR;
 
 namespace Application.Features.BasketItem.Commands.UpsertBasketItem;
 
-public record UpsertBasketItemCommand(string UserName, int GoodId, int Amount) : IRequest;
+public record UpsertBasketItemCommand(string UserName, int GoodId, int Amount) : IRequest<UpsertResult>;

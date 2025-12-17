@@ -7,16 +7,18 @@ namespace Infrastructure.Persistence.Repositories;
 
 public class BasketItemRepository(ApplicationDbContext dbContext) : IBasketItemRepository
 {
-    public async Task UpsertBasketItem(BasketItem basketItem, CancellationToken cancellationToken = default)
+    public async Task CreateBasketItem(BasketItem basketItem, CancellationToken cancellationToken = default)
     {
-        var basketItemFromDb = await GetBasketItem(basketItem.UserName, basketItem.GoodId, cancellationToken);
-
-        if (basketItemFromDb == null) await dbContext.BasketItems.AddAsync(basketItem, cancellationToken);
-        else                                dbContext.BasketItems.Update  (basketItem);
-        
+        await dbContext.BasketItems.AddAsync(basketItem, cancellationToken);
         await dbContext.SaveChangesAsync(cancellationToken);
     }
     
+    public async Task UpdateBasketItem(BasketItem basketItem, CancellationToken cancellationToken = default)
+    {
+        dbContext.BasketItems.Update(basketItem);
+        await dbContext.SaveChangesAsync(cancellationToken);
+    }
+
     public async Task DeleteBasketItem(string userName, int goodId, CancellationToken cancellationToken = default)
     {
         var basketItem = await GetBasketItem(userName, goodId, cancellationToken);

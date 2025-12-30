@@ -648,10 +648,6 @@
           {
             "description": "Товар удален"
           },
-          "400":
-          {
-            "description": "Ошибка в теле запроса"
-          },
           "401":
           {
             "description": "Пользователь не авторизован"
@@ -663,6 +659,186 @@
           "404":
           {
             "description": "Товар не найден"
+          }
+        }
+      }
+    },
+
+    "/basketItems": {
+      "get": {
+        "tags": ["BasketItems"],
+        "summary": "Получение списка товаров из корзины пользователя",
+        "parameters": 
+        [
+          {
+            "name"    : "UserName",
+            "in"      : "query",
+            "required": true,
+            "schema"  : 
+            {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": 
+        {
+          "200": 
+          {
+            "description": "Список товаров из корзины пользователя",
+            "content": 
+            {
+              "application/json": 
+              {
+                "schema": 
+                {
+                  "example": 
+                  [
+                    {
+                      "id": "550e8400-e29b-41d4-a716-446655440000",
+                      "userName": "john_doe",
+                      "goodId": 1001,
+                      "amount": 2
+                    },
+                    {
+                      "id": "123e4567-e89b-12d3-a456-426614174000",
+                      "userName": "john_doe",
+                      "goodId": 1002,
+                      "amount": 3
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401":
+          {
+            "description": "Пользователь не авторизован"
+          },
+          "403":
+          {
+            "description": "Доступ запрещен"
+          },
+          "404":
+          {
+            "description": "Пользователь не найден"
+          }
+        }
+      },
+      "put": {
+        "tags": ["BasketItems"],
+        "summary": "Добавление/обновление товара в корзине",
+        "requestBody":
+        {
+          "content":
+          {
+            "application/json":
+            {
+              "schema":
+              {
+                "example":
+                {
+                  "userName": "john_doe",
+                  "goodId"  : 1001,
+                  "amount"  : 2
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Товар создан"
+          },
+          "400": {
+            "description": "Ошибка в теле запроса"
+          },
+          "401": {
+            "description": "Пользователь не авторизован"
+          },
+          "403": {
+            "description": "Доступ запрещен"
+          }
+        }
+      }
+    },
+
+    "/basketItems/{basketItemId}": {
+      "get": {
+        "tags": ["BasketItems"],
+        "summary": "Получение информации о товаре в корзине",
+        "parameters": [
+          {
+            "name"    : "basketItemId",
+            "in"      : "path",
+            "required": true,
+            "schema"  :
+            {
+              "type"  : "string"
+            }
+          }
+        ],
+        "responses":
+        {
+          "200":
+          {
+            "description": "Информация о товаре в корзине",
+            "content":
+            {
+              "application/json":
+              {
+                "schema":
+                {
+                  "$ref": "#/components/schemas/BasketItem"
+                }
+              }
+            }
+          },
+          "401":
+          {
+            "description": "Пользователь не авторизован"
+          },
+          "403":
+          {
+            "description": "Доступ запрещен"
+          },
+          "404":
+          {
+            "description": "Товар в корзине не найден / Пользователь не найден"
+          }
+        }
+      },
+
+      "delete": {
+        "tags": ["BasketItems"],
+        "summary": "Удаление товара из корзины",
+        "parameters": [
+          {
+            "name"    : "basketItemId",
+            "in"      : "path",
+            "required": true,
+            "schema"  :
+            {
+              "type"  : "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200":
+          {
+            "description": "Товар удален из корзины"
+          },
+          "401":
+          {
+            "description": "Пользователь не авторизован"
+          },
+          "403":
+          {
+            "description": "Доступ запрещен"
+          },
+          "404":
+          {
+            "description": "Товар в корзине не найден / Пользователь не найден"
           }
         }
       }
@@ -745,6 +921,24 @@
             "items": {
               "type": "string"
             }
+          }
+        }
+      },
+      "BasketItem": {
+        "type": "object",
+        "properties": {
+          "Id": {
+            "type"  : "string",
+            "format": "uuid"
+          },
+          "UserName": {
+            "type": "string"
+          },
+          "GoodId": {
+            "type": "integer"
+          },
+          "Amount": {
+            "type": "integer"
           }
         }
       }

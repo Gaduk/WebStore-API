@@ -63,6 +63,15 @@ public class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logger) : IE
             default:
                 problemDetails.Title = exception.GetType().Name;
                 problemDetails.Extensions.Add("error", exception.Message);
+                
+                // TODO: Удалить или переписать
+                logger.LogError(exception, 
+                    "Unhandled exception: {ExceptionType}. Message: {Message}. Stack: {StackTrace}",
+                    exception.GetType().Name,
+                    exception.Message,
+                    exception.StackTrace);
+                //**********************************
+                
                 break;
         }
         problemDetails.Status = httpContext.Response.StatusCode;

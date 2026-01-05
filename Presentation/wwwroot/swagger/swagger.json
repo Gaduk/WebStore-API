@@ -664,15 +664,15 @@
       }
     },
 
-    "/basketItems": {
+    "/users/{username}/basketItems": {
       "get": {
         "tags": ["BasketItems"],
         "summary": "Получение списка товаров из корзины пользователя",
         "parameters": 
         [
           {
-            "name"    : "UserName",
-            "in"      : "query",
+            "name"    : "username",
+            "in"      : "path",
             "required": true,
             "schema"  : 
             {
@@ -723,57 +723,30 @@
             "description": "Пользователь не найден"
           }
         }
-      },
-      "put": {
-        "tags": ["BasketItems"],
-        "summary": "Добавление/обновление товара в корзине",
-        "requestBody":
-        {
-          "content":
-          {
-            "application/json":
-            {
-              "schema":
-              {
-                "example":
-                {
-                  "userName": "john_doe",
-                  "goodId"  : 1001,
-                  "amount"  : 2
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "Товар создан"
-          },
-          "400": {
-            "description": "Ошибка в теле запроса"
-          },
-          "401": {
-            "description": "Пользователь не авторизован"
-          },
-          "403": {
-            "description": "Доступ запрещен"
-          }
-        }
       }
     },
 
-    "/basketItems/{basketItemId}": {
+    "/users/{username}/basketItems/{goodId}": {
       "get": {
         "tags": ["BasketItems"],
         "summary": "Получение информации о товаре в корзине",
         "parameters": [
           {
-            "name"    : "basketItemId",
+            "name"    : "username",
             "in"      : "path",
             "required": true,
             "schema"  :
             {
               "type"  : "string"
+            }
+          },
+          {
+            "name"    : "goodId",
+            "in"      : "path",
+            "required": true,
+            "schema"  :
+            {
+              "type"  : "integer"
             }
           }
         ],
@@ -808,18 +781,74 @@
         }
       },
 
+      "put": {
+        "tags": ["BasketItems"],
+        "summary": "Добавление/обновление товара в корзине",
+        "parameters": [
+          {
+            "name"    : "username",
+            "in"      : "path",
+            "required": true,
+            "schema"  :
+            {
+              "type"  : "string"
+            }
+          },
+          {
+            "name"    : "goodId",
+            "in"      : "path",
+            "required": true,
+            "schema"  :
+            {
+              "type"  : "integer"
+            }
+          },
+          {
+            "name"    : "amount",
+            "in"      : "query",
+            "required": true,
+            "schema"  :
+            {
+              "type"  : "integer"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Товар создан"
+          },
+          "400": {
+            "description": "Ошибка в теле запроса"
+          },
+          "401": {
+            "description": "Пользователь не авторизован"
+          },
+          "403": {
+            "description": "Доступ запрещен"
+          }
+        }
+      },
+
       "delete": {
         "tags": ["BasketItems"],
         "summary": "Удаление товара из корзины",
         "parameters": [
           {
-            "name"    : "basketItemId",
+            "name"    : "username",
             "in"      : "path",
             "required": true,
             "schema"  :
             {
-              "type"  : "string",
-              "format": "uuid"
+              "type"  : "string"
+            }
+          },
+          {
+            "name"    : "goodId",
+            "in"      : "path",
+            "required": true,
+            "schema"  :
+            {
+              "type"  : "integer"
             }
           }
         ],

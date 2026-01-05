@@ -35,7 +35,7 @@ public class GetBasketItemQueryHandler(
         var basketItem = await basketItemRepository.GetBasketItem(request.UserName, request.GoodId, cancellationToken);
         if (basketItem == null)
         {
-            throw new NotFoundException($"User {request.UserName} doesn't have a good with ID {request.GoodId}");
+            throw new NotFoundException($"User {request.UserName} doesn't have a good with ID {request.GoodId} in basket");
         }
         
         return basketItem;

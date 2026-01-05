@@ -25,20 +25,24 @@ public class BasketItemController(ILogger<BasketItemController> logger, IMediato
         return Ok(basketItem);
     }
     
-    [HttpPut("/basketItems")]
-    public async Task<IActionResult> UpsertBasketItem(UpsertBasketItemCommand command, CancellationToken cancellationToken)
+    [HttpPut("/users/{username}/basketItems/{goodId:int}")]
+    public async Task<IActionResult> UpsertBasketItem(
+        [FromRoute] string username,
+        [FromRoute] int goodId, 
+        [FromQuery] int amount, 
+        CancellationToken cancellationToken)
     {
-        var result = await mediator.Send(command, cancellationToken);
+        var result = await mediator.Send(new UpsertBasketItemCommand(username, goodId, amount), cancellationToken);
 
         switch (result.status)
         {
             case UpsertStatus.Created:
-                logger.LogInformation("Good with ID {goodId} is added to {username}'s basket", command.GoodId, command.UserName);
-                return CreatedAtAction(nameof(GetBasketItem), new { command.UserName, command.GoodId }, null);
+                logger.LogInformation("Good with ID {goodId} is added to {username}'s basket", goodId, username);
+                return CreatedAtAction(nameof(GetBasketItem), new { username,goodId }, null);
             
             case UpsertStatus.Updated:
-                logger.LogInformation("Good with ID {goodId} is updated in {username}'s basket", command.GoodId, command.UserName);
-                return Ok($"Good with ID {command.GoodId} is updated in {command.UserName}'s basket");
+                logger.LogInformation("Good with ID {goodId} is updated in {username}'s basket", goodId, username);
+                return Ok($"Good with ID {goodId} is updated in {username}'s basket");
 
             default:
                 return StatusCode(500);

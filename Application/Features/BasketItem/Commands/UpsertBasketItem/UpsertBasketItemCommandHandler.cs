@@ -10,11 +10,12 @@ namespace Application.Features.BasketItem.Commands.UpsertBasketItem;
 public class UpsertBasketItemCommandHandler(
     IBasketItemRepository basketItemRepository,  
     IUserRepository       userRepository,
+    IGoodRepository       goodRepository,
     IAuthorizationService authorizationService,
     IHttpContextAccessor  httpContextAccessor) : IRequestHandler<UpsertBasketItemCommand, UpsertResult>
 {
     public async Task<UpsertResult> Handle(UpsertBasketItemCommand request, CancellationToken cancellationToken)
-    {
+    {   
         var user = await userRepository.GetUser(request.UserName, cancellationToken: cancellationToken);
         if (user == null)
         {
@@ -32,11 +33,19 @@ public class UpsertBasketItemCommandHandler(
         {
             throw new ForbiddenException();
         }
-
+        
+        var good = await goodRepository.GetGood(request.GoodId, cancellationToken);
+        if (good == null)
+        {
+            throw new NotFoundException($"Good with ID {request.GoodId} is not found");
+        }
+        
         var basketItem = await basketItemRepository.GetBasketItem(request.UserName, request.GoodId, cancellationToken);
         
         if (basketItem != null)
         {
+            basketItem.Amount = request.Amount;
+            
             await basketItemRepository.UpdateBasketItem(basketItem, cancellationToken);
             return new UpsertResult(UpsertStatus.Updated);
         }

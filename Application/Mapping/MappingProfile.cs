@@ -1,3 +1,4 @@
+using Application.Dto.BasketItem;
 using Application.Dto.Order;
 using Application.Dto.OrderedGoods;
 using Application.Dto.User;
@@ -13,6 +14,8 @@ public class MappingProfile : Profile
         CreateMap<User, UserDto>();
         
         CreateMap<Order, OrderDto>();
+        
+        CreateMap<BasketItem, BasketItemDto>();
         
         CreateMap<OrderedGood, OrderedGoodDto>()
             .ForMember(dest => dest.Name, 

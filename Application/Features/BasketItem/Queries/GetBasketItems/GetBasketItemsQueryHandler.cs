@@ -1,4 +1,6 @@
+using Application.Dto.BasketItem;
 using Application.Exceptions;
+using AutoMapper;
 using Domain.Repositories;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -10,9 +12,10 @@ public class GetBasketItemsQueryHandler(
     IBasketItemRepository basketItemRepository,  
     IUserRepository       userRepository,
     IAuthorizationService authorizationService,
-    IHttpContextAccessor  httpContextAccessor) : IRequestHandler<GetBasketItemsQuery, List<Domain.Entities.BasketItem>>
+    IHttpContextAccessor  httpContextAccessor,
+    IMapper               mapper) : IRequestHandler<GetBasketItemsQuery, List<BasketItemDto>>
 {
-    public async Task<List<Domain.Entities.BasketItem>> Handle(GetBasketItemsQuery request, CancellationToken cancellationToken)
+    public async Task<List<BasketItemDto>> Handle(GetBasketItemsQuery request, CancellationToken cancellationToken)
     {
         var user = await userRepository.GetUser(request.UserName, cancellationToken: cancellationToken);
         if (user == null)
@@ -32,6 +35,7 @@ public class GetBasketItemsQueryHandler(
             throw new ForbiddenException();
         }
         
-        return await basketItemRepository.GetBasketItems(request.UserName, cancellationToken);
+        var basketItems = await basketItemRepository.GetBasketItems(request.UserName, cancellationToken);
+        return mapper.Map<List<BasketItemDto>>(basketItems);
     }
 }
